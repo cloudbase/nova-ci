@@ -1,0 +1,10 @@
+# Parameters
+ZUUL_SITE="http://zuul.openstack.tld"
+ZUUL_REF="refs/zuul/master/Z37fa7dee8b2247149d545d19bcb75446"
+ZUUL_CHANGE="188249"
+ZUUL_PROJECT="openstack/nova"
+ZUUL_BRANCH="master"
+hyperv01="c2-r1-u04.openstack.tld"
+hyperv02="c2-r1-u06.openstack.tld"
+WIN_USER="administrator"
+WIN_PASS="H@rd24G3t"
