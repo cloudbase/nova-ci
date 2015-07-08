@@ -26,7 +26,6 @@ if [ -e "$LOCALCONF" ]
 then
     	[ -z "$MYIP" ] && exit 1
         sed -i 's/^HOST_IP=.*/HOST_IP='$MYIP'/g' "$LOCALCONF"
-        sed -i 's/^local_ip=.*/local_ip='$MYIP'/g' "$LOCALCONF" 
 fi
 
 if [ -e "$LOCALRC" ]
