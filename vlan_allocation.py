@@ -15,6 +15,9 @@ class VlanRanges(object):
 
     def __init__(self):
         self.db = MySQLdb.connect(
+                host="10.21.7.85",
+                user="jenkins-slave",
+                passwd="cMo83Hdef8d",
                 db="cbs_data",
                 read_default_file="~/.my.cnf",
                 cursorclass = DictCursor)
