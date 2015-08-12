@@ -244,8 +244,6 @@ FixExecScript "$virtualenv\Scripts\neutron-hyperv-agent-script.py"
 Remove-Item -Recurse -Force "$remoteConfigs\$hostname\*"
 Copy-Item -Recurse $configDir "$remoteConfigs\$hostname"
 
-pip install SQLAlchemy==0.9.8
-
 Write-Host "Starting the services"
 Try
 {
