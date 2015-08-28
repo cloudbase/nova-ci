@@ -14,6 +14,7 @@ $neutronTemplate = "$templateDir\neutron_hyperv_agent.conf"
 $hostname = hostname
 $rabbitUser = "stackrabbit"
 $pythonDir = "C:\Python27"
+$pythonArchive = "python27new.tar.gz"
 $pythonExec = "$pythonDir\python.exe"
 
 $remoteLogs="\\"+$devstackIP+"\openstack\logs"
