@@ -1,5 +1,4 @@
-﻿# Loading config
-
+# Loading config
 . "C:\OpenStack\HyperV\scripts\config.ps1"
 . "C:\OpenStack\HyperV\scripts\utils.ps1"
 
@@ -10,21 +9,6 @@ Param(
     [string]$branchName='master',
     [string]$buildFor='openstack/nova'
 )
-
-function FixExecScript([String] $ExecScriptPath)
-{
-    ############################################################################
-    # temporary fix for pbr bug: https://review.openstack.org/#/c/151595/      #
-    ############################################################################
-    $ExecScript = (gc "$ExecScriptPath").Replace("#!c:OpenStackvirtualenvScriptspython.exe","#!c:\OpenStack\virtualenv\Scripts\python.exe")
-    Set-Content $ExecScriptPath $ExecScript
-}
-
-############################################################################
-#  virtualenv and pip install must be run via cmd. There is a bug in the   #
-#  activate.ps1 that actually installs packages in the system site package #
-#  folder                                                                  #
-############################################################################
 
 $projectName = $buildFor.split('/')[-1]
 
@@ -40,6 +24,17 @@ $hasMkisoFs = Test-Path $binDir\mkisofs.exe
 $hasQemuImg = Test-Path $binDir\qemu-img.exe
 
 $ErrorActionPreference = "SilentlyContinue"
+
+$ErrorActionPreference = "SilentlyContinue"
+
+$pip_conf_content = @"
+[global]
+index-url = http://dl.openstack.tld:8080/root/pypi/+simple/
+[install]
+trusted-host = dl.openstack.tld
+find-links = 
+    http://dl.openstack.tld/wheels
+"@
 
 $ErrorActionPreference = "SilentlyContinue"
 
@@ -65,25 +60,22 @@ if (Get-Process -Name python){
 
 $ErrorActionPreference = "Stop"
 
+if (-not (Get-Service neutron-hyperv-agent -ErrorAction SilentlyContinue))
+{
+    Throw "Neutron Hyper-V Agent Service not registered"
+}
+
+if (-not (get-service nova-compute -ErrorAction SilentlyContinue))
+{
+    Throw "Nova Compute Service not registered"
+}
+
 if ($(Get-Service nova-compute).Status -ne "Stopped"){
     Throw "Nova service is still running"
 }
 
 if ($(Get-Service neutron-hyperv-agent).Status -ne "Stopped"){
     Throw "Neutron service is still running"
-}
-
-Write-Host "Removing any stale virtenv folder."
-if ($hasVirtualenv -eq $true){
-    Try
-    {
-        Remove-Item -Recurse -Force $virtualenv
-        $hasVirtualenv = Test-Path $virtualenv
-    }
-    Catch
-    {
-        Throw "Vrtualenv already exists. Environment not clean."
-    }
 }
 
 Write-Host "Cleaning up the config folder."
@@ -118,10 +110,6 @@ if (($hasMkisoFs -eq $false) -or ($hasQemuImg -eq $false)){
     } else {
         Throw "Required binary files (mkisofs, qemuimg etc.)  are missing"
     }
-}
-
-if ($hasVirtualenv -eq $true){
-    Throw "Vrtualenv already exists. Environment not clean."
 }
 
 if ($hasNovaTemplate -eq $false){
@@ -161,9 +149,9 @@ if ($buildFor -eq "openstack/nova"){
     Throw "Cannot build for project: $buildFor"
 }
 
-$hasLogDir = Test-Path $remoteLogs\$hostname
+$hasLogDir = Test-Path $openstackLogs
 if ($hasLogDir -eq $false){
-    mkdir $remoteLogs\$hostname
+    mkdir $openstackLogs
 }
 
 $hasConfigDir = Test-Path $remoteConfigs\$hostname
@@ -171,44 +159,97 @@ if ($hasConfigDir -eq $false){
     mkdir $remoteConfigs\$hostname
 }
 
-cmd.exe /C virtualenv --system-site-packages $virtualenv
-
-if ($? -eq $false){
-    Throw "Failed to create virtualenv"
+pushd C:\
+if (Test-Path $pythonArchive)
+{
+    Remove-Item -Force $pythonArchive
 }
-
-cp $templateDir\distutils.cfg $virtualenv\Lib\distutils\distutils.cfg
-
-# Hack due to cicso patch problem:
-$missingPath="C:\Openstack\build\openstack\neutron\etc\neutron\plugins\cisco\cisco_cfg_agent.ini"
-if(!(Test-Path -Path $missingPath)){
-    new-item -Path $missingPath -Value ' ' –itemtype file
+Invoke-WebRequest -Uri http://dl.openstack.tld/python27new.tar.gz -OutFile $pythonArchive
+if (Test-Path $pythonDir)
+{
+    Remove-Item -Recurse -Force $pythonDir
 }
+Write-Host "Ensure Python folder is up to date"
+Write-Host "Extracting archive.."
+& C:\mingw-get\msys\1.0\bin\tar.exe -xzf "$pythonArchive"
 
-#FixExecScript "$virtualenv\Scripts\nova-compute-script.py"
-#FixExecScript "$virtualenv\Scripts\neutron-hyperv-agent-script.py"
+$hasPipConf = Test-Path "$env:APPDATA\pip"
+if ($hasPipConf -eq $false){
+    mkdir "$env:APPDATA\pip"
+}
+else 
+{
+    Remove-Item -Force "$env:APPDATA\pip\*"
+}
+Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
+
+& easy_install -U pip
+& pip install -U setuptools
+& pip install -U wmi
+& pip install --use-wheel --no-index --find-links=http://dl.openstack.tld/wheels cffi
+popd
+
+$hasPipConf = Test-Path "$env:APPDATA\pip"
+if ($hasPipConf -eq $false){
+    mkdir "$env:APPDATA\pip"
+}
+else 
+{
+    Remove-Item -Force "$env:APPDATA\pip\*"
+}
+Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
+
+cp $templateDir\distutils.cfg C:\Python27\Lib\distutils\distutils.cfg
+
+function cherry_pick($commit){
+    $ErrorActionPreference = "Continue"
+    git cherry-pick $commit
+
+    if ($LastExitCode) {
+        echo "Ignoring failed git cherry-pick $commit"
+        git checkout --force
+    }
+}
 
 ExecRetry {
-    cmd.exe /C $scriptdir\install_openstack_from_repo.bat $buildDir\networking-hyperv
+    #pushd C:\OpenStack\build\openstack\networking-hyperv
+    #& python setup.py install
+    & pip install -e C:\OpenStack\build\openstack\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
+    popd
 }
 
 ExecRetry {
-    cmd.exe /C $scriptdir\install_openstack_from_repo.bat $buildDir\neutron
+    #pushd C:\OpenStack\build\openstack\neutron
+    #& python setup.py install
+    pip install -e C:\OpenStack\build\openstack\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
+    popd
 }
 
 ExecRetry {
-    cmd.exe /C $scriptdir\install_openstack_from_repo.bat $buildDir\nova
+    #pushd C:\OpenStack\build\openstack\nova
+    #& python setup.py install
+    # 20 Aug # cherry-pick for Claudiu's fixed until they are merged
+    pushd C:\OpenStack\build\openstack\nova
+    git fetch https://review.openstack.org/openstack/nova refs/changes/20/213720/4
+    git cherry-pick FETCH_HEAD
+    git fetch https://review.openstack.org/openstack/nova refs/changes/93/214493/5
+    git cherry-pick FETCH_HEAD
+    git fetch https://review.openstack.org/openstack/nova refs/changes/60/214560/5
+    git cherry-pick FETCH_HEAD
+    # end of cherry-pick
+    pip install -e C:\OpenStack\build\openstack\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
+    popd
 }
 
 if (($branchName.ToLower().CompareTo($('stable/juno').ToLower()) -eq 0) -or ($branchName.ToLower().CompareTo($('stable/icehouse').ToLower()) -eq 0)) {
     $rabbitUser = "guest"
 }
 
-$novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$($remoteLogs)\$($hostname)").Replace('[RABBITUSER]', $rabbitUser)
-$neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$($remoteLogs)\$($hostname)").Replace('[RABBITUSER]', $rabbitUser)
+$novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
+$neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
 
 Set-Content C:\OpenStack\etc\nova.conf $novaConfig
 if ($? -eq $false){
@@ -221,45 +262,94 @@ if ($? -eq $false){
 }
 
 cp "$templateDir\policy.json" "$configDir\"
-cp "$buildDir\interfaces.template" "$configDir\"
+cp "$templateDir\interfaces.template" "$configDir\"
 
-$hasNovaExec = Test-Path c:\OpenStack\virtualenv\Scripts\nova-compute.exe
+$hasNovaExec = Test-Path c:\Python27\Scripts\nova-compute.exe
 if ($hasNovaExec -eq $false){
     Throw "No nova exe found"
-}else{
-    $novaExec = "$virtualenv\Scripts\nova-compute.exe"
 }
 
-FixExecScript "$virtualenv\Scripts\nova-compute-script.py"
-
-$hasNeutronExec = Test-Path "$virtualenv\Scripts\neutron-hyperv-agent.exe"
+$hasNeutronExec = Test-Path "c:\Python27\Scripts\neutron-hyperv-agent.exe"
 if ($hasNeutronExec -eq $false){
     Throw "No neutron exe found"
-}else{
-    $neutronExe = "$virtualenv\Scripts\neutron-hyperv-agent.exe"
 }
 
-FixExecScript "$virtualenv\Scripts\neutron-hyperv-agent-script.py"
 
 Remove-Item -Recurse -Force "$remoteConfigs\$hostname\*"
 Copy-Item -Recurse $configDir "$remoteConfigs\$hostname"
 
 Write-Host "Starting the services"
+
+Write-Host "Starting nova-compute service"
 Try
 {
     Start-Service nova-compute
 }
 Catch
 {
-    Throw "Can not start the nova service"
+    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
+    Start-Sleep -s 30
+    if (! $proc.HasExited) {Stop-Process -Id $proc.Id -Force}
+    Throw "Can not start the nova-compute service"
 }
-Start-Sleep -s 15
+Start-Sleep -s 30
+if ($(get-service nova-compute).Status -eq "Stopped")
+{
+    Write-Host "We try to start:"
+    Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
+    Try
+    {
+    	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
+    }
+    Catch
+    {
+    	Throw "Could not start the process manually"
+    }
+    Start-Sleep -s 30
+    if (! $proc.HasExited)
+    {
+    	Stop-Process -Id $proc.Id -Force
+    	Throw "Process started fine when run manually."
+    }
+    else
+    {
+    	Throw "Can not start the nova-compute service. The manual run failed as well."
+    }
+}
+
+Write-Host "Starting neutron-hyperv-agent service"
 Try
 {
     Start-Service neutron-hyperv-agent
 }
 Catch
 {
-    Throw "Can not start neutron agent service"
+    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    Start-Sleep -s 30
+    if (! $proc.HasExited) {Stop-Process -Id $proc.Id -Force}
+    Throw "Can not start the neutron-hyperv-agent service"
 }
-Write-Host "Environment initialization done."
+Start-Sleep -s 30
+if ($(get-service neutron-hyperv-agent).Status -eq "Stopped")
+{
+    Write-Host "We try to start:"
+    Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    Try
+    {
+    	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    }
+    Catch
+    {
+    	Throw "Could not start the process manually"
+    }
+    Start-Sleep -s 30
+    if (! $proc.HasExited)
+    {
+    	Stop-Process -Id $proc.Id -Force
+    	Throw "Process started fine when run manually."
+    }
+    else
+    {
+    	Throw "Can not start the neutron-hyperv-agent service. The manual run failed as well."
+    }
+}
