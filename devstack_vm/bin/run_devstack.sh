@@ -2,20 +2,47 @@
 
 set -x
 set -e
-
+#sudo ifconfig eth0 promisc up
 sudo ifconfig eth1 promisc up
-sudo ifconfig eth2 promisc up
-
-source $HOME/bin/config.sh
 
 HOSTNAME=$(hostname)
 
 sudo sed -i '2i127.0.0.1  '$HOSTNAME'' /etc/hosts
 
-#Update six to latest version
+# Add pip cache for devstack
+mkdir -p $HOME/.pip
+echo "[global]" > $HOME/.pip/pip.conf
+echo "trusted-host = dl.openstack.tld" >> $HOME/.pip/pip.conf
+echo "index-url = http://dl.openstack.tld:8080/root/pypi/+simple/" >> $HOME/.pip/pip.conf
+echo "[install]" >> $HOME/.pip/pip.conf
+echo "trusted-host = dl.openstack.tld" >> $HOME/.pip/pip.conf
+echo "find-links =" >> $HOME/.pip/pip.conf
+echo "    http://dl.openstack.tld/wheels" >> $HOME/.pip/pip.conf
+
+sudo mkdir -p /root/.pip
+sudo cp $HOME/.pip/pip.conf /root/.pip/
+sudo chown -R root:root /root/.pip
+
+# Update pip to latest
+sudo easy_install -U pip
+
+# Update six to latest version
 sudo pip install -U six
 sudo pip install -U kombu
 
+set +e
+# Ensure subunit is available
+sudo apt-get install subunit -y -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true -f
+# moreutils is needed for tc (timestamp)
+sudo apt-get install moreutils -y -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true -f
+# sysstat needed for iostat
+sudo apt-get install sysstat -y -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true -f
+set -e
+
+DEVSTACK_LOGS="/opt/stack/logs/screen"
+LOCALRC="/home/ubuntu/devstack/localrc"
+LOCALCONF="/home/ubuntu/devstack/local.conf"
+PBR_LOC="/opt/stack/pbr"
 # Clean devstack logs
 rm -f "$DEVSTACK_LOGS/*"
 rm -rf "$PBR_LOC"
@@ -34,13 +61,17 @@ then
         sed -i 's/^HOST_IP=.*/HOST_IP='$MYIP'/g' "$LOCALRC"
 fi
 
-# Moving to devstack dir for further operations
-cd $DEVSTACK_DIR
+cd /home/ubuntu/devstack
 git pull
-sudo easy_install -U pip
+
 ./unstack.sh
 
-nohup ./stack.sh > $DEVSTACK_LOG_DIR/stack.sh.txt 2>&1 &
-pid=$!
-wait $pid
-cat $DEVSTACK_LOG_DIR/stack.sh.txt
+if [ -d "/home/ubuntu/.cache/pip/wheels" ]
+then
+        sudo chown -R ubuntu.ubuntu /home/ubuntu/.cache/pip/wheels
+else
+        echo "Folder /home/ubuntu/.cache/pip/wheels not found!"
+fi
+
+set -o pipefail
+./stack.sh 2>&1 | tee /opt/stack/logs/stack.sh.txt
