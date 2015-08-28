@@ -34,7 +34,6 @@ then
 fi
 echo FLOATING_IP=$FLOATING_IP > devstack_params.txt
 
-#UUID=$(python -c "import uuid; print uuid.uuid4().hex")
 #export NAME="devstack-$UUID"
 export NAME="vic-stack"
 
@@ -49,7 +48,7 @@ echo `date -u +%H:%M:%S` NET_ID=$NET_ID >> /home/jenkins-slave/console-$NAME.log
 
 echo `date -u +%H:%M:%S` "Deploying devstack $NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1
 
-devstack_image="devstack"
+devstack_image="devstack-62v3"
 
 echo `date -u +%H:%M:%S` "Image used is: $devstack_image" >> /home/jenkins-slave/console-$NAME.log 2>&1
 echo `date -u +%H:%M:%S` "Deploying devstack $NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1
@@ -116,8 +115,11 @@ echo `date -u +%H:%M:%S` "nova show $NAME:"
 nova show "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1
 
 sleep 30
-wait_for_listening_port $FLOATING_IP 22 10 || { echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1;echo "Failed listening for ssh port on devstack" >> /home/jenkins-slave/console-$NAME.log 2>&1;exit 1; }
+wait_for_listening_port $FLOATING_IP 22 30 || { echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1;echo "Failed listening for ssh port on devstack" >> /home/jenkins-slave/console-$NAME.log 2>&1;exit 1; }
 sleep 5
+
+echo "adding apt-cacher-ng:" /home/jenkins-slave/admin-msft.pem
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo "Acquire::http { Proxy \"http://10.21.7.214:3142\" };" | sudo tee --append /etc/apt/apt.conf.d/90-apt-proxy.conf' 1
 
 echo "clean any apt files:"  >> /home/jenkins-slave/console-$NAME.log 2>&1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo rm -rf /var/lib/apt/lists/*" 1
@@ -126,22 +128,14 @@ echo "apt-get update:" >> /home/jenkins-slave/console-$NAME.log 2>&1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo apt-get update -y" 1
 
 echo "apt-get upgrade:" >> /home/jenkins-slave/console-$NAME.log 2>&1
-#run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade' 1 
-
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade' 1 
-
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install pkg-config' 1 
-
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install libvirt-dev' 1
-
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" remove mongodb-server' 1 
-
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade' 1
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install pkg-config' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" autoremove' 1
 
 # set timezone to UTC
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime" 1
 
-#set pip to use local mirror
+# set pip to use local mirror
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'mkdir -p $HOME/.pip' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo "[global]" > $HOME/.pip/pip.conf' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo "trusted-host = dl.openstack.tld" >> $HOME/.pip/pip.conf' 1
@@ -164,8 +158,7 @@ set -e
 
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sed -i 's/export OS_AUTH_URL.*/export OS_AUTH_URL=http:\/\/127.0.0.1:5000\/v2.0\//g' /home/ubuntu/keystonerc" 1
 
-# Add 2 more interfaces after successful SSH
-nova interface-attach --net-id "$NET_ID" "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1
+# Add 1 more interface after successful SSH
 nova interface-attach --net-id "$NET_ID" "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1
 
 # update repos
@@ -207,5 +200,6 @@ join_hyperv $hyperv02 $WIN_USER $WIN_PASS
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NOVA_COUNT=$(nova service-list | grep nova-compute | grep -c -w up); if [ "$NOVA_COUNT" != 2 ];then nova service-list; exit 1;fi' 12
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; nova service-list' 1
 #check for neutron join (must equal 2)
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NEUTRON_COUNT=$(neutron agent-list | grep -c "HyperV agent.*:-)"); if [ "$NEUTRON_COUNT" != 2 ];then neutron agent-list; exit 1;fi' 12
+#run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NEUTRON_COUNT=$(neutron agent-list | grep -c "HyperV agent.*:-)"); if [ "$NEUTRON_COUNT" != 2 ];then neutron agent-list; exit 1;fi' 12
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NEUTRON_COUNT=$(neutron agent-list | grep -c "hyperv.*:-)"); if [ "$NEUTRON_COUNT" != 2 ];then neutron agent-list; exit 1;fi' 12
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; neutron agent-list' 1
