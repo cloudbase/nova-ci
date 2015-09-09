@@ -123,7 +123,7 @@ sleep 30
 wait_for_listening_port $FLOATING_IP 22 30 || { echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1;echo "Failed listening for ssh port on devstack" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1;exit 1; }
 sleep 5
 
-echo "adding apt-cacher-ng:" /home/jenkins-slave/admin-msft.pem
+echo "adding apt-cacher-ng:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo "Acquire::http { Proxy \"http://10.21.7.214:3142\" };" | sudo tee --append /etc/apt/apt.conf.d/90-apt-proxy.conf' 1
 
 echo "clean any apt files:"  >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
