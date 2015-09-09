@@ -1,3 +1,10 @@
+# library.sh
+
+# Loading params.txt if exists
+set +e
+source /usr/local/src/params.txt
+set -e
+
 exec_with_retry2 () {
     MAX_RETRIES=$1
     INTERVAL=$2
