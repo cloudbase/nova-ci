@@ -16,6 +16,11 @@
 #    under the License.
 #
 
+# Loading params.txt if exists
+set +e
+source /usr/local/src/params.txt
+set -e
+
 # Loading OpenStack credentials
 source /home/jenkins-slave/keystonerc_admin
 
