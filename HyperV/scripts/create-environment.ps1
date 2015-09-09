@@ -1,14 +1,12 @@
-# Loading config
-. "C:\OpenStack\devstack\HyperV\scripts\config.ps1"
-. "C:\OpenStack\devstack\HyperV\scripts\utils.ps1"
-
-# end Loading config
-
 Param(
     [Parameter(Mandatory=$true)][string]$devstackIP,
     [string]$branchName='master',
     [string]$buildFor='openstack/nova'
 )
+
+# Loading config
+. "C:\OpenStack\devstack\HyperV\scripts\config.ps1"
+. "C:\OpenStack\devstack\HyperV\scripts\utils.ps1"
 
 $projectName = $buildFor.split('/')[-1]
 
