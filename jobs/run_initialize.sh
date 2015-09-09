@@ -54,7 +54,7 @@ echo `date -u +%H:%M:%S` "Image used is: $devstack_image" >> /home/jenkins-slave
 echo `date -u +%H:%M:%S` "Deploying devstack $NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 
 # Boot the new 10G of RAM flavor
-nova boot --availability-zone hyper-v --flavor nova.devstack --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll >> /home/jenkins-slave/console-$NAME.log 2>&1
+nova boot --availability-zone hyper-v --flavor nova.devstack --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 if [ $? -ne 0 ]
 then
     echo `date -u +%H:%M:%S` "Failed to create devstack VM: $NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
@@ -93,9 +93,9 @@ do
         then
             echo `date -u +%H:%M:%S` "Failed to get fixed IP" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
             echo `date -u +%H:%M:%S` "nova show output:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            nova show "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1
+            nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
             echo `date -u +%H:%M:%S` "nova console-log output:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            nova console-log "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1
+            nova console-log "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
             echo `date -u +%H:%M:%S` "neutron port-list output:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
             neutron port-list -D -c device_id -c fixed_ips | grep $VMID >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
             exit 1
@@ -109,7 +109,7 @@ echo FIXED_IP=$FIXED_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$
 echo `date -u +%H:%M:%S` "FIXED_IP=$FIXED_IP" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 
 sleep 10
-exec_with_retry "nova add-floating-ip $NAME $FLOATING_IP" 15 5 || { echo `date -u +%H:%M:%S` "nova show $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova show "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1; echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1; exit 1; }
+exec_with_retry "nova add-floating-ip $NAME $FLOATING_IP" 15 5 || { echo `date -u +%H:%M:%S` "nova show $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova show "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1; echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; exit 1; }
 
 echo `date -u +%H:%M:%S` "nova show $NAME:"
 nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
