@@ -1,7 +1,7 @@
 # Loading config
 
-. "C:\OpenStack\scripts\HyperV\scripts\config.ps1"
-. "C:\OpenStack\scripts\HyperV\scripts\utils.ps1"
+. "C:\OpenStack\devstack\HyperV\scripts\config.ps1"
+. "C:\OpenStack\devstack\HyperV\scripts\utils.ps1"
 
 # end Loading config
 
