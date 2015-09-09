@@ -47,7 +47,7 @@ echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
-echo `date -u +%H:%M:%S` FLOATING_IP=$FLOATING_IP > /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo `date -u +%H:%M:%S` FLOATING_IP=$FLOATING_IP >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 echo `date -u +%H:%M:%S` NAME=$NAME >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 echo `date -u +%H:%M:%S` NET_ID=$NET_ID >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 
@@ -116,7 +116,7 @@ echo `date -u +%H:%M:%S` "FIXED_IP=$FIXED_IP" >> /home/jenkins-slave/logs/consol
 sleep 10
 exec_with_retry "nova add-floating-ip $NAME $FLOATING_IP" 15 5 || { echo `date -u +%H:%M:%S` "nova show $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova show "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1; echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; exit 1; }
 
-echo `date -u +%H:%M:%S` "nova show $NAME:"
+echo `date -u +%H:%M:%S` "nova show $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 
 sleep 30
