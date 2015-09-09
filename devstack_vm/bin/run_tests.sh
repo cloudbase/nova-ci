@@ -1,8 +1,8 @@
 #!/bin/bash
 
 tests_dir=$1
-parallel_tests=${2:-4}
-max_attempts=${3:-2}
+parallel_tests=${2:-12}
+max_attempts=${3:-1}
 test_suite=${4:-"default"}
 log_file=${5:-"subunit-output.log"}
 results_html_file=${6:-"results.html"}
