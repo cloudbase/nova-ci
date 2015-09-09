@@ -1,5 +1,3 @@
-# library.sh
-
 exec_with_retry2 () {
     MAX_RETRIES=$1
     INTERVAL=$2
@@ -7,6 +5,7 @@ exec_with_retry2 () {
     COUNTER=0
     while [ $COUNTER -lt $MAX_RETRIES ]; do
         EXIT=0
+        echo `date -u +%H:%M:%S` >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
         eval '${@:3} >> /home/jenkins-slave/logs/console-$NAME.log 2>&1' || EXIT=$?
         if [ $EXIT -eq 0 ]; then
             return 0
@@ -25,7 +24,7 @@ exec_with_retry () {
     MAX_RETRIES=${2-10}
     INTERVAL=${3-0}
 
-    exec_with_retry2 $MAX_RETRIES $INTERVAL $CMD
+    exec_with_retry2 $MAX_RETRIES $INTERVAL "$CMD"
 }
 
 run_wsmancmd_with_retry () {
@@ -48,6 +47,8 @@ run_ssh_cmd () {
     SSHUSER_HOST=$1
     SSHKEY=$2
     CMD=$3
+    echo `date -u +%H:%M:%S` >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+    echo "Running $CMD" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
     ssh -t -o 'PasswordAuthentication no' -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i $SSHKEY $SSHUSER_HOST "$CMD" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 }
 
