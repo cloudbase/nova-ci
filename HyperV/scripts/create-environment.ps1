@@ -234,9 +234,9 @@ ExecRetry {
     pushd C:\OpenStack\build\openstack\nova
     git fetch https://review.openstack.org/openstack/nova refs/changes/20/213720/4
     git cherry-pick FETCH_HEAD
-    git fetch https://review.openstack.org/openstack/nova refs/changes/93/214493/5
+    git fetch https://review.openstack.org/openstack/nova refs/changes/93/214493/11
     git cherry-pick FETCH_HEAD
-    git fetch https://review.openstack.org/openstack/nova refs/changes/60/214560/5
+    git fetch https://review.openstack.org/openstack/nova refs/changes/60/214560/10
     git cherry-pick FETCH_HEAD
     # end of cherry-pick
     pip install -e C:\OpenStack\build\openstack\nova
