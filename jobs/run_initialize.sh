@@ -24,7 +24,7 @@ source /usr/local/src/nova-ci/jobs/library.sh
 
 DEVSTACK_SSH_KEY=/home/jenkins-slave/admin-msft.pem
 
-FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP" >> /home/jenkins-slave/console-$NAME.log 2>&1
+FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 if [ -z "$FLOATING_IP" ]
 then
    exit 1
