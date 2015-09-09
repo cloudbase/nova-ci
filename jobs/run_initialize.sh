@@ -32,12 +32,12 @@ if [ -z "$FLOATING_IP" ]
 then
    exit 1
 fi
-echo FLOATING_IP=$FLOATING_IP > devstack_params.txt
+echo FLOATING_IP=$FLOATING_IP > /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
 #export NAME="devstack-$UUID"
 export NAME="vic-stack"
 
-echo NAME=$NAME >> devstack_params.txt
+echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID >> devstack_params.txt
@@ -65,7 +65,7 @@ fi
 nova show "$NAME"
 
 export VMID=`nova show $NAME | awk '{if (NR == 20) {print $4}}'`
-echo VM_ID=$VMID >> devstack_params.txt
+echo VM_ID=$VMID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
 echo `date -u +%H:%M:%S` VM_ID=$VMID >> /home/jenkins-slave/console-$NAME.log 2>&1
 
@@ -105,7 +105,7 @@ do
     fi
 done
 
-echo FIXED_IP=$FIXED_IP >> devstack_params.txt
+echo FIXED_IP=$FIXED_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 echo `date -u +%H:%M:%S` "FIXED_IP=$FIXED_IP" >> /home/jenkins-slave/console-$NAME.log 2>&1
 
 sleep 10
@@ -164,7 +164,7 @@ nova interface-attach --net-id "$NET_ID" "$NAME" >> /home/jenkins-slave/console-
 # update repos
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/update_devstack_repos.sh --branch $ZUUL_BRANCH --build-for $ZUUL_PROJECT" 1
 
-echo ZUUL_SITE=$ZUUL_SITE >> devstack_params.txt
+echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
 # gerrit-git-prep
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/gerrit_git_prep.sh --zuul-site $ZUUL_SITE --gerrit-site $ZUUL_SITE --zuul-ref $ZUUL_REF --zuul-change $ZUUL_CHANGE --zuul-project $ZUUL_PROJECT" 1
