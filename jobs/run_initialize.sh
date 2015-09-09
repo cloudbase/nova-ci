@@ -40,7 +40,7 @@ export NAME=$NAME
 echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
-echo NET_ID=$NET_ID >> devstack_params.txt
+echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
 echo `date -u +%H:%M:%S` FLOATING_IP=$FLOATING_IP > /home/jenkins-slave/console-$NAME.log 2>&1
 echo `date -u +%H:%M:%S` NAME=$NAME >> /home/jenkins-slave/console-$NAME.log 2>&1
