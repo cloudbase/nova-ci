@@ -34,8 +34,11 @@ then
 fi
 echo FLOATING_IP=$FLOATING_IP > /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
-#export NAME="devstack-$UUID"
-export NAME="vic-stack"
+NAME="nov-dvs-$ZUUL_CHANGE-$ZUUL_PATCHSET"
+if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB = "yes" ]]; then
+	NAME="$NAME-dbg"
+fi
+export NAME=$NAME
 
 echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
 
