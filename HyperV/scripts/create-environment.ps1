@@ -4,11 +4,10 @@ Param(
     [string]$buildFor='openstack/nova'
 )
 
-# Loading config
+$projectName = $buildFor.split('/')[-1]
+
 . "C:\OpenStack\devstack\HyperV\scripts\config.ps1"
 . "C:\OpenStack\devstack\HyperV\scripts\utils.ps1"
-
-$projectName = $buildFor.split('/')[-1]
 
 $hasProject = Test-Path $buildDir\$projectName
 $hasVirtualenv = Test-Path $virtualenv
@@ -20,10 +19,6 @@ $hasConfigDir = Test-Path $configDir
 $hasBinDir = Test-Path $binDir
 $hasMkisoFs = Test-Path $binDir\mkisofs.exe
 $hasQemuImg = Test-Path $binDir\qemu-img.exe
-
-$ErrorActionPreference = "SilentlyContinue"
-
-$ErrorActionPreference = "SilentlyContinue"
 
 $pip_conf_content = @"
 [global]
@@ -251,6 +246,7 @@ ExecRetry {
     if ($LastExitCode) { Throw "Failed to install keystoneclient fom repo" }
     popd
 }
+
 
 if (($branchName.ToLower().CompareTo($('stable/juno').ToLower()) -eq 0) -or ($branchName.ToLower().CompareTo($('stable/icehouse').ToLower()) -eq 0)) {
     $rabbitUser = "guest"
