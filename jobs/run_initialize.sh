@@ -67,7 +67,7 @@ then
     exit 1
 fi
 
-nova show "$NAME"
+nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 
 export VMID=`nova show $NAME | awk '{if (NR == 20) {print $4}}'`
 echo VM_ID=$VMID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
