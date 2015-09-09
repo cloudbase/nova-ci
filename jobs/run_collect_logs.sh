@@ -33,7 +33,7 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 		nova remove-floating-ip "$NAME" "$FLOATING_IP"
 		echo "Removing devstack VM"
 		nova delete "$NAME"
-		/usr/local/src/ci-overcloud-init-scripts/vlan_allocation.py -r $NAME
+		/usr/local/src/nova-ci/vlan_allocation.py -r $NAME
 		echo "Deleting devstack floating IP"
 		nova floating-ip-delete "$FLOATING_IP"
 		rm -f /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
