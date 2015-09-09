@@ -19,9 +19,6 @@
 # Loading OpenStack credentials
 source /home/jenkins-slave/keystonerc_admin
 
-# Params
-source /usr/local/src/nova-ci/params.txt
-
 # Loading all the needed functions
 source /usr/local/src/nova-ci/jobs/library.sh
 
