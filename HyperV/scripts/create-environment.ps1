@@ -6,8 +6,8 @@ Param(
 
 $projectName = $buildFor.split('/')[-1]
 
-. "C:\OpenStack\devstack\HyperV\scripts\config.ps1"
-. "C:\OpenStack\devstack\HyperV\scripts\utils.ps1"
+. "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
+. "C:\OpenStack\nova-ci\HyperV\scripts\utils.ps1"
 
 $hasProject = Test-Path $buildDir\$projectName
 $hasNova = Test-Path $buildDir\nova
