@@ -3,7 +3,7 @@
 # Hyper-V
 #
 $openstackDir = "C:\OpenStack"
-$baseDir = "$openstackDir\scripts\HyperV"
+$baseDir = "$openstackDir\devstack\HyperV"
 $scriptdir = "$baseDir\scripts"
 $configDir = "$openstackDir\etc"
 $templateDir = "$baseDir\templates"
