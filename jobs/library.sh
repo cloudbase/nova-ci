@@ -76,9 +76,10 @@ run_ssh_cmd_with_retry () {
 }
 
 join_hyperv (){
-    run_wsmancmd_with_retry $1 $2 $3 '"bash C:\OpenStack\devstack\HyperV\scripts\gerrit-git-prep.sh --zuul-site '$ZUUL_SITE' --gerrit-site '$ZUUL_SITE' --zuul-ref '$ZUUL_REF' --zuul-change '$ZUUL_CHANGE' --zuul-project '$ZUUL_PROJECT' >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1"'
-    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\devstack\HyperV\scripts\EnsureOpenStackServices.ps1 administrator H@rd24G3t >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1'
-    run_wsmancmd_with_retry $1 $2 $3 '"powershell -ExecutionPolicy RemoteSigned C:\OpenStack\devstack\HyperV\scripts\create-environment.ps1 -devstackIP '$FIXED_IP' -branchName '$ZUUL_BRANCH' -buildFor '$ZUUL_PROJECT' >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1"'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\nova-ci ; git clone https://github.com/vlaza/nova-ci C:\OpenStack\nova-ci >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1'
+    run_wsmancmd_with_retry $1 $2 $3 '"bash C:\OpenStack\nova-ci\HyperV\scripts\gerrit-git-prep.sh --zuul-site '$ZUUL_SITE' --gerrit-site '$ZUUL_SITE' --zuul-ref '$ZUUL_REF' --zuul-change '$ZUUL_CHANGE' --zuul-project '$ZUUL_PROJECT' >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1"'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\EnsureOpenStackServices.ps1 Administrator H@rd24G3t >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1'
+    run_wsmancmd_with_retry $1 $2 $3 '"powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\create-environment.ps1 -devstackIP '$FIXED_IP' -branchName '$ZUUL_BRANCH' -buildFor '$ZUUL_PROJECT' >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1"'
 }
 
 teardown_hyperv () {
@@ -86,7 +87,7 @@ teardown_hyperv () {
     WIN_USER=$2
     WIN_PASS=$3
 
-    run_wsmancmd_with_retry $URL $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned C:\OpenStack\devstack\HyperV\scripts\teardown.ps1"
+    run_wsmancmd_with_retry $URL $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1"
 }
 
 generate_vlan_ranges () {
