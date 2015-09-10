@@ -342,7 +342,7 @@ $ServiceChangeErrors.Add(23, "Status Service Exists")
 $ServiceChangeErrors.Add(24, "Service Already Paused")
 
 $openstackDir = "C:\OpenStack"
-$virtualenv = "$openstackDir\virtualenv"
+$virtualenv = "C:\Python27"
 $configDir = "$openstackDir\etc"
 $downloadLocation = "http://dl.openstack.tld/"
 
@@ -418,29 +418,81 @@ Function Check-Service
     $hasService = Get-Service $serviceName -ErrorAction SilentlyContinue
     $hasCorrectUser = (Get-WmiObject -namespace "root\cimv2" -class Win32_Service -Filter $filter).StartName -like "*$serviceUsername*"
 
+    Write-Host "Initial status for $serviceName is:"
+    Write-Host "hasServiceFileFolder: $hasServiceFileFolder"
+    Write-Host "hasServiceFile: $hasServiceFile"
+    Write-Host "hasService: $hasService"
+    Write-Host "hasCorrectUser: $hasCorrectUser"
+
     if(!$hasServiceFileFolder)
     {
-        New-Item -Path $serviceFileLocation -ItemType directory
+        Try
+        {
+            New-Item -Path $serviceFileLocation -ItemType directory
+        }
+        Catch
+        {
+            Throw "Can't create service file folder"
+        }
+    }
+    else 
+    {
+        Write-Host "Service File folder exists"
     }
 
     if(!$hasServiceFile)
     {
-        Invoke-WebRequest -Uri "$downloadLocation/$serviceFileName" -OutFile "$serviceFileLocation\$serviceFileName"
+        Try
+        {
+            Invoke-WebRequest -Uri "$downloadLocation/$serviceFileName" -OutFile "$serviceFileLocation\$serviceFileName"
+        }
+        Catch
+        {
+            Throw "Error downloading the service file executable."
+        }
+    }
+    else 
+    {
+        Write-Host "Service file executable exists"
     }
 
     if(!$hasService)
     {
-        New-Service -name "$serviceName" -binaryPathName "`"$serviceFileLocation\$serviceFileName`" $serviceName `"$serviceExecutable`" --config-file `"$serviceConfig`"" -displayName "$serviceName" -description "$serviceDescription" -startupType $serviceStartMode
+        Try
+        {
+            New-Service -name "$serviceName" -binaryPathName "`"$serviceFileLocation\$serviceFileName`" $serviceName `"$serviceExecutable`" --config-file `"$serviceConfig`"" -displayName "$serviceName" -description "$serviceDescription" -startupType $serviceStartMode
+        }
+        Catch
+        {
+            Throw "Error creating the service $serviceName"
+        }
+    }
+    else 
+    {
+        Write-Host "Service $serviceName already registered"
     }
 
     if((Get-Service -Name $serviceName).Status -eq "Running")
     {
         Stop-Service $serviceName
+        Write-Host "Service $serviceName was found in Running state."
+        Write-Host "Current $serviceName state is: $((Get-Service -Name $serviceName).Status)"
     }
 
     if(!$hasCorrectUser)
     {
-        Set-ServiceAcctCreds $serviceName
+        Try
+        {
+            Set-ServiceAcctCreds $serviceName
+        }
+        Catch
+        {
+            Throw "Error setting service account credentials for $serviceName"
+        }
+    }
+    else 
+    {
+        Write-Host "Service $serviceName already has correct user credentials."
     }
 }
 
