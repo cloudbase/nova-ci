@@ -24,7 +24,7 @@ exec_with_retry () {
     MAX_RETRIES=${2-10}
     INTERVAL=${3-0}
 
-    exec_with_retry2 $MAX_RETRIES $INTERVAL "$CMD"
+    exec_with_retry2 $MAX_RETRIES $INTERVAL $CMD
 }
 
 run_wsmancmd_with_retry () {
