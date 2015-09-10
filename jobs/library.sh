@@ -49,7 +49,7 @@ run_ssh_cmd () {
     CMD=$3
     echo `date -u +%H:%M:%S` >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
     echo "Running $CMD" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-    ssh -t -o 'PasswordAuthentication no' -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i $SSHKEY $SSHUSER_HOST "$CMD" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+    ssh -vvv -t -o 'PasswordAuthentication no' -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i $SSHKEY $SSHUSER_HOST "$CMD" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 }
 
 run_ssh_cmd_with_retry () {
