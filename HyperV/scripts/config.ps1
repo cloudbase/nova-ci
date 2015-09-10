@@ -16,7 +16,7 @@ $rabbitUser = "stackrabbit"
 $pythonDir = "C:\Python27"
 $pythonArchive = "python27new.tar.gz"
 $pythonExec = "$pythonDir\python.exe"
-
+$openstackLogs="$openstackDir\Log"
 $remoteLogs="\\"+$devstackIP+"\openstack\logs"
 $remoteConfigs="\\"+$devstackIP+"\openstack\config"
 
