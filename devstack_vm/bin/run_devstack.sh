@@ -79,3 +79,6 @@ nohup ./stack.sh > /opt/stack/logs/stack.sh.txt 2>&1 &
 pid=$!
 wait $pid
 cat /opt/stack/logs/stack.sh.txt
+
+echo "Cleaning caches before starting tests; needed to avoid memory starvation"
+sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
