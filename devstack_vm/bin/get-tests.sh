@@ -22,11 +22,8 @@ test_suite=${3:-"default"}
 
 BASEDIR=$(dirname $0)
 
-#include_tests_file=$BASEDIR/include-tests-$test_suite.txt
 exclude_tests_file=$BASEDIR/excluded-tests.txt
 isolated_tests_file=$BASEDIR/isolated-tests.txt
-
-#include_tests=(`awk 'NF && $1!~/^#/' $include_tests_file`)
 
 if [ -f "$exclude_tests_file" ]; then
     exclude_tests=(`awk 'NF && $1!~/^#/' $exclude_tests_file`)
@@ -37,8 +34,6 @@ if [ -f "$isolated_tests_file" ]; then
 fi
 
 exclude_tests=( ${exclude_tests[@]} ${isolated_tests[@]} )
-
-#include_regex=$(array_to_regex ${include_tests[@]})
 exclude_regex=$(array_to_regex ${exclude_tests[@]})
 
 cd $tests_dir
