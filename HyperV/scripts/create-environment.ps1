@@ -204,25 +204,18 @@ function cherry_pick($commit){
 }
 
 ExecRetry {
-    #pushd C:\OpenStack\build\openstack\networking-hyperv
-    #& python setup.py install
     & pip install -e C:\OpenStack\build\openstack\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
 }
 
 ExecRetry {
-    #pushd C:\OpenStack\build\openstack\neutron
-    #& python setup.py install
-    pip install -e C:\OpenStack\build\openstack\neutron
+    & pip install -e C:\OpenStack\build\openstack\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
 }
 
 ExecRetry {
-    #pushd C:\OpenStack\build\openstack\nova
-    #& python setup.py install
-    # 20 Aug # cherry-pick for Claudiu's fixed until they are merged
     pushd C:\OpenStack\build\openstack\nova
     git fetch https://review.openstack.org/openstack/nova refs/changes/20/213720/4
     git cherry-pick FETCH_HEAD
@@ -230,8 +223,7 @@ ExecRetry {
     git cherry-pick FETCH_HEAD
     git fetch https://review.openstack.org/openstack/nova refs/changes/60/214560/10
     git cherry-pick FETCH_HEAD
-    # end of cherry-pick
-    pip install -e C:\OpenStack\build\openstack\nova
+    & pip install -e C:\OpenStack\build\openstack\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
 }
@@ -239,9 +231,9 @@ ExecRetry {
 #Fix for keystoneclient
 ExecRetry {
     GitClonePull "$buildDir\python-keystoneclient" "https://github.com/openstack/python-keystoneclient.git" "master"
-    pushd C:\OpenStack\build\openstack\\python-keystoneclient
+    pushd C:\OpenStack\build\openstack\python-keystoneclient
     git fetch https://review.openstack.org/openstack/python-keystoneclient refs/changes/86/211686/7 ; git cherry-pick FETCH_HEAD
-    pip install -U -e C:\OpenStack\build\openstack\\python-keystoneclient
+    & pip install -U -e C:\OpenStack\build\openstack\python-keystoneclient
     if ($LastExitCode) { Throw "Failed to install keystoneclient fom repo" }
     popd
 }
