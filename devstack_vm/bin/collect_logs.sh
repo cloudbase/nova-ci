@@ -29,11 +29,24 @@ function archive_devstack_logs() {
                 $GZIP -c "$REAL" > "$LOG_DST_DEVSTACK/$i.gz" || emit_warning "L38: Failed to archive devstack logs"
         fi
     done
+    $GZIP -c /var/log/mysql/error.log > "$LOG_DST_DEVSTACK/mysql_error.log.gz"
+    $GZIP -c /var/log/cloud-init.log > "$LOG_DST_DEVSTACK/cloud-init.log.gz"
+    $GZIP -c /var/log/cloud-init-output.log > "$LOG_DST_DEVSTACK/cloud-init-output.log.gz"
+    $GZIP -c /var/log/dmesg > "$LOG_DST_DEVSTACK/dmesg.log.gz"
+    $GZIP -c /var/log/kern.log > "$LOG_DST_DEVSTACK/kern.log.gz"
+    $GZIP -c /var/log/syslog > "$LOG_DST_DEVSTACK/syslog.log.gz"
+    mkdir -p "$LOG_DST_DEVSTACK/rabbitmq"
+    cp /var/log/rabbitmq/* "$LOG_DST_DEVSTACK/rabbitmq"
+    sudo rabbitmqctl status > "$LOG_DST_DEVSTACK/rabbitmq/status.txt" 2>&1
+    $GZIP $LOG_DST_DEVSTACK/rabbitmq/*
+    mkdir -p "$LOG_DST_DEVSTACK/openvswitch"
+    cp /var/log/openvswitch/* "$LOG_DST_DEVSTACK/openvswitch"
+    $GZIP $LOG_DST_DEVSTACK/openvswitch/*
 }
 
 function archive_devstack_configs() {
 
-    for i in ceilometer cinder glance keystone neutron nova swift openvswitch openvswitch-switch
+    for i in ceilometer cinder glance keystone neutron nova swift openvswitch
     do
         mkdir -p $CONFIG_DST_DEVSTACK/$i || emit_error "L30: Failed to create $CONFIG_DST_DEVSTACK/$i"
         for j in `ls -A /etc/$i`
@@ -46,7 +59,6 @@ function archive_devstack_configs() {
             fi
         done
     done
-    $GZIP -c /home/ubuntu/devstack/localrc > "$CONFIG_DST_DEVSTACK/localrc.txt.gz"
     $GZIP -c /home/ubuntu/devstack/local.conf > "$CONFIG_DST_DEVSTACK/local.conf.gz"
     $GZIP -c /opt/stack/tempest/etc/tempest.conf > "$CONFIG_DST_DEVSTACK/tempest.conf.gz"
     df -h > "$CONFIG_DST_DEVSTACK/df.txt" 2>&1 && $GZIP "$CONFIG_DST_DEVSTACK/df.txt"
@@ -54,6 +66,8 @@ function archive_devstack_configs() {
     dpkg-query -l > "$CONFIG_DST_DEVSTACK/dpkg-l.txt" 2>&1 && $GZIP "$CONFIG_DST_DEVSTACK/dpkg-l.txt"
     pip freeze > "$CONFIG_DST_DEVSTACK/pip-freeze.txt" 2>&1 && $GZIP "$CONFIG_DST_DEVSTACK/pip-freeze.txt"
     ps axwu > "$CONFIG_DST_DEVSTACK/pidstat.txt" 2>&1 && $GZIP "$CONFIG_DST_DEVSTACK/pidstat.txt"
+    ifconfig -a -v > "$CONFIG_DST_DEVSTACK/ifconfig.txt" 2>&1 && $GZIP "$CONFIG_DST_DEVSTACK/ifconfig.txt"
+    sudo ovs-vsctl -v show > "$CONFIG_DST_DEVSTACK/ovs_bridges.txt" 2>&1 && $GZIP "$CONFIG_DST_DEVSTACK/ovs_bridges.txt"
 }
 
 function archive_hyperv_configs() {
