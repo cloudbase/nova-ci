@@ -44,9 +44,9 @@ IMAGE_REF=`iniget $TEMPEST_CONFIG compute image_ref`
 iniset $TEMPEST_CONFIG compute image_ref_alt $IMAGE_REF
 
 iniset $TEMPEST_CONFIG compute build_timeout 180
-iniset $TEMPEST_CONFIG orchestration build_timeout 300
+iniset $TEMPEST_CONFIG orchestration build_timeout 180
 iniset $TEMPEST_CONFIG volume build_timeout 180
-iniset $TEMPEST_CONFIG boto build_timeout 300
+iniset $TEMPEST_CONFIG boto build_timeout 180
 
 iniset $TEMPEST_CONFIG compute ssh_timeout 180
 iniset $TEMPEST_CONFIG compute allow_tenant_isolation True
