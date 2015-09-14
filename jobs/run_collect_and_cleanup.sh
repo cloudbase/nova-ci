@@ -1,12 +1,12 @@
-source /home/jenkins-slave/keystonerc_admin
+source /home/jenkins-slave/tools/keystonerc_admin
 source /usr/local/src/nova-ci/jobs/library.sh
 
 set +e
 
-ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/admin-msft.pem ubuntu@$FLOATING_IP "mkdir -p /openstack/logs/${hyperv01%%[.]*}"
-ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/admin-msft.pem ubuntu@$FLOATING_IP "mkdir -p /openstack/logs/${hyperv02%%[.]*}"
-ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/admin-msft.pem ubuntu@$FLOATING_IP "sudo chown -R nobody:nogroup /openstack/logs"
-ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/admin-msft.pem ubuntu@$FLOATING_IP "sudo chmod -R 777 /openstack/logs"
+ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP "mkdir -p /openstack/logs/${hyperv01%%[.]*}"
+ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP "mkdir -p /openstack/logs/${hyperv02%%[.]*}"
+ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP "sudo chown -R nobody:nogroup /openstack/logs"
+ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP "sudo chmod -R 777 /openstack/logs"
 
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned Copy-Item -Recurse C:\OpenStack\Log\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'systeminfo >> \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\systeminfo.log'
@@ -37,7 +37,7 @@ run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'sc qc nova-compute >> \\'
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'sc qc neutron-hyperv-agent >> \\'$FLOATING_IP'\openstack\logs\'${hyperv02%%[.]*}'\neutron_hyperv_agent_service.log'
 
 echo "Collecting logs"
-ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/admin-msft.pem ubuntu@$FLOATING_IP "/home/ubuntu/bin/collect_logs.sh"
+ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP "/home/ubuntu/bin/collect_logs.sh"
 
 if [ "$IS_DEBUG_JOB" != "yes" ]
 	then
@@ -46,21 +46,21 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 		echo "Detaching and cleaning Hyper-V node 2"
 		teardown_hyperv $hyperv02
 		echo "Creating logs destination folder"
-		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET ]; then mkdir -p /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET; else rm -rf /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/*; fi"
+		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET ]; then mkdir -p /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET; else rm -rf /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/*; fi"
 
 		echo "Downloading logs"
-		scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/admin-msft.pem ubuntu@$FLOATING_IP:/home/ubuntu/aggregate.tar.gz "aggregate-$NAME.tar.gz"
+		scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP:/home/ubuntu/aggregate.tar.gz "aggregate-$NAME.tar.gz"
 
 		echo "Uploading logs"
-		scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem "aggregate-$NAME.tar.gz" logs@logs.openstack.tld:/srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/aggregate-logs.tar.gz
+		scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY "aggregate-$NAME.tar.gz" logs@logs.openstack.tld:/srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/aggregate-logs.tar.gz
 		gzip -9 /home/jenkins-slave/logs/console-$NAME.log
-		scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem "/home/jenkins-slave/logs/console-$NAME.log.gz" logs@logs.openstack.tld:/srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/console.log.gz && rm -f /home/jenkins-slave/logs/console-$NAME.log.gz
+		scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY "/home/jenkins-slave/logs/console-$NAME.log.gz" logs@logs.openstack.tld:/srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/console.log.gz && rm -f /home/jenkins-slave/logs/console-$NAME.log.gz
 
 		echo "Extracting logs"
-		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem logs@logs.openstack.tld "tar -xzf /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/aggregate-logs.tar.gz -C /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/"
+		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "tar -xzf /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/aggregate-logs.tar.gz -C /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/"
     
 		echo "Fixing permissions on all log files"
-		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem logs@logs.openstack.tld "chmod a+rx -R /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET"
+		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "chmod a+rx -R /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET"
     
 		echo "Releasing devstack floating IP"
 		nova remove-floating-ip "$NAME" "$FLOATING_IP"
@@ -69,25 +69,25 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 		/usr/local/src/nova-ci/vlan_allocation.py -r $NAME
 		echo "Deleting devstack floating IP"
 		nova floating-ip-delete "$FLOATING_IP"
-		rm -f /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
+		rm -f /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 	else
 		TIMESTAMP=$(date +%d-%m-%Y_%H-%M)
         echo "Creating logs destination folder"
-        ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP ]; then mkdir -p /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP; else rm -rf /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/*; fi"
+        ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP ]; then mkdir -p /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP; else rm -rf /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/*; fi"
 
 		echo "Downloading logs"
-        scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/admin-msft.pem ubuntu@$FLOATING_IP:/home/ubuntu/aggregate.tar.gz "aggregate-$NAME.tar.gz"
+        scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP:/home/ubuntu/aggregate.tar.gz "aggregate-$NAME.tar.gz"
 
 		echo "Uploading logs"
-        scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem "aggregate-$NAME.tar.gz" logs@logs.openstack.tld:/srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/aggregate-logs.tar.gz
+        scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY "aggregate-$NAME.tar.gz" logs@logs.openstack.tld:/srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/aggregate-logs.tar.gz
         gzip -9 /home/jenkins-slave/logs/console-$NAME.log
-        scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem "/home/jenkins-slave/logs/console-$NAME.log.gz" logs@logs.openstack.tld:/srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/console.log.gz && rm -f /home/jenkins-slave/logs/console-$NAME.log.gz
+        scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY "/home/jenkins-slave/logs/console-$NAME.log.gz" logs@logs.openstack.tld:/srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/console.log.gz && rm -f /home/jenkins-slave/logs/console-$NAME.log.gz
 
 		echo "Extracting logs"
-        ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem logs@logs.openstack.tld "tar -xzf /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/aggregate-logs.tar.gz -C /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/"
+        ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "tar -xzf /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/aggregate-logs.tar.gz -C /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP/"
 
 		echo "Fixing permissions on all log files"
-        ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i /home/jenkins-slave/norman.pem logs@logs.openstack.tld "chmod a+rx -R /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP"    
+        ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "chmod a+rx -R /srv/logs/debug/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP"    
 fi
 
 set -e
