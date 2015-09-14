@@ -17,12 +17,12 @@
 #
 
 # Loading OpenStack credentials
-source /home/jenkins-slave/keystonerc_admin
+source /home/jenkins-slave/tools/keystonerc_admin
 
 # Loading all the needed functions
 source /usr/local/src/nova-ci/jobs/library.sh
 
-DEVSTACK_SSH_KEY=/home/jenkins-slave/admin-msft.pem
+DEVSTACK_SSH_KEY=/home/jenkins-slave/tools/admin-msft.pem
 
 FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
 if [ -z "$FLOATING_IP" ]
@@ -42,22 +42,22 @@ echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo `date -u +%H:%M:%S` FLOATING_IP=$FLOATING_IP
-echo `date -u +%H:%M:%S` NAME=$NAME
-echo `date -u +%H:%M:%S` NET_ID=$NET_ID
+echo FLOATING_IP=$FLOATING_IP
+echo NAME=$NAME
+echo NET_ID=$NET_ID
 
-echo `date -u +%H:%M:%S` "Deploying devstack $NAME"
+echo "Deploying devstack $NAME"
 
 devstack_image="devstack-62v3"
 
-echo `date -u +%H:%M:%S` "Image used is: $devstack_image"
-echo `date -u +%H:%M:%S` "Deploying devstack $NAME"
+echo "Image used is: $devstack_image"
+echo "Deploying devstack $NAME"
 
 # Boot the new 10G of RAM flavor
 nova boot --availability-zone hyper-v --flavor nova.devstack --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll
 if [ $? -ne 0 ]
 then
-    echo `date -u +%H:%M:%S` "Failed to create devstack VM: $NAME"
+    echo "Failed to create devstack VM: $NAME"
     nova show "$NAME"
     exit 1
 fi
@@ -67,9 +67,9 @@ nova show "$NAME"
 export VMID=`nova show $NAME | awk '{if (NR == 20) {print $4}}'`
 echo VM_ID=$VMID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo `date -u +%H:%M:%S` VM_ID=$VMID
+echo VM_ID=$VMID
 
-echo `date -u +%H:%M:%S` "Fetching devstack VM fixed IP address"
+echo "Fetching devstack VM fixed IP address"
 FIXED_IP=$(nova show "$NAME" | grep "private network" | awk '{print $5}')
 export FIXED_IP="${FIXED_IP//,}"
 
@@ -91,12 +91,12 @@ do
         echo "From neutron port-list we got IP: $FIXED_IP2"
         if [[ -z "$FIXED_IP1" || -z "$FIXED_IP2" ||  "$FIXED_IP1" != "$FIXED_IP2" ]]
         then
-            echo `date -u +%H:%M:%S` "Failed to get fixed IP"
-            echo `date -u +%H:%M:%S` "nova show output:"
+            echo "Failed to get fixed IP"
+            echo "nova show output:"
             nova show "$NAME"
-            echo `date -u +%H:%M:%S` "nova console-log output:"
+            echo "nova console-log output:"
             nova console-log "$NAME"
-            echo `date -u +%H:%M:%S` "neutron port-list output:"
+            echo "neutron port-list output:"
             neutron port-list -D -c device_id -c fixed_ips | grep $VMID
             exit 1
         else
@@ -106,16 +106,16 @@ do
 done
 
 echo FIXED_IP=$FIXED_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-echo `date -u +%H:%M:%S` "FIXED_IP=$FIXED_IP"
+echo "FIXED_IP=$FIXED_IP"
 
 sleep 10
-exec_with_retry "nova add-floating-ip $NAME $FLOATING_IP" 15 5 || { echo `date -u +%H:%M:%S` "nova show $NAME:"; nova show "$NAME"; echo `date -u +%H:%M:%S` "nova console-log $NAME:"; nova console-log "$NAME"; exit 1; }
+exec_with_retry "nova add-floating-ip $NAME $FLOATING_IP" 15 5 || { echo "nova show $NAME:"; nova show "$NAME"; echo "nova console-log $NAME:"; nova console-log "$NAME"; exit 1; }
 
-echo `date -u +%H:%M:%S` "nova show $NAME:"
+echo "nova show $NAME:"
 nova show "$NAME"
 
 sleep 30
-wait_for_listening_port $FLOATING_IP 22 30 || { echo `date -u +%H:%M:%S` "nova console-log $NAME:"; nova console-log "$NAME"; echo "Failed listening for ssh port on devstack";exit 1; }
+wait_for_listening_port $FLOATING_IP 22 30 || { echo "nova console-log $NAME:"; nova console-log "$NAME"; echo "Failed listening for ssh port on devstack";exit 1; }
 sleep 5
 
 echo "adding apt-cacher-ng:"
