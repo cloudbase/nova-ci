@@ -143,6 +143,9 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo ln -fs /usr/s
 # copy files to devstack
 scp -v -r -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i $DEVSTACK_SSH_KEY /usr/local/src/nova-ci/devstack_vm/* ubuntu@$FLOATING_IP:/home/ubuntu/ >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 
+ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
+echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+
 set +e
 VLAN_RANGE=`/usr/local/src/nova-ci/vlan_allocation.py -a $NAME`
 if [ ! -z "$VLAN_RANGE" ]
