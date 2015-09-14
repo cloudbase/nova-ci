@@ -37,39 +37,39 @@ if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB = "yes" ]]; then
 fi
 export NAME=$NAME
 
-echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
+echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
-echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
+echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo `date -u +%H:%M:%S` FLOATING_IP=$FLOATING_IP >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-echo `date -u +%H:%M:%S` NAME=$NAME >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-echo `date -u +%H:%M:%S` NET_ID=$NET_ID >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo `date -u +%H:%M:%S` FLOATING_IP=$FLOATING_IP
+echo `date -u +%H:%M:%S` NAME=$NAME
+echo `date -u +%H:%M:%S` NET_ID=$NET_ID
 
-echo `date -u +%H:%M:%S` "Deploying devstack $NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo `date -u +%H:%M:%S` "Deploying devstack $NAME"
 
 devstack_image="devstack-62v3"
 
-echo `date -u +%H:%M:%S` "Image used is: $devstack_image" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-echo `date -u +%H:%M:%S` "Deploying devstack $NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo `date -u +%H:%M:%S` "Image used is: $devstack_image"
+echo `date -u +%H:%M:%S` "Deploying devstack $NAME"
 
 # Boot the new 10G of RAM flavor
 nova boot --availability-zone hyper-v --flavor nova.devstack --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 if [ $? -ne 0 ]
 then
-    echo `date -u +%H:%M:%S` "Failed to create devstack VM: $NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-    nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+    echo `date -u +%H:%M:%S` "Failed to create devstack VM: $NAME"
+    nova show "$NAME"
     exit 1
 fi
 
-nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+nova show "$NAME"
 
 export VMID=`nova show $NAME | awk '{if (NR == 20) {print $4}}'`
-echo VM_ID=$VMID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
+echo VM_ID=$VMID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo `date -u +%H:%M:%S` VM_ID=$VMID >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo `date -u +%H:%M:%S` VM_ID=$VMID
 
-echo `date -u +%H:%M:%S` "Fetching devstack VM fixed IP address" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo `date -u +%H:%M:%S` "Fetching devstack VM fixed IP address"
 FIXED_IP=$(nova show "$NAME" | grep "private network" | awk '{print $5}')
 export FIXED_IP="${FIXED_IP//,}"
 
@@ -83,21 +83,21 @@ do
         export FIXED_IP="${FIXED_IP//,}"
         COUNT=$(($COUNT + 1))
     else
-        echo "Failed to get fixed IP using nova show $NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-        echo "Trying to get the IP from console-log and port-list" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+        echo "Failed to get fixed IP using nova show $NAME"
+        echo "Trying to get the IP from console-log and port-list"
         FIXED_IP1=`nova console-log $VMID | grep "ci-info" | grep "eth0" | grep "True" | awk '{print $7}'`
-        echo "From console-log we got IP: $FIXED_IP1" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+        echo "From console-log we got IP: $FIXED_IP1"
         FIXED_IP2=`neutron port-list -D -c device_id -c fixed_ips | grep $VMID | awk '{print $7}' | tr -d \" | tr -d }`
-        echo "From neutron port-list we got IP: $FIXED_IP2" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+        echo "From neutron port-list we got IP: $FIXED_IP2"
         if [[ -z "$FIXED_IP1" || -z "$FIXED_IP2" ||  "$FIXED_IP1" != "$FIXED_IP2" ]]
         then
-            echo `date -u +%H:%M:%S` "Failed to get fixed IP" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            echo `date -u +%H:%M:%S` "nova show output:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            echo `date -u +%H:%M:%S` "nova console-log output:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            nova console-log "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            echo `date -u +%H:%M:%S` "neutron port-list output:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-            neutron port-list -D -c device_id -c fixed_ips | grep $VMID >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+            echo `date -u +%H:%M:%S` "Failed to get fixed IP"
+            echo `date -u +%H:%M:%S` "nova show output:"
+            nova show "$NAME"
+            echo `date -u +%H:%M:%S` "nova console-log output:"
+            nova console-log "$NAME"
+            echo `date -u +%H:%M:%S` "neutron port-list output:"
+            neutron port-list -D -c device_id -c fixed_ips | grep $VMID
             exit 1
         else
             export FIXED_IP=$FIXED_IP1
@@ -105,29 +105,29 @@ do
     fi
 done
 
-echo FIXED_IP=$FIXED_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
-echo `date -u +%H:%M:%S` "FIXED_IP=$FIXED_IP" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo FIXED_IP=$FIXED_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo `date -u +%H:%M:%S` "FIXED_IP=$FIXED_IP"
 
 sleep 10
-exec_with_retry "nova add-floating-ip $NAME $FLOATING_IP" 15 5 || { echo `date -u +%H:%M:%S` "nova show $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova show "$NAME" >> /home/jenkins-slave/console-$NAME.log 2>&1; echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; exit 1; }
+exec_with_retry "nova add-floating-ip $NAME $FLOATING_IP" 15 5 || { echo `date -u +%H:%M:%S` "nova show $NAME:"; nova show "$NAME"; echo `date -u +%H:%M:%S` "nova console-log $NAME:"; nova console-log "$NAME"; exit 1; }
 
-echo `date -u +%H:%M:%S` "nova show $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-nova show "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo `date -u +%H:%M:%S` "nova show $NAME:"
+nova show "$NAME"
 
 sleep 30
-wait_for_listening_port $FLOATING_IP 22 30 || { echo `date -u +%H:%M:%S` "nova console-log $NAME:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1; nova console-log "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1;echo "Failed listening for ssh port on devstack" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1;exit 1; }
+wait_for_listening_port $FLOATING_IP 22 30 || { echo `date -u +%H:%M:%S` "nova console-log $NAME:"; nova console-log "$NAME"; echo "Failed listening for ssh port on devstack";exit 1; }
 sleep 5
 
-echo "adding apt-cacher-ng:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo "adding apt-cacher-ng:"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo "Acquire::http { Proxy \"http://10.21.7.214:3142\" };" | sudo tee --append /etc/apt/apt.conf.d/90-apt-proxy.conf' 1
 
-echo "clean any apt files:"  >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo "clean any apt files:"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo rm -rf /var/lib/apt/lists/*" 1
 
-echo "apt-get update:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo "apt-get update:"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo apt-get update -y" 1
 
-echo "apt-get upgrade:" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+echo "apt-get upgrade:"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install pkg-config' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" autoremove' 1
@@ -152,12 +152,12 @@ set -e
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sed -i 's/export OS_AUTH_URL.*/export OS_AUTH_URL=http:\/\/127.0.0.1:5000\/v2.0\//g' /home/ubuntu/keystonerc" 3
 
 # Add 1 more interface after successful SSH
-nova interface-attach --net-id "$NET_ID" "$NAME" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+nova interface-attach --net-id "$NET_ID" "$NAME"
 
 # update repos
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/update_devstack_repos.sh --branch $ZUUL_BRANCH --build-for $ZUUL_PROJECT" 1
 
-echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.$JOB_TYPE.txt
+echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 # gerrit-git-prep
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/gerrit_git_prep.sh --zuul-site $ZUUL_SITE --gerrit-site $ZUUL_SITE --zuul-ref $ZUUL_REF --zuul-change $ZUUL_CHANGE --zuul-project $ZUUL_PROJECT" 1
@@ -182,11 +182,9 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "source /home/ubunt
 # join Hyper-V servers
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'mkdir -p /openstack/logs; chmod 777 /openstack/logs; sudo chown nobody:nogroup /openstack/logs'
 echo `date -u +%H:%M:%S` "Joining Hyper-V node: $hyperv01"
-echo `date -u +%H:%M:%S` "Joining Hyper-V node: $hyperv01" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 join_hyperv $hyperv01 $WIN_USER $WIN_PASS
 
 echo `date -u +%H:%M:%S` "Joining Hyper-V node: $hyperv02"
-echo `date -u +%H:%M:%S` "Joining Hyper-V node: $hyperv02" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
 join_hyperv $hyperv02 $WIN_USER $WIN_PASS
 
 #check for nova join (must equal 2)
