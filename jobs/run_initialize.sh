@@ -29,7 +29,7 @@ if [ -z "$FLOATING_IP" ]
 then
    exit 1
 fi
-echo FLOATING_IP=$FLOATING_IP > /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo FLOATING_IP=$FLOATING_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 NAME="nov-dvs-$ZUUL_CHANGE-$ZUUL_PATCHSET"
 if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB = "yes" ]]; then
