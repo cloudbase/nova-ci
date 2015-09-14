@@ -35,3 +35,4 @@ tempest.api.compute.v3.servers.test_servers_negative.ServersNegativeV3Test.test_
 tempest.api.compute.v3.servers.test_servers_negative.ServersNegativeV3Test.test_resize_server_with_null_flavor[gate,negative]
 tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_resize[compute,network]
 tempest.scenario.test_server_advanced_ops.TestServerAdvancedOps.test_resize_server_confirm[compute]
+tempest.api.network.test_routers.RoutersTest[network]
