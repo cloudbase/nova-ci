@@ -5,8 +5,8 @@ exec_with_retry2 () {
     COUNTER=0
     while [ $COUNTER -lt $MAX_RETRIES ]; do
         EXIT=0
-        echo `date -u +%H:%M:%S` >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-        eval '${@:3} >> /home/jenkins-slave/logs/console-$NAME.log 2>&1' || EXIT=$?
+        echo `date -u +%H:%M:%S`
+        eval '${@:3}' || EXIT=$?
         if [ $EXIT -eq 0 ]; then
             return 0
         fi
@@ -33,7 +33,7 @@ run_wsmancmd_with_retry () {
     PASSWORD=$3
     CMD=$4
 
-    exec_with_retry "python /home/jenkins-slave/wsman.py -U https://$HOST:5986/wsman -u $USERNAME -p $PASSWORD $CMD"
+    exec_with_retry "python /home/jenkins-slave/tools/wsman.py -U https://$HOST:5986/wsman -u $USERNAME -p $PASSWORD $CMD"
 }
 
 wait_for_listening_port () {
@@ -47,9 +47,7 @@ run_ssh_cmd () {
     SSHUSER_HOST=$1
     SSHKEY=$2
     CMD=$3
-    echo `date -u +%H:%M:%S` >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-    echo "Running $CMD" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
-    ssh -t -o 'PasswordAuthentication no' -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i $SSHKEY $SSHUSER_HOST "$CMD" >> /home/jenkins-slave/logs/console-$NAME.log 2>&1
+    ssh -t -o 'PasswordAuthentication no' -o 'StrictHostKeyChecking no' -o 'UserKnownHostsFile /dev/null' -i $SSHKEY $SSHUSER_HOST "$CMD"
 }
 
 run_ssh_cmd_with_retry () {
