@@ -73,12 +73,12 @@ else
         echo "Folder /home/ubuntu/.cache/pip/wheels not found!"
 fi
 
-set -o pipefail
-./stack.sh 2>&1 | tee /opt/stack/logs/stack.sh.txt
-#nohup ./stack.sh > /opt/stack/logs/stack.sh.txt 2>&1 &
-#pid=$!
-#wait $pid
-#cat /opt/stack/logs/stack.sh.txt
+#set -o pipefail
+#./stack.sh 2>&1 | tee /opt/stack/logs/stack.sh.txt
+nohup ./stack.sh > /opt/stack/logs/stack.sh.txt 2>&1 &
+pid=$!
+wait $pid
+cat /opt/stack/logs/stack.sh.txt
 
 echo "Cleaning caches before starting tests; needed to avoid memory starvation"
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
