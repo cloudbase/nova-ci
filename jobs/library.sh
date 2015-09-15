@@ -85,7 +85,7 @@ teardown_hyperv () {
     WIN_USER=$2
     WIN_PASS=$3
 
-    run_wsmancmd_with_retry $URL $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1"
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1'
 }
 
 generate_vlan_ranges () {
