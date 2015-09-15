@@ -11,7 +11,7 @@ tempest_output_file="/home/ubuntu/tempest/tempest-output.log"
 subunit_stats_file="/home/ubuntu/tempest/subunit_stats.log"
 TEMPEST_DIR="/home/ubuntu/tempest"
 
-basedir="$HOME/bin"
+basedir="/home/ubuntu/bin"
 
 project_name=$(basename $project)
 
