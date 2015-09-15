@@ -81,10 +81,6 @@ join_hyperv (){
 }
 
 teardown_hyperv () {
-    URL=$1
-    WIN_USER=$2
-    WIN_PASS=$3
-
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1'
 }
 
