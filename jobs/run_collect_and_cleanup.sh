@@ -42,9 +42,9 @@ ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK
 if [ "$IS_DEBUG_JOB" != "yes" ]
 	then
 		echo "Detaching and cleaning Hyper-V node 1"
-		teardown_hyperv $hyperv01
+		teardown_hyperv $hyperv01 $WIN_USER $WIN_PASS
 		echo "Detaching and cleaning Hyper-V node 2"
-		teardown_hyperv $hyperv02
+		teardown_hyperv $hyperv02 $WIN_USER $WIN_PASS
 		echo "Creating logs destination folder"
 		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET ]; then mkdir -p /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET; else rm -rf /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/*; fi"
 
