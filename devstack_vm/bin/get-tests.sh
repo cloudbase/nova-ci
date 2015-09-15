@@ -20,8 +20,8 @@ project=$1
 tests_dir=$2
 test_suite=${3:-"default"}
 
-exclude_tests_file=/home/ubuntu/bin/excluded-tests.txt
-isolated_tests_file=/home/ubuntu/bin/isolated-tests.txt
+exclude_tests_file="/home/ubuntu/bin/excluded-tests.txt"
+isolated_tests_file="/home/ubuntu/bin/isolated-tests.txt"
 
 if [ -f "$exclude_tests_file" ]; then
     exclude_tests=(`awk 'NF && $1!~/^#/' $exclude_tests_file`)
