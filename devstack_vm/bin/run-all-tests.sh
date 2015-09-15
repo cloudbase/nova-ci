@@ -2,7 +2,7 @@
 
 project=${1:-"openstack/nova"}
 tests_dir=${2:-"/opt/stack/tempest"}
-parallel_tests=${3:-12}
+parallel_tests=${3:-8}
 max_attempts=${4:-3}
 test_suite=${5:-"default"}
 log_file=${6:-"/home/ubuntu/tempest/subunit-output.log"}
