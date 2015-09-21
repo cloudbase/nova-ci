@@ -8,7 +8,6 @@ tempest.api.compute.v3.servers.test_server_rescue_negative.ServerRescueNegativeV
 
 # Hyper-V does not support attaching vNics to a running instance 
 tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestJSON.test_create_list_show_delete_interfaces
-tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestJSON.test_add_remove_fixed_ip
 tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestXML.test_create_list_show_delete_interfaces
 tempest.scenario.test_network_basic_ops.TestNetworkBasicOps.test_hotplug_nic
 
