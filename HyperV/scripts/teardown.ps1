@@ -1,7 +1,7 @@
 # Loading config
 
-. "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
-. "C:\OpenStack\nova-ci\HyperV\scripts\utils.ps1"
+. "C:\OpenStack\neutron-ci\HyperV\scripts\config.ps1"
+. "C:\OpenStack\neutron-ci\HyperV\scripts\utils.ps1"
 
 # end Loading config
 
