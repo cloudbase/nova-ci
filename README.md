@@ -1,2 +1,2 @@
-# nova-ci
-Hyper-V Nova CI
+# neutron-ci
+Hyper-V Neutron CI

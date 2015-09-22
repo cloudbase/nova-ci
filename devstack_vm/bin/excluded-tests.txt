@@ -1,0 +1,86 @@
+# Rescue (to be removed when the feature is added)
+tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.
+tempest.api.compute.servers.test_server_rescue.ServerRescueTestXML.
+tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON.
+tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestXML.
+tempest.api.compute.v3.servers.test_server_rescue.ServerRescueV3Test.
+tempest.api.compute.v3.servers.test_server_rescue_negative.ServerRescueNegativeV3Test.
+
+# Hyper-V does not support attaching vNics to a running instance 
+tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestJSON.test_create_list_show_delete_interfaces
+tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestXML.test_create_list_show_delete_interfaces
+tempest.scenario.test_network_basic_ops.TestNetworkBasicOps.test_hotplug_nic
+
+# Unsupported consoles (Hyper-V uses RDP, not VNC or SPICE)
+tempest.api.compute.v3.servers.test_server_actions.ServerActionsV3Test.test_get_spice_console
+tempest.api.compute.v3.servers.test_server_actions.ServerActionsV3Test.test_get_vnc_console
+
+# See Tempest bug: https://bugs.launchpad.net/tempest/+bug/1363986
+tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps.test_cross_tenant_traffic
+
+# Fails on DevStack. Not related to Hyper-V
+tempest.scenario.test_load_balancer_basic.TestLoadBalancerBasic.test_load_balancer_basic
+
+# Fails on DevStack. requires investigation.
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_rebuild
+
+# Fails on DevStack. requires investigation.
+# Note that corresponding XML tests pass
+tempest.api.compute.admin.test_simple_tenant_usage.TenantUsagesTestJSON.test_get_usage_tenant
+tempest.api.compute.admin.test_simple_tenant_usage.TenantUsagesTestJSON.test_get_usage_tenant_with_non_admin_user
+
+#Bug in tempest looking for image including extension (.vhdx)
+tempest.api.orchestration.stacks.test_neutron_resources
+tempest.api.orchestration.stacks.test_non_empty_stack
+
+# Snapshot issue related test fails:
+tempest.api.compute.images.test_list_image_filters
+tempest.api.compute.images.test_images_negative.ImagesNegativeTestJSON.test_create_image_from_stopped_server
+tempest.api.compute.images.test_images_oneserver.ImagesOneServerTestJSON.test_create_delete_image
+tempest.api.compute.images.test_images_oneserver.ImagesOneServerTestJSON.test_create_image_specify_multibyte_character_image_name
+tempest.api.compute.servers.test_delete_server.DeleteServersTestJSON.test_delete_server_while_in_shelved_state
+tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_create_backup
+tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_shelve_unshelve_server
+tempest.api.compute.servers.test_servers_negative.ServersNegativeTestJSON.test_shelve_shelved_server
+
+# Migrate permission issue:
+tempest.api.compute.servers.test_delete_server.DeleteServersTestJSON.test_delete_server_while_in_verify_resize_state
+
+# Unexpected response code
+tempest.api.compute.servers.test_delete_server.DeleteServersTestJSON.test_delete_server_while_in_shutoff_state
+
+# Not testing boto third-party
+tempest.thirdparty.boto
+
+#We do not test Swift
+tempest.api.object_storage.test_container_sync_middleware.ContainerSyncMiddlewareTest
+
+#Not relevant for Hyper-V tests
+tempest.api.image.v1.test_images.CreateRegisterImagesTest
+
+#Bug in "nova migrations-list"
+tempest.api.compute.admin.test_migrations.MigrationsAdminTest
+
+# Tests needing further investigation:
+tempest.api.compute.servers.test_delete_server.DeleteServersTestJSON.test_delete_server_while_in_attached_volume
+tempest.api.compute.servers.test_disk_config.ServerDiskConfigTestJSON.test_resize_server_from_manual_to_auto
+tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_resize_server_revert
+tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_resize_server_confirm
+tempest.api.compute.volumes.test_attach_volume.AttachVolumeTestJSON.test_list_get_volume_attachments
+tempest.scenario.test_encrypted_cinder_volumes.TestEncryptedCinderVolumes
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_pause_unpause
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_reboot
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_suspend_resume
+tempest.scenario.test_shelve_instance.TestShelveInstance
+tempest.scenario.test_snapshot_pattern.TestSnapshotPattern
+tempest.scenario.test_server_advanced_ops.TestServerAdvancedOps.test_resize_server_confirm
+#Need investigation - recently enabled in tempest
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_resize
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_stop_start
+tempest.scenario.test_network_basic_ops.TestNetworkBasicOps
+tempest.scenario.test_network_v6.TestGettingAddress
+tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps
+#Need investigation - were failing on cinder ci as well
+tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern
+tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_volume_boot_pattern
+tempest.api.compute.admin.test_live_migration.LiveBlockMigration
