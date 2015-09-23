@@ -53,7 +53,7 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 		echo "Detaching and cleaning Hyper-V node 2"
 		teardown_hyperv $hyperv02 $WIN_USER $WIN_PASS
 		echo "Creating logs destination folder"
-		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET ]; then mkdir -p /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET; else rm -rf /srv/logs/$ZUUL_CHANGE/$ZUUL_PATCHSET/*; fi"
+		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/nova/$ZUUL_CHANGE/$ZUUL_PATCHSET ]; then mkdir -p /srv/logs/nova/$ZUUL_CHANGE/$ZUUL_PATCHSET; else rm -rf /srv/logs/nova/$ZUUL_CHANGE/$ZUUL_PATCHSET/*; fi"
 
 		echo "Downloading logs"
 		scp -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP:/home/ubuntu/aggregate.tar.gz "aggregate-$NAME.tar.gz"
