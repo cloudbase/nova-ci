@@ -121,21 +121,7 @@ if ($buildFor -eq "openstack/nova"){
         GitClonePull "$buildDir\neutron" "https://github.com/openstack/neutron.git" $branchName
     }
     ExecRetry {
-        GitClonePull "$buildDir\networking-hyperv" "https://github.com/stackforge/networking-hyperv.git" "master"
-    }
-}elseif ($buildFor -eq "openstack/neutron" -or $buildFor -eq "openstack/quantum"){
-    ExecRetry {
-        GitClonePull "$buildDir\nova" "https://github.com/openstack/nova.git" $branchName
-    }
-    ExecRetry {
-        GitClonePull "$buildDir\networking-hyperv" "https://github.com/stackforge/networking-hyperv.git" "master"
-    }
-}elseif ($buildFor -eq "stackforge/networking-hyperv"){
-    ExecRetry {
-        GitClonePull "$buildDir\nova" "https://github.com/openstack/nova.git" $branchName
-    }
-    ExecRetry {
-        GitClonePull "$buildDir\neutron" "https://github.com/openstack/neutron.git" $branchName
+        GitClonePull "$buildDir\networking-hyperv" "https://github.com/stackforge/networking-hyperv.git" $branchName
     }
 }else{
     Throw "Cannot build for project: $buildFor"
