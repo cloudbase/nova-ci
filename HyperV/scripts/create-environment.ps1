@@ -215,8 +215,7 @@ ExecRetry {
 ExecRetry {
     GitClonePull "$buildDir\python-keystoneclient" "https://github.com/openstack/python-keystoneclient.git" "master"
     pushd C:\OpenStack\build\openstack\python-keystoneclient
-    git fetch https://review.openstack.org/openstack/python-keystoneclient refs/changes/86/211686/7 ; git cherry-pick FETCH_HEAD
-    & pip install -U -e C:\OpenStack\build\openstack\python-keystoneclient
+    pip install -U -e C:\OpenStack\build\openstack\python-keystoneclient
     if ($LastExitCode) { Throw "Failed to install keystoneclient fom repo" }
     popd
 }
