@@ -52,5 +52,6 @@ Write-Host("Installation Result: " + $InstallationResult.ResultCode)
 Write-Host("    Reboot Required: " + $InstallationResult.RebootRequired)
 
 If ($InstallationResult.RebootRequired -eq $True){
+    Start-Sleep -s 10
     (Get-WMIObject -Class Win32_OperatingSystem).Reboot()
 }
