@@ -30,15 +30,6 @@ sudo easy_install -U pip
 sudo pip install -U six
 sudo pip install -U kombu
 
-set +e
-# Ensure subunit is available
-sudo apt-get install subunit -y -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true -f
-# moreutils is needed for tc (timestamp)
-sudo apt-get install moreutils -y -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true -f
-# sysstat needed for iostat
-sudo apt-get install sysstat -y -o Debug::pkgProblemResolver=true -o Debug::Acquire::http=true -f
-set -e
-
 DEVSTACK_LOGS="/opt/stack/logs/screen"
 LOCALRC="/home/ubuntu/devstack/localrc"
 LOCALCONF="/home/ubuntu/devstack/local.conf"
