@@ -23,6 +23,8 @@ sudo mkdir -p /root/.pip
 sudo cp $HOME/.pip/pip.conf /root/.pip/
 sudo chown -R root:root /root/.pip
 
+sudo apt-get install -f
+
 # Update pip to latest
 sudo easy_install -U pip
 
