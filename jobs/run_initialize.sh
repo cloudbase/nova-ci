@@ -167,7 +167,7 @@ echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID
 # Set ZUUL IP in hosts file
 ZUUL="10.21.7.8"
 if  ! grep -qi zuul /etc/hosts ; then
-    echo "$ZUUL zuul.openstack.tld"  >> /etc/hosts
+    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "echo '$ZUUL zuul.openstack.tld' | sudo tee -a /etc/hosts"
 fi
 
 # gerrit-git-prep
