@@ -205,3 +205,23 @@ function add_user_to_passwordless_sudoers() {
         sudo sh -c "echo $user_name 'ALL=(ALL) NOPASSWD:ALL' > $path && chmod 440 $path"
     fi
 }
+
+rotate_log () {
+    local file="$1"
+    local limit=$2
+    if [ -f $file ] ; then
+        if [ -f ${file}.${limit} ] ; then
+            rm ${file}.${limit}
+        fi
+
+        for (( CNT=$limit; CNT > 1; CNT-- )) ; do
+            if [ -f ${file}.$(($CNT-1)) ]; then
+                mv ${file}.$(($CNT-1)) ${file}.${CNT} || echo "Failed to run: mv ${file}.$(($CNT-1)) ${file}.${CNT}"
+            fi
+        done
+
+        # Renames current log to .1
+        mv $file ${file}.1
+        touch $file
+    fi
+}
