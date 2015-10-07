@@ -70,7 +70,7 @@ STACK_LOG="/opt/stack/logs/stack.sh.txt"
 STACK_ROTATE_LIMIT=5
 rotate_log $STACK_LOG $STACK_ROTATE_LIMIT
 
-sed -i "s#PIP_GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py#PIP_GET_PIP_URL=https://raw.githubusercontent.com/pypa/pip/develop/contrib/get-pip.py#g" /home/ubuntu/devstack/tools/install_pip.sh
+sed -i "s#PIP_GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py#PIP_GET_PIP_URL=http://dl.openstack.tld/get-pip.py#g" /home/ubuntu/devstack/tools/install_pip.sh
 
 #set -o pipefail
 #./stack.sh 2>&1 | tee /opt/stack/logs/stack.sh.txt
