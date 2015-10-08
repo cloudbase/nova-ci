@@ -72,6 +72,11 @@ rotate_log $STACK_LOG $STACK_ROTATE_LIMIT
 
 sed -i "s#PIP_GET_PIP_URL=https://bootstrap.pypa.io/get-pip.py#PIP_GET_PIP_URL=http://dl.openstack.tld/get-pip.py#g" /home/ubuntu/devstack/tools/install_pip.sh
 
+# 8 Oct 2015 # workaround for https://bugs.launchpad.net/nova/+bug/1503974
+pushd /opt/stack/nova
+git fetch https://review.openstack.org/openstack/nova refs/changes/67/232367/2 && git checkout FETCH_HEAD
+popd
+
 #set -o pipefail
 #./stack.sh 2>&1 | tee /opt/stack/logs/stack.sh.txt
 nohup ./stack.sh > $STACK_LOG 2>&1 &
