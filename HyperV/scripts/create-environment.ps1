@@ -85,7 +85,7 @@ if ($hasConfigDir -eq $false) {
 }
 
 if ($hasProject -eq $false){
-    Throw "$projectName repository was not found. Please run gerrit-git-pref for this project first"
+    Throw "$projectName repository was not found. Please run gerrit-git-prep.sh for this project first"
 }
 
 if ($hasBinDir -eq $false){
