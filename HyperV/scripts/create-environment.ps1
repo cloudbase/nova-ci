@@ -166,6 +166,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install -U wmi
 & pip install --use-wheel --no-index --find-links=http://dl.openstack.tld/wheels cffi
 & pip install --use-wheel --no-index --find-links=http://dl.openstack.tld/wheels numpy
+& pip install -U oslo.log==1.11.0
 popd
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
