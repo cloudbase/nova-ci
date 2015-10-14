@@ -210,10 +210,6 @@ ExecRetry {
     git fetch https://review.openstack.org/openstack/nova refs/changes/20/213720/5
     Write-Host "Cherry-picking.. refs/changes/20/213720/5"
     cherry_pick FETCH_HEAD
-    Write-Host "Doing fetch.. refs/changes/37/234437/6"
-    git fetch https://review.openstack.org/openstack/nova refs/changes/37/234437/6
-    Write-Host "Cherry-picking.. refs/changes/37/234437/6"
-    cherry_pick FETCH_HEAD
     & pip install -e C:\OpenStack\build\openstack\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
