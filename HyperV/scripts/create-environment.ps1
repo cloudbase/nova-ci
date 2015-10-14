@@ -180,7 +180,8 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
 cp $templateDir\distutils.cfg C:\Python27\Lib\distutils\distutils.cfg
 
-function cherry_pick($commit){
+function cherry_pick($commit) {
+    $eapSet = $ErrorActionPreference
     $ErrorActionPreference = "Continue"
     git cherry-pick $commit
 
@@ -188,6 +189,7 @@ function cherry_pick($commit){
         echo "Ignoring failed git cherry-pick $commit"
         git checkout --force
     }
+    $ErrorActionPreference = $eapSet
 }
 
 ExecRetry {
