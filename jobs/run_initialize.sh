@@ -22,8 +22,6 @@ source /home/jenkins-slave/tools/keystonerc_admin
 # Loading all the needed functions
 source /usr/local/src/nova-ci/jobs/library.sh
 
-DEVSTACK_SSH_KEY=/home/jenkins-slave/tools/admin-msft.pem
-
 FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
 if [ -z "$FLOATING_IP" ]
 then
