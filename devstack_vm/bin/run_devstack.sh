@@ -16,8 +16,6 @@ echo "trusted-host = dl.openstack.tld" >> $HOME/.pip/pip.conf
 echo "index-url = http://dl.openstack.tld:8080/cloudbase/CI/+simple/" >> $HOME/.pip/pip.conf
 echo "[install]" >> $HOME/.pip/pip.conf
 echo "trusted-host = dl.openstack.tld" >> $HOME/.pip/pip.conf
-echo "find-links =" >> $HOME/.pip/pip.conf
-echo "    http://dl.openstack.tld/wheels" >> $HOME/.pip/pip.conf
 
 sudo mkdir -p /root/.pip
 sudo cp $HOME/.pip/pip.conf /root/.pip/
