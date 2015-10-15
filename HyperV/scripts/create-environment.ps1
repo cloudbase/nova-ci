@@ -21,7 +21,7 @@ $hasQemuImg = Test-Path $binDir\qemu-img.exe
 
 $pip_conf_content = @"
 [global]
-index-url = http://dl.openstack.tld:8080/root/pypi/+simple/
+index-url = http://dl.openstack.tld:8080/cloudbase/CI/+simple/
 [install]
 trusted-host = dl.openstack.tld
 find-links = 

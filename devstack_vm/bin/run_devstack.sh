@@ -13,7 +13,7 @@ sudo sed -i '2i127.0.0.1  '$HOSTNAME'' /etc/hosts
 mkdir -p $HOME/.pip
 echo "[global]" > $HOME/.pip/pip.conf
 echo "trusted-host = dl.openstack.tld" >> $HOME/.pip/pip.conf
-echo "index-url = http://dl.openstack.tld:8080/root/pypi/+simple/" >> $HOME/.pip/pip.conf
+echo "index-url = http://dl.openstack.tld:8080/cloudbase/CI/+simple/" >> $HOME/.pip/pip.conf
 echo "[install]" >> $HOME/.pip/pip.conf
 echo "trusted-host = dl.openstack.tld" >> $HOME/.pip/pip.conf
 echo "find-links =" >> $HOME/.pip/pip.conf
