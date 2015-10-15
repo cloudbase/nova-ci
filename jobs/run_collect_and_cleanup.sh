@@ -68,7 +68,11 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
     
 		echo "Fixing permissions on all log files"
 		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "chmod a+rx -R /srv/logs/nova/$ZUUL_CHANGE/$ZUUL_PATCHSET"
-    
+                echo "Removing HyperV temporary console logs.."
+                rm -fv /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01
+                rm -fv /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02
+                echo "Removing temporary devstack log.."
+                rm -fv /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID    
 		echo "Releasing devstack floating IP"
 		nova remove-floating-ip "$NAME" "$FLOATING_IP"
 		echo "Removing devstack VM"
