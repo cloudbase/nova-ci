@@ -87,7 +87,7 @@ function archive_hyperv_configs() {
     do
         if [ -d "$HYPERV_CONFIGS/$i" ]
         then
-            NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
+            NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]\{2\}\-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
             
             mkdir -p "$CONFIG_DST_HV/$NAME"
             COUNT=$(($COUNT + 1))
@@ -126,7 +126,7 @@ function archive_hyperv_logs() {
     do
         if [ -d "$HYPERV_LOGS/$i" ]
         then
-            NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
+            NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]\{2\}\-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
             
             mkdir -p "$LOG_DST_HV/$NAME"
             COUNT=$(($COUNT + 1))
