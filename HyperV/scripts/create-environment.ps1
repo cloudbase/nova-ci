@@ -4,6 +4,11 @@ Param(
     [string]$buildFor='openstack/nova'
 )
 
+Write-Host "Debug info:"
+Write-Host "devstackIP: $devstackIP"
+Write-Host "branchName: $branchName"
+Write-Host "buildFor: $buildFor"
+
 $projectName = $buildFor.split('/')[-1]
 
 . "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
