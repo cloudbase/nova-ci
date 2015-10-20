@@ -124,7 +124,7 @@ if ($buildFor -eq "openstack/nova"){
         GitClonePull "$buildDir\neutron" "https://github.com/openstack/neutron.git" $branchName
     }
     ExecRetry {
-        GitClonePull "$buildDir\networking-hyperv" "https://github.com/stackforge/networking-hyperv.git" $branchName
+        GitClonePull "$buildDir\networking-hyperv" "https://github.com/openstack/networking-hyperv.git" $branchName
     }
 }else{
     Throw "Cannot build for project: $buildFor"
