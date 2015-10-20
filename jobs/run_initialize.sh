@@ -192,11 +192,11 @@ pid_devstack=$!
 
 # Building and joining HyperV nodes
 echo `date -u +%H:%M:%S` "Started building & joining Hyper-V node: $hyperv01"
-nohup /usr/local/src/nova-ci/jobs/build_hv01.sh > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01 2>&1 &
+nohup /usr/local/src/nova-ci/jobs/build_hyperv.sh $hyperv01 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01 2>&1 &
 pid_hv01=$!
 
 echo `date -u +%H:%M:%S` "Started building & joining Hyper-V node: $hyperv02"
-nohup /usr/local/src/nova-ci/jobs/build_hv02.sh > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02 2>&1 &
+nohup /usr/local/src/nova-ci/jobs/build_hyperv.sh $hyperv02 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02 2>&1 &
 pid_hv02=$!
 
 # Waiting for devstack threaded job to finish
@@ -209,6 +209,9 @@ cat /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01
 
 wait $pid_hv02
 cat /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02
+
+post_build_restart_hyperv_services $hyperv01 $WIN_USER $WIN_PASS
+post_build_restart_hyperv_services $hyperv02 $WIN_USER $WIN_PASS
 
 #check for nova join (must equal 2)
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NOVA_COUNT=$(nova service-list | grep nova-compute | grep -c -w up); if [ "$NOVA_COUNT" != 2 ];then nova service-list; exit 1;fi' 12

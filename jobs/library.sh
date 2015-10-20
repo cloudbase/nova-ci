@@ -88,6 +88,10 @@ teardown_hyperv () {
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1'
 }
 
+post_build_restart_hyperv_services (){
+    run_wsmancmd_with_retry $1 $2 $3 '"powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\post-build-restart-services.ps1 >>\\'$FIXED_IP'\openstack\logs\create-environment-'$1'.log 2>&1"'
+}
+
 generate_vlan_ranges () {
 	vlan_start=500
 	vlan_step=25
