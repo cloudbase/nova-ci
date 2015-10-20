@@ -213,9 +213,9 @@ ExecRetry {
     git fetch https://review.openstack.org/openstack/nova refs/changes/20/213720/5
     Write-Host "Cherry-picking refs/changes/20/213720/5 - vm_com_pipe error during spawn"
     cherry_pick FETCH_HEAD
-    git fetch https://review.openstack.org/openstack/nova refs/changes/33/237133/2
     Write-Host "Cherry-picking refs/changes/33/237133/2 - serial log issue"
-    cherry_pick FETCH_HEAD
+    git fetch https://review.openstack.org/openstack/nova refs/changes/33/237133/2
+    git cherry-pick FETCH_HEAD
     & pip install -e C:\OpenStack\build\openstack\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
