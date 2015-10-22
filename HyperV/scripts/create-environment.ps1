@@ -196,13 +196,13 @@ function cherry_pick($commit) {
 }
 
 ExecRetry {
-    & pip install -e C:\OpenStack\build\openstack\networking-hyperv
+    & pip install C:\OpenStack\build\openstack\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
 }
 
 ExecRetry {
-    & pip install -e C:\OpenStack\build\openstack\neutron
+    & pip install C:\OpenStack\build\openstack\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
 }
@@ -216,7 +216,7 @@ ExecRetry {
     Write-Host "Cherry-picking refs/changes/33/237133/2 - serial log issue"
     git fetch https://review.openstack.org/openstack/nova refs/changes/33/237133/2
     git cherry-pick FETCH_HEAD
-    & pip install -e C:\OpenStack\build\openstack\nova
+    & pip install C:\OpenStack\build\openstack\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
 }
