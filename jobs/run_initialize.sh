@@ -201,11 +201,14 @@ pid_hv02=$!
 
 # Waiting for devstack threaded job to finish
 wait $pid_devstack
+cat /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID
 
 # Wait for both nodes to finish building and joining
 wait $pid_hv01
+cat /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01
 
 wait $pid_hv02
+cat /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02
 
 post_build_restart_hyperv_services $hyperv01 $WIN_USER $WIN_PASS
 post_build_restart_hyperv_services $hyperv02 $WIN_USER $WIN_PASS
