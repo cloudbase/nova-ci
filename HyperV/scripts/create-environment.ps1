@@ -221,16 +221,6 @@ ExecRetry {
     popd
 }
 
-#Fix for keystoneclient
-ExecRetry {
-    GitClonePull "$buildDir\python-keystoneclient" "https://github.com/openstack/python-keystoneclient.git" "master"
-    pushd C:\OpenStack\build\openstack\python-keystoneclient
-    pip install -U -e C:\OpenStack\build\openstack\python-keystoneclient
-    if ($LastExitCode) { Throw "Failed to install keystoneclient fom repo" }
-    popd
-}
-
-
 if (($branchName.ToLower().CompareTo($('stable/juno').ToLower()) -eq 0) -or ($branchName.ToLower().CompareTo($('stable/icehouse').ToLower()) -eq 0)) {
     $rabbitUser = "guest"
 }
