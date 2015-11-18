@@ -407,11 +407,16 @@ Function Check-Service
     $filter='Name=' + "'" + $serviceName + "'"
 
     #Temporary hack
+	
+	Stop-Service $serviceName
+	
     $service=Get-WmiObject -namespace "root\cimv2" -Class Win32_Service -Filter $filter
     if($service)
     {
         $service.delete()
     }
+	#to make sure the service was actually deleted
+	Get-Service $serviceName
 
     $hasServiceFileFolder = Test-Path $serviceFileLocation
     $hasServiceFile = Test-Path "$serviceFileLocation\$serviceFileName"
