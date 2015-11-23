@@ -46,7 +46,7 @@ echo NET_ID=$NET_ID
 
 echo "Deploying devstack $NAME"
 
-devstack_image="devstack-68v1"
+devstack_image="devstack-68v2"
 
 echo "Image used is: $devstack_image"
 echo "Deploying devstack $NAME"
