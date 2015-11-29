@@ -196,14 +196,14 @@ function cherry_pick($commit) {
 }
 
 ExecRetry {
-    & pip install C:\OpenStack\build\openstack\networking-hyperv
-    if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
+    & pip install C:\OpenStack\build\openstack\neutron
+    if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
 }
 
 ExecRetry {
-    & pip install C:\OpenStack\build\openstack\neutron
-    if ($LastExitCode) { Throw "Failed to install neutron from repo" }
+    & pip install C:\OpenStack\build\openstack\networking-hyperv
+    if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
 }
 
