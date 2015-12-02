@@ -46,4 +46,6 @@ tempest.api.orchestration.stacks.test_neutron_resources
 neutron_fwaas.tests.tempest_plugin.tests.scenario.test_fwaas.TestFWaaS
 tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV1Test
 tempest.api.volume.admin.test_volumes_backup.VolumesBackupsV2Test
+tempest.scenario.test_encrypted_cinder_volumes.TestEncryptedCinderVolumes.test_encrypted_cinder_volumes_cryptsetup
+tempest.scenario.test_encrypted_cinder_volumes.TestEncryptedCinderVolumes.test_encrypted_cinder_volumes_luks
 
