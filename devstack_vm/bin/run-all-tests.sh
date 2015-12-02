@@ -50,7 +50,7 @@ rm $tests_file
 echo "Generating HTML report..."
 $basedir/get-results-html.sh $log_file $results_html_file
 
-cat $log_file | /opt/stack/tempest/tools/colorizer.py > $tempest_output_file 2>&1 || true
+cat $log_file | subunit-trace -n -f > $tempest_output_file 2>&1 || true
 
 subunit-stats $log_file > $subunit_stats_file
 exit_code=$?
