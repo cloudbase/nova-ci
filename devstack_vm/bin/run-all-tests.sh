@@ -21,6 +21,11 @@ pushd $basedir
 tests_file=$(tempfile)
 $basedir/get-tests.sh $tests_dir > $tests_file
 
+echo "Activating virtual env."
+set +u
+source $tests_dir/.tox/full/bin/activate
+set -u
+
 echo "Started running tests."
 
 if [ ! -d "$tests_dir/.testrepository" ]; then
