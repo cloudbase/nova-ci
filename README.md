@@ -1,2 +1,2 @@
 # nova-ci
-Hyper-V Nova CI
+Cloudbase Hyper-V Nova CI
