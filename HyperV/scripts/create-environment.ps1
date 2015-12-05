@@ -197,9 +197,6 @@ function cherry_pick($commit) {
 
 ExecRetry {
     pushd C:\OpenStack\build\openstack\neutron
-    Write-Host "Doing fetch... refs/changes/95/253395/2"
-    git fetch https://review.openstack.org/openstack/neutron refs/changes/95/253395/2
-    cherry_pick FETCH_HEAD
     & pip install C:\OpenStack\build\openstack\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
