@@ -48,3 +48,6 @@ tempest.scenario.test_shelve_instance.TestShelveInstance
 tempest.scenario.test_snapshot_pattern.TestSnapshotPattern
 tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern
 tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_volume_boot_pattern
+
+# Excluded for further investigation - Dec.07 2015
+tempest.scenario.test_server_multinode.TestServerMultinode
