@@ -201,22 +201,34 @@ pid_hv02=$!
 
 # Waiting for devstack threaded job to finish
 wait $pid_devstack
-echo "devstack build log can be found in http://64.119.130.115/nova/$ZUUL_CHANGE/$ZUUL_PATCHSET/devstack-build-log-$ZUUL_UUID"
 
 # Wait for both nodes to finish building and joining
 wait $pid_hv01
-echo "$hyperv01 build log can be found in http://64.119.130.115/nova/$ZUUL_CHANGE/$ZUUL_PATCHSET/hyperv-build-log-$ZUUL_UUID-$hyperv01"
 
 wait $pid_hv02
-echo "$hyperv02 build log can be found in http://64.119.130.115/nova/$ZUUL_CHANGE/$ZUUL_PATCHSET/hyperv-build-log-$ZUUL_UUID-$hyperv02"
 
+OSTACK_PROJECT=`echo "$ZUUL_PROJECT" | cut -d/ -f2`
+
+if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB = "yes" ]]
+    then
+	echo "devstack build log can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/<timestamp>/devstack-build-log-$ZUUL_UUID.log"
+	echo "$hyperv01 build log can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/<timestamp>/hyperv-build-log-$ZUUL_UUID-$hyperv01.log"
+	echo "$hyperv02 build log can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/<timestamp>/hyperv-build-log-$ZUUL_UUID-$hyperv02.log"
+    else
+	echo "devstack build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/devstack-build-log-$ZUUL_UUID.log"
+        echo "$hyperv01 build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/hyperv-build-log-$ZUUL_UUID-$hyperv01.log"
+        echo "$hyperv02 build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/hyperv-build-log-$ZUUL_UUID-$hyperv02.log"
+fi
+
+# HyperV post-build services restart
 post_build_restart_hyperv_services $hyperv01 $WIN_USER $WIN_PASS
 post_build_restart_hyperv_services $hyperv02 $WIN_USER $WIN_PASS
 
-#check for nova join (must equal 2)
+# Check for nova join (must equal 2)
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NOVA_COUNT=$(nova service-list | grep nova-compute | grep -c -w up); if [ "$NOVA_COUNT" != 2 ];then nova service-list; exit 1;fi' 12
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; nova service-list' 1
-#check for neutron join (must equal 2)
+
+# Check for neutron join (must equal 2)
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NEUTRON_COUNT=$(neutron agent-list | grep -c "HyperV agent.*:-)"); if [ "$NEUTRON_COUNT" != 2 ];then neutron agent-list; exit 1;fi' 12
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; neutron agent-list' 1
 
