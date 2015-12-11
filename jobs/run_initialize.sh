@@ -211,9 +211,7 @@ OSTACK_PROJECT=`echo "$ZUUL_PROJECT" | cut -d/ -f2`
 
 if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB = "yes" ]]
     then
-	echo "devstack build log can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/<timestamp>/devstack-build-log-$ZUUL_UUID.log"
-	echo "$hyperv01 build log can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/<timestamp>/hyperv-build-log-$ZUUL_UUID-$hyperv01.log"
-	echo "$hyperv02 build log can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/<timestamp>/hyperv-build-log-$ZUUL_UUID-$hyperv02.log"
+	echo "All build logs can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/"
     else
 	echo "devstack build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/devstack-build-log-$ZUUL_UUID.log"
         echo "$hyperv01 build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/hyperv-build-log-$ZUUL_UUID-$hyperv01.log"
