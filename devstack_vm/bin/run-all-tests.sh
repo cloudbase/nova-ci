@@ -45,7 +45,7 @@ if [ -f "$isolated_tests_file" ]; then
     log_tmp=$(tempfile)
     $basedir/parallel-test-runner.sh $isolated_tests_file $tests_dir $log_tmp \
         $parallel_tests $max_attempts 1 || true
-
+    cp $log_tmp /home/ubuntu/tempest/isolated-tests-output.log
     cat $log_tmp >> $log_file
     rm $log_tmp
 fi
