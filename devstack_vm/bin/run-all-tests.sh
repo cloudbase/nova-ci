@@ -39,18 +39,21 @@ fi
 $basedir/parallel-test-runner.sh $tests_file $tests_dir $log_file \
     $parallel_tests $max_attempts || true
 
-isolated_tests_file=$basedir/isolated-tests.txt
-if [ -f "$isolated_tests_file" ]; then
-    echo "Running isolated tests from: $isolated_tests_file"
+rm $tests_file
+
+isolated_tests_list_file=$basedir/isolated-tests.txt
+if [ -f "$isolated_tests_list_file" ]; then
+    echo "Running isolated tests from: $isolated_tests_list_file"
+    isolated_tests_file=$(tempfile)
+    $basedir/get-tests.sh $tests_dir > $isolated_tests_file
     log_tmp=$(tempfile)
     $basedir/parallel-test-runner.sh $isolated_tests_file $tests_dir $log_tmp \
         $parallel_tests $max_attempts 1 || true
     cp $log_tmp /home/ubuntu/tempest/isolated-tests-output.log
     cat $log_tmp >> $log_file
+    rm $isolated_tests_file
     rm $log_tmp
 fi
-
-rm $tests_file
 
 echo "Generating HTML report..."
 $basedir/get-results-html.sh $log_file $results_html_file
