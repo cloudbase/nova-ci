@@ -45,7 +45,7 @@ isolated_tests_list_file=$basedir/isolated-tests.txt
 if [ -f "$isolated_tests_list_file" ]; then
     echo "Running isolated tests from: $isolated_tests_list_file"
     isolated_tests_file=$(tempfile)
-    $basedir/get-tests.sh $tests_dir > $isolated_tests_file
+    $basedir/get-isolated-tests.sh $tests_dir > $isolated_tests_file
     log_tmp=$(tempfile)
     $basedir/parallel-test-runner.sh $isolated_tests_file $tests_dir $log_tmp \
         $parallel_tests $max_attempts 1 || true
