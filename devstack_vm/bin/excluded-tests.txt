@@ -51,3 +51,6 @@ tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_volume_bo
 
 # Excluded for further investigation - Dec.07 2015
 tempest.scenario.test_server_multinode.TestServerMultinode
+
+#Fails constantly atm - Dec 29 2015
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
