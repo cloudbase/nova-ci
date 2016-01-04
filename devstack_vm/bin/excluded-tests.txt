@@ -54,3 +54,6 @@ tempest.scenario.test_server_multinode.TestServerMultinode
 
 #Fails constantly atm - Dec 29 2015
 tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
+
+#Fails due to tempest config - Jan 04 2016
+tempest.api.orchestration.stacks.test_neutron_resources
