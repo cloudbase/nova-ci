@@ -169,6 +169,12 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install -U pymi
 & pip install cffi
 & pip install numpy
+
+# Temporary fix for stable/liberty, forcing ryu==3.26
+if (($branchName.ToLower().CompareTo($('stable/liberty').ToLower()) -eq 0)) {
+& pip install ryu==3.26
+}
+
 popd
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
