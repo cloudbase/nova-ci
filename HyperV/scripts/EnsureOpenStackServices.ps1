@@ -416,9 +416,7 @@ Function Check-Service
         $service.delete()
     }
     #to make sure the service was actually deleted
-    Get-Service $serviceName -ErrorAction SilentlyContinue
-    if ($?){
-
+    if (Get-Service $serviceName -ErrorAction SilentlyContinue){
 	Write-Host "Service $serviceName failed deletion"
     }
     else
