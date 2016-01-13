@@ -102,6 +102,7 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 		echo "Deleting devstack floating IP"
 		nova floating-ip-delete "$FLOATING_IP"
 		rm -f /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+
 	else
 		TIMESTAMP=$(date +%d-%m-%Y_%H-%M)
 		echo "Creating logs destination folder"
@@ -133,6 +134,17 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
                 echo "Removing temporary devstack log.."
                 rm -fv /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID
 fi
+
+		echo `date -u +%H:%M:%S` "Started cleaning iSCSI targets"
+		nohup python /home/jenkins-slave/tools/wsman.py -U https://$hyperv01:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitarget; $targets[0].update();' &
+		pid_clean_hyperv01=$!
+
+		nohup python /home/jenkins-slave/tools/wsman.py -U https://$hyperv02:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitarget; $targets[0].update();' &
+		pid_clean_hyperv02=$!
+
+		#Waiting for iSCSI cleanup
+		wait $pid_clean_hyperv01
+		wait $pid_clean_hyperv02
 
 set -e
 
