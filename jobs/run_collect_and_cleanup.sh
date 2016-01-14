@@ -136,10 +136,10 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 fi
 
 		echo `date -u +%H:%M:%S` "Started cleaning iSCSI targets"
-		nohup python /home/jenkins-slave/tools/wsman.py -U https://$hyperv01:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitarget; $targets[0].update();' &
+		nohup python /home/jenkins-slave/tools/wsman.py -U https://$hyperv01:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitarget; $ErrorActionPreference = "Continue"; $targets[0].update();' &
 		pid_clean_hyperv01=$!
 
-		nohup python /home/jenkins-slave/tools/wsman.py -U https://$hyperv02:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitarget; $targets[0].update();' &
+		nohup python /home/jenkins-slave/tools/wsman.py -U https://$hyperv02:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitarget; $ErrorActionPreference = "Continue"; $targets[0].update();' &
 		pid_clean_hyperv02=$!
 
 		#Waiting for iSCSI cleanup
