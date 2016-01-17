@@ -407,10 +407,21 @@ Function Check-Service
     $filter='Name=' + "'" + $serviceName + "'"
 
     #Temporary hack
+	
+    Stop-Service $serviceName
+	
     $service=Get-WmiObject -namespace "root\cimv2" -Class Win32_Service -Filter $filter
     if($service)
     {
         $service.delete()
+    }
+    #to make sure the service was actually deleted
+    if (Get-Service $serviceName -ErrorAction SilentlyContinue){
+	Write-Host "Service $serviceName failed deletion"
+    }
+    else
+    {
+	Write-Host "Service $serviceName succesfully deleted"
     }
 
     $hasServiceFileFolder = Test-Path $serviceFileLocation
