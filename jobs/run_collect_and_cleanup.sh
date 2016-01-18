@@ -170,4 +170,9 @@ python /home/jenkins-slave/tools/wsman.py -U https://$hyperv02:5986/wsman -u $WI
 python /home/jenkins-slave/tools/wsman.py -U https://$hyperv01:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitargetportal; Write-Host "[POST_CLEAN] $env:computername has $targets.count" iSCSI portals'
 python /home/jenkins-slave/tools/wsman.py -U https://$hyperv02:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell $targets = gwmi -ns root/microsoft/windows/storage -class msft_iscsitargetportal; Write-Host "[POST_CLEAN] $env:computername has $targets.count" iSCSI portals'
 
+# Restarting MSiSCSI service 
+python /home/jenkins-slave/tools/wsman.py -U https://$hyperv01:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell restart-service msiscsi; iscsicli listtargets; iscsicli listtargetportals'
+python /home/jenkins-slave/tools/wsman.py -U https://$hyperv02:5986/wsman -u $WIN_USER -p $WIN_PASS 'powershell restart-service msiscsi; iscsicli listtargets; iscsicli listtargetportals'
+
+echo `date -u +%H:%M:%S`
 set -e
