@@ -208,20 +208,23 @@ function add_user_to_passwordless_sudoers() {
 
 rotate_log () {
     local file="$1"
-    local limit=$2
+    local limit="$2"
+    #We set $new_file as $file without extension 
+    local new_file="${file//.txt/}"
     if [ -f $file ] ; then
-        if [ -f ${file}.${limit} ] ; then
-            rm ${file}.${limit}
+        if [[ -f ${new_file}.${limit}.txt ]] ; then
+            rm ${new_file}.${limit}.txt
         fi
 
         for (( CNT=$limit; CNT > 1; CNT-- )) ; do
-            if [ -f ${file}.$(($CNT-1)) ]; then
-                mv ${file}.$(($CNT-1)) ${file}.${CNT} || echo "Failed to run: mv ${file}.$(($CNT-1)) ${file}.${CNT}"
+            if [[ -f ${new_file}.$(($CNT-1)).txt ]]; then
+                echo ${new_file}.$(($CNT-1)).txt
+                mv ${new_file}.$(($CNT-1)).txt ${new_file}.${CNT}.txt || echo "Failed to run: mv ${new_file}.$(($CNT-1)).txt ${new_file}.${CNT}.txt"
             fi
         done
 
-        # Renames current log to .1
-        mv $file ${file}.1
+        # Renames current log to .1.txt
+        mv $file ${new_file}.1.txt
         touch $file
     fi
 }
