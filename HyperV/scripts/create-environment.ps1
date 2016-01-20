@@ -146,6 +146,10 @@ if (Test-Path $pythonArchive)
     Remove-Item -Force $pythonArchive
 }
 Invoke-WebRequest -Uri http://dl.openstack.tld/python27new.tar.gz -OutFile $pythonArchive
+if (Test-Path $pythonTar)
+{
+    Remove-Item -Force $pythonTar
+}
 if (Test-Path $pythonDir)
 {
     Remove-Item -Recurse -Force $pythonDir
