@@ -22,7 +22,7 @@ sudo cp $HOME/.pip/pip.conf /root/.pip/
 sudo chown -R root:root /root/.pip
 
 # Update pip to latest
-sudo easy_install -U pip
+sudo easy_install -U pip==7.1.2
 
 # Update six to latest version
 sudo pip install -U six
