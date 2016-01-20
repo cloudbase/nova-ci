@@ -146,13 +146,18 @@ if (Test-Path $pythonArchive)
     Remove-Item -Force $pythonArchive
 }
 Invoke-WebRequest -Uri http://dl.openstack.tld/python27new.tar.gz -OutFile $pythonArchive
+if (Test-Path $pythonTar)
+{
+    Remove-Item -Force $pythonTar
+}
 if (Test-Path $pythonDir)
 {
     Remove-Item -Recurse -Force $pythonDir
 }
 Write-Host "Ensure Python folder is up to date"
 Write-Host "Extracting archive.."
-& C:\mingw-get\msys\1.0\bin\tar.exe -xzf "$pythonArchive"
+& "C:\Program Files\7-Zip\7z.exe" x -y "$pythonArchive"
+& "C:\Program Files\7-Zip\7z.exe" x -y python27new.tar
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
 if ($hasPipConf -eq $false){
