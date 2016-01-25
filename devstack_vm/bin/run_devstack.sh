@@ -21,10 +21,8 @@ sudo mkdir -p /root/.pip
 sudo cp $HOME/.pip/pip.conf /root/.pip/
 sudo chown -R root:root /root/.pip
 
-# Update pip to latest
-sudo easy_install -U pip==7.1.2
-
-# Update six to latest version
+# Update packages to latest version
+sudo easy_install -U pip
 sudo pip install -U six
 sudo pip install -U kombu
 sudo pip install -U pbr
