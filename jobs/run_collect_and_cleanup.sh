@@ -85,6 +85,9 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 		echo "Fixing permissions on all log files"
 		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "chmod a+rx -R /srv/logs/$logs_project/$ZUUL_CHANGE/$ZUUL_PATCHSET"
 
+		echo "Removing local copy of aggregate logs"
+		rm -fv aggregate-$VMID.tar.gz
+
                 echo "Removing HyperV temporary console logs.."
                 rm -fv /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01
                 rm -fv /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02
@@ -126,6 +129,9 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 
 		echo "Fixing permissions on all log files"
         	ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "chmod a+rx -R /srv/logs/debug/$logs_project/$ZUUL_CHANGE/$ZUUL_PATCHSET/$TIMESTAMP"
+
+		echo "Removing local copy of aggregate logs"
+		rm -fv aggregate-$VMID.tar.gz
 
                 echo "Removing HyperV temporary console logs.."
                 rm -fv /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01
