@@ -181,6 +181,11 @@ if (($branchName.ToLower().CompareTo($('stable/liberty').ToLower()) -eq 0)) {
 & pip install ryu==3.26
 }
 
+# Temporary fix for stable/kilo, forcing testtools==1.9.0
+if (($branchName.ToLower().CompareTo($('stable/kilo').ToLower()) -eq 0)) {
+& pip install -U testtools==1.9.0
+}
+
 popd
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
