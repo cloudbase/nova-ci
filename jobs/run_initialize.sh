@@ -190,6 +190,10 @@ echo `date -u +%H:%M:%S` "Started to build devstack as a threaded job"
 nohup /usr/local/src/nova-ci/jobs/build_devstack.sh > /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID 2>&1 &
 pid_devstack=$!
 
+# Check for supported virtualization
+run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'systeminfo | findstr /c:"A hypervisor has been detected"'
+run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'systeminfo | findstr /c:"A hypervisor has been detected"'
+
 # Building and joining HyperV nodes
 echo `date -u +%H:%M:%S` "Started building & joining Hyper-V node: $hyperv01"
 nohup /usr/local/src/nova-ci/jobs/build_hyperv.sh $hyperv01 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01 2>&1 &
