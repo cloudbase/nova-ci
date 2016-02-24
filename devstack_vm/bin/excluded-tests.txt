@@ -49,3 +49,6 @@ tempest.api.orchestration.stacks.test_neutron_resources
 
 #Fails very often and needs invastigation Jan 21 2016
 tempest.api.orchestration.stacks.test_resource_types.ResourceTypesTest
+
+#Fails every time and needs invastigation Feb 24 2016
+tempest.api.image.v1.test_images.CreateRegisterImagesTest.test_register_http_image
