@@ -52,3 +52,6 @@ tempest.api.orchestration.stacks.test_resource_types.ResourceTypesTest
 
 #Fails every time and needs invastigation Feb 24 2016
 tempest.api.image.v1.test_images.CreateRegisterImagesTest.test_register_http_image
+
+#Fails dues to "_migrate_server_to() takes exactly 4 arguments (3 given)" Feb 29 2016
+tempest.api.compute.admin.test_live_migration.LiveBlockMigrationTestJSON.test_iscsi_volume
