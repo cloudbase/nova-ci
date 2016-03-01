@@ -55,7 +55,3 @@ tempest.api.image.v1.test_images.CreateRegisterImagesTest.test_register_http_ima
 
 #Fails dues to "_migrate_server_to() takes exactly 4 arguments (3 given)" Feb 29 2016
 tempest.api.compute.admin.test_live_migration.LiveBlockMigrationTestJSON.test_iscsi_volume
-
-#Temporary disable until patch 285370 is merged 1 March 2016
-tempest.api.compute.admin.test_live_migration.LiveBlockMigrationTestJSON.test_live_block_migration
-tempest.api.compute.admin.test_live_migration.LiveBlockMigrationTestJSON.test_live_block_migration_paused
