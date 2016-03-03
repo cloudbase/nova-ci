@@ -237,12 +237,13 @@ if (($branchName.ToLower().CompareTo($('stable/juno').ToLower()) -eq 0) -or ($br
     $rabbitUser = "guest"
 }
 
+$cores_count = (gwmi -class Win32_Processor).count * (gwmi -class Win32_Processor)[0].NumberOfCores
 $novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
-$neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
+$neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser).replace('[CORES_COUNT]', "$cores_count")
 
 Set-Content C:\OpenStack\etc\nova.conf $novaConfig
 if ($? -eq $false){
-    Throw "Error writting $templateDir\nova.conf"
+    Throw "Error writting C:\OpenStack\etc\nova.conf"
 }
 
 Set-Content C:\OpenStack\etc\neutron_hyperv_agent.conf $neutronConfig
