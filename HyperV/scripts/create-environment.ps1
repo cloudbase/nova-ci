@@ -229,6 +229,11 @@ ExecRetry {
 
 ExecRetry {
     pushd C:\OpenStack\build\openstack\nova
+
+    # This patch attempts to fix the issue that is causing the nova-service to hang.
+    git fetch https://review.openstack.org/openstack/nova refs/changes/68/291668/2
+    cherry_pick FETCH_HEAD
+
     & pip install C:\OpenStack\build\openstack\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
