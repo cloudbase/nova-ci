@@ -171,7 +171,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
 & easy_install -U pip
 & pip install -U setuptools
-& pip install -U --pre pymi
+& pip install -U pymi
 & pip install cffi
 & pip install numpy
 & pip install -U cliff==1.15.0
