@@ -13,7 +13,7 @@ function dumpeventlog(){
 function exporteventlog(){
 	$path = "C:\OpenStack\Logs\Eventlog"
 	mkdir $path
-	rm $path\*.txt
+	rm $path\*
 	get-eventlog -list | ForEach-Object {
 		$logname = $_.LogDisplayName
 		$logfilename = "eventlog_" + $_.LogDisplayName + ".txt"
