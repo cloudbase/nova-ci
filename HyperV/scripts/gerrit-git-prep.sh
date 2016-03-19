@@ -37,9 +37,14 @@ then
     echo "ZUUL_REF ZUUL_CHANGE ZUUL_PROJECT are mandatory"
     exit 1
 fi
-
-BUILD_DIR="C:/OpenStack/build/"
-PROJECT_DIR="$BUILD_DIR/$ZUUL_PROJECT"
+echo "Starting gerrit-gitprep"
+BUILD_DIR="C:/OpenStack/build"
+echo "BUILD_DIR=$BUILD_DIR"
+echo "ZUUL_PROJECT=$ZUUL_PROJECT"
+PROJECT_NAME=`basename $ZUUL_PROJECT`
+echo "PROJECT=$PROJECT_NAME"
+PROJECT_DIR="$BUILD_DIR/$PROJECT_NAME"
+echo "PROJECT_DIR=$PROJECT_DIR"
 
 function exit_error(){
     echo $1
