@@ -53,17 +53,23 @@ function archive_devstack_configs() {
 
     for i in ceilometer cinder glance keystone neutron nova swift openvswitch
     do
-        mkdir -p $CONFIG_DST_DEVSTACK/$i || emit_error "L30: Failed to create $CONFIG_DST_DEVSTACK/$i"
-        for j in `ls -A /etc/$i`
-        do
-            if [ -d /etc/$i/$j ]
-            then
-                $TAR cvzf "$CONFIG_DST_DEVSTACK/$i/$j.tar.gz" "/etc/$i/$j"
-            else
-                $GZIP -c "/etc/$i/$j" > "$CONFIG_DST_DEVSTACK/$i/$j.gz" || emit_warning "L38: Failed to archive devstack configs"
-            fi
-        done
+        # mkdir -p $CONFIG_DST_DEVSTACK/$i || emit_error "L30: Failed to create $CONFIG_DST_DEVSTACK/$i"
+        # for j in `ls -A /etc/$i`
+        # do
+        #    if [ -d /etc/$i/$j ]
+        #    then
+        #        $TAR cvzf "$CONFIG_DST_DEVSTACK/$i/$j.tar.gz" "/etc/$i/$j"
+        #    else
+        #        $GZIP -c "/etc/$i/$j" > "$CONFIG_DST_DEVSTACK/$i/$j.gz" || emit_warning "L38: Failed to archive devstack configs"
+        #    fi
+        # done
+        cp -r -L "/etc/$i" "$CONFIG_DST_DEVSTACK/$i"
     done
+    for file in `find "$CONFIG_DST_DEVSTACK/$i" -type f`
+    do 
+        $GZIP $file
+    done
+    
     $GZIP -c /home/ubuntu/devstack/local.conf > "$CONFIG_DST_DEVSTACK/local.conf.gz"
     $GZIP -c /opt/stack/tempest/etc/tempest.conf > "$CONFIG_DST_DEVSTACK/tempest.conf.gz"
     df -h > "$CONFIG_DST_DEVSTACK/df.txt" 2>&1 && $GZIP "$CONFIG_DST_DEVSTACK/df.txt"
@@ -82,38 +88,43 @@ function archive_hyperv_configs() {
     then
         mkdir -p "$CONFIG_DST_HV"
     fi
-    COUNT=1
-    for i in `ls -A "$HYPERV_CONFIGS"`
-    do
-        if [ -d "$HYPERV_CONFIGS/$i" ]
-        then
-            NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]\{2\}\-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
-            
-            mkdir -p "$CONFIG_DST_HV/$NAME"
-            COUNT=$(($COUNT + 1))
-
-            for j in `ls -A "$HYPERV_CONFIGS/$i"`
-            do
-                if [ -d "$HYPERV_CONFIGS/$i/$j" ]
-                then
-                    mkdir -p "$CONFIG_DST_HV/$NAME/$j"
-                    for k in `ls -A "$HYPERV_CONFIGS/$i/$j"`
-                    do
-                        if [ -d "$HYPERV_CONFIGS/$i/$j/$k" ]
-                        then
-                            $TAR cvzf "$CONFIG_DST_HV/$NAME/$j/$k.tar.gz" "$HYPERV_CONFIGS/$i/$j/$k"
-                        else
-                            $GZIP -c "$HYPERV_CONFIGS/$i/$j/$k" > "$CONFIG_DST_HV/$NAME/$j/$k.gz" || emit_warning "L93: Failed to archive $HYPERV_CONFIGS/$i/$j/$k"
-                        fi
-                    done
-                else
-                    $GZIP -c "$HYPERV_CONFIGS/$i/$j" > "$CONFIG_DST_HV/$NAME/$j.gz" || emit_warning "L97: Failed to archive $HYPERV_CONFIGS/$i/$j"
-                fi
-            done
-        else
-            $GZIP -c "$HYPERV_CONFIGS/$i" > "$CONFIG_DST_HV/$i.gz" || emit_warning "L101: Failed to archive $HYPERV_CONFIGS/$i"
-        fi
+    # COUNT=1
+    cp -r -L "$HYPERV_CONFIGS" "$CONFIG_DST_HV"
+    for file in `find "$CONFIG_DST_HV" -type f`
+    do 
+        $GZIP $file
     done
+    # for i in `ls -A "$HYPERV_CONFIGS"`
+    # do
+    #    if [ -d "$HYPERV_CONFIGS/$i" ]
+    #    then
+            # NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]\{1,2\}\-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
+    #        NAME=$i
+    #        mkdir -p "$CONFIG_DST_HV/$NAME"
+            # COUNT=$(($COUNT + 1))
+
+    #        for j in `ls -A "$HYPERV_CONFIGS/$i"`
+    #        do
+    #            if [ -d "$HYPERV_CONFIGS/$i/$j" ]
+    #            then
+    #                mkdir -p "$CONFIG_DST_HV/$NAME/$j"
+    #                for k in `ls -A "$HYPERV_CONFIGS/$i/$j"`
+    #                do
+    #                    if [ -d "$HYPERV_CONFIGS/$i/$j/$k" ]
+    #                    then
+    #                        $TAR cvzf "$CONFIG_DST_HV/$NAME/$j/$k.tar.gz" "$HYPERV_CONFIGS/$i/$j/$k"
+    #                    else
+    #                        $GZIP -c "$HYPERV_CONFIGS/$i/$j/$k" > "$CONFIG_DST_HV/$NAME/$j/$k.gz" || emit_warning "L93: Failed to archive $HYPERV_CONFIGS/$i/$j/$k"
+    #                    fi
+    #                done
+    #            else
+    #                $GZIP -c "$HYPERV_CONFIGS/$i/$j" > "$CONFIG_DST_HV/$NAME/$j.gz" || emit_warning "L97: Failed to archive $HYPERV_CONFIGS/$i/$j"
+    #            fi
+    #        done
+    #    else
+    #        $GZIP -c "$HYPERV_CONFIGS/$i" > "$CONFIG_DST_HV/$i.gz" || emit_warning "L101: Failed to archive $HYPERV_CONFIGS/$i"
+    #    fi
+    # done
 }
 
 function archive_hyperv_logs() {
@@ -121,24 +132,31 @@ function archive_hyperv_logs() {
     then
         mkdir -p "$LOG_DST_HV"
     fi
-    COUNT=1
-    for i in `ls -A "$HYPERV_LOGS"`
+    cp -r -L "$HYPERV_LOGS" "$LOG_DST_HV"
+    for file in `find "$LOG_DST_HV" -type f`
     do
-        if [ -d "$HYPERV_LOGS/$i" ]
-        then
-            NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]\{2\}\-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
-            
-            mkdir -p "$LOG_DST_HV/$NAME"
-            COUNT=$(($COUNT + 1))
-
-            for j in `ls -A "$HYPERV_LOGS/$i"`;
-            do
-                $GZIP -c "$HYPERV_LOGS/$i/$j" > "$LOG_DST_HV/$NAME/$j.gz" || emit_warning "L123: Failed to archive $HYPERV_LOGS/$i/$j"
-            done
-        else
-            $GZIP -c "$HYPERV_LOGS/$i" > "$LOG_DST_HV/$i.gz" || emit_warning "L126: Failed to archive $HYPERV_LOGS/$i"
-        fi
+        $GZIP $file
     done
+
+    # COUNT=1
+    # for i in `ls -A "$HYPERV_LOGS"`
+    # do
+    #    if [ -d "$HYPERV_LOGS/$i" ]
+    #    then
+            #NAME=`echo $i | sed 's/^\(hv-compute[0-9]\{2,3\}\)\|^\(c[0-9]-r[0-9]\{1,2\}\-u[0-9]\{2\}\)/hv-compute'$COUNT'/g'`
+    #        NAME=$i
+            
+    #        mkdir -p "$LOG_DST_HV/$NAME"
+            # COUNT=$(($COUNT + 1))
+
+    #        for j in `ls -A "$HYPERV_LOGS/$i"`;
+    #        do
+    #            $GZIP -c "$HYPERV_LOGS/$i/$j" > "$LOG_DST_HV/$NAME/$j.gz" || emit_warning "L123: Failed to archive $HYPERV_LOGS/$i/$j"
+    #        done
+    #    else
+    #        $GZIP -c "$HYPERV_LOGS/$i" > "$LOG_DST_HV/$i.gz" || emit_warning "L126: Failed to archive $HYPERV_LOGS/$i"
+    #    fi
+    # done
 }
 function archive_tempest_files() {
     for i in `ls -A $TEMPEST_LOGS`
