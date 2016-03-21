@@ -1,3 +1,4 @@
+source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 export FAILURE=0
 set +e
 echo "Running tests"
