@@ -1,3 +1,4 @@
+source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 source /home/jenkins-slave/tools/keystonerc_admin
 source /usr/local/src/nova-ci/jobs/library.sh
 
@@ -13,7 +14,6 @@ ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK
 set -f
 
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned Copy-Item -Recurse C:\OpenStack\Log\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
-
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\export-eventlog.ps1'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned cp -Recurse -Container  C:\OpenStack\Logs\Eventlog\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
 
@@ -34,6 +34,7 @@ run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'sc qc neutron-hyperv-agen
 
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\export-eventlog.ps1'
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned cp -Recurse -Container  C:\OpenStack\Logs\Eventlog\* \\'$FLOATING_IP'\openstack\logs\'${hyperv02%%[.]*}'\'
+
 
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned Copy-Item -Recurse C:\OpenStack\Log\* \\'$FLOATING_IP'\openstack\logs\'${hyperv02%%[.]*}'\'
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'systeminfo >> \\'$FLOATING_IP'\openstack\logs\'${hyperv02%%[.]*}'\systeminfo.log'
@@ -57,19 +58,6 @@ ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK
 
 if [ "$IS_DEBUG_JOB" != "yes" ]
 	then
-		
-		#logging the fact that the hyper-v nodes are being freed
-		jen_date=$(date +%d/%m/%Y-%H:%M:%S)
-		echo "Detaching and cleaning Hyper-V node 1"
-		teardown_hyperv $hyperv01 $WIN_USER $WIN_PASS
-		echo "$jen_date;$ZUUL_PROJECT;$ZUUL_BRANCH;$ZUUL_CHANGE;$ZUUL_PATCHSET;$hyperv01;FREE" >> /home/jenkins-slave/hypervnodes.log
-		
-		jen_date=$(date +%d/%m/%Y-%H:%M:%S)
-		echo "Detaching and cleaning Hyper-V node 2"
-		teardown_hyperv $hyperv02 $WIN_USER $WIN_PASS
-		echo "$jen_date;$ZUUL_PROJECT;$ZUUL_BRANCH;$ZUUL_CHANGE;$ZUUL_PATCHSET;$hyperv02;FREE" >> /home/jenkins-slave/hypervnodes.log
-		
-		
 		echo "Creating logs destination folder"
 		ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $LOGS_SSH_KEY logs@logs.openstack.tld "if [ -z '$ZUUL_CHANGE' ] || [ -z '$ZUUL_PATCHSET' ]; then echo 'Missing parameters!'; exit 1; elif [ ! -d /srv/logs/$logs_project/$ZUUL_CHANGE/$ZUUL_PATCHSET ]; then mkdir -p /srv/logs/$logs_project/$ZUUL_CHANGE/$ZUUL_PATCHSET; else rm -rf /srv/logs/$logs_project/$ZUUL_CHANGE/$ZUUL_PATCHSET/*; fi"
 
@@ -101,17 +89,6 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
 
                 echo "Removing temporary devstack log.."
                 rm -fv /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID    
-
-		echo "Releasing devstack floating IP"
-		nova remove-floating-ip "$VMID" "$FLOATING_IP"
-
-		echo "Removing devstack VM"
-		nova delete "$VMID"
-		/usr/local/src/nova-ci/vlan_allocation.py -r $VMID
-
-		echo "Deleting devstack floating IP"
-		nova floating-ip-delete "$FLOATING_IP"
-		rm -f /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 	else
 		TIMESTAMP=$(date +%d-%m-%Y_%H-%M)
