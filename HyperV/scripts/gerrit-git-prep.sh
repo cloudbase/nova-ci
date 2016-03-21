@@ -37,9 +37,14 @@ then
     echo "ZUUL_REF ZUUL_CHANGE ZUUL_PROJECT are mandatory"
     exit 1
 fi
-
-BUILD_DIR="C:/OpenStack/build/"
-PROJECT_DIR="$BUILD_DIR/$ZUUL_PROJECT"
+echo "Starting gerrit-gitprep"
+BUILD_DIR="C:/OpenStack/build"
+echo "BUILD_DIR=$BUILD_DIR"
+echo "ZUUL_PROJECT=$ZUUL_PROJECT"
+PROJECT_NAME=`basename $ZUUL_PROJECT`
+echo "PROJECT=$PROJECT_NAME"
+PROJECT_DIR="$BUILD_DIR/$PROJECT_NAME"
+echo "PROJECT_DIR=$PROJECT_DIR"
 
 function exit_error(){
     echo $1
@@ -76,16 +81,16 @@ then
     echo "Triggered by: $GERRIT_SITE/$ZUUL_CHANGE"
 fi
 
-if [ -d "$BUILD_DIR" ]
-then
-  rm -rf "$BUILD_DIR"
-fi
-mkdir -p "$BUILD_DIR" || exit_error "Failed to create build dir"
+echo "Content of $BUILD_DIR"
+ls -a "$BUILD_DIR" || exit_error "Build dir doesnt exist"
 
+echo "Removing $PROJECT_DIR if it exists"
 if [ -d "$PROJECT_DIR" ]
 then
   rm -rf "$PROJECT_DIR"
+  echo "Removed $PROJECT_DIR"
 fi
+echo "Creating $PROJECT_DIR"
 mkdir -p  "$PROJECT_DIR" || exit_error "Failed to create project dir"
 
 cd "$PROJECT_DIR" || exit_error "Failed to enter project build dir"
@@ -94,14 +99,14 @@ set -x
 
 if [[ ! -e .git ]]
 then
+    echo "cwd should be $PROJECT_DIR"
+    pwd
+    echo "Content of $PROJECT_DIR before git clone"
     ls -a
     rm -fr .[^.]* *
-    if [ -d /opt/git/$ZUUL_PROJECT/.git ]
-    then
-        git clone file:///opt/git/$ZUUL_PROJECT .
-    else
-        git clone $GIT_ORIGIN/$ZUUL_PROJECT .
-    fi
+    git clone $GIT_ORIGIN/$ZUUL_PROJECT .
+    echo "Content of $PROJECT_DIR after git clone"
+    ls -a
 fi
 git remote set-url origin $GIT_ORIGIN/$ZUUL_PROJECT
 
@@ -157,3 +162,5 @@ echo "Git branch output:"
 git branch 2>&1
 echo "Git log output:"
 git log -10 --pretty=format:"%h - %an, %ae, %ar : %s" 2>&1
+echo "Content of $PROJECT_DIR after finishing gerrit-git-prep"
+ls -a
