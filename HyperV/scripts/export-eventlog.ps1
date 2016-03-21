@@ -6,20 +6,23 @@ function dumpeventlog($path){
 	
 	Get-Eventlog -list | ForEach-Object {
 		$logFileName = $_.LogDisplayName
-		$exportFileName = "\eventlog_" + $logFileName + (get-date -f yyyyMMdd) + ".evt"
+		$exportFileName =$path + "\eventlog_" + $logFileName + (get-date -f yyyyMMdd) + ".evt"
 		$exportFileName = $exportFileName.replace(" ","_")
 		$logFile = Get-WmiObject Win32_NTEventlogFile | Where-Object {$_.logfilename -eq $logFileName}
-		$logFile.backupeventlog($path + $exportFileName) -ErrorAction SilentlyContinue
+		try{
+			$logFile.backupeventlog($exportFileName)
+		} catch {
+			break
+		}
 	}
 }
 
 function exporteventlog($path){
 
 	Get-Eventlog -list | ForEach-Object {
-		$logname = $_.LogDisplayName
 		$logfilename = "eventlog_" + $_.LogDisplayName + ".txt"
 		$logfilename = $logfilename.replace(" ","_")
-		Get-EventLog -Logname $logname | fl | out-file $path\$logfilename -ErrorAction SilentlyContinue
+		Get-EventLog -Logname $_.LogDisplayName | fl | out-file $path\$logfilename -ErrorAction SilentlyContinue
 	}
 }
 
@@ -32,11 +35,11 @@ function cleareventlog(){
 
 
 $hasEventlogDir = Test-Path -PathType Container $eventlogPath
-if (!$hasEventlogDir){
-	New-Item -ItemType Directory -Force -Path $eventlogPath
+if (Test-Path $eventlogPath){
+	Remove-Item $eventlogPath\* -recurse -force
 }
 else {
-	Remove-Item $eventlogPath\* -recurse
+	New-Item -ItemType Directory -Force -Path $eventlogPath
 }
 
 exporteventlog $eventlogPath
