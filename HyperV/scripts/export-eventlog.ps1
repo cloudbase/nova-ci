@@ -1,27 +1,44 @@
-function dumpeventlog(){
+# Loading config
 
-	get-eventlog -list | ForEach-Object {
+. "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
+
+function dumpeventlog($path){
+	
+	Get-Eventlog -list | ForEach-Object {
 		$logFileName = $_.LogDisplayName
-		$path = "C:\OpenStack\Logs\Eventlog\"
-		$exportFileName = "eventlog_" + $logFileName + (get-date -f yyyyMMdd) + ".evt"
+		$exportFileName = "\eventlog_" + $logFileName + (get-date -f yyyyMMdd) + ".evt"
 		$exportFileName = $exportFileName.replace(" ","_")
 		$logFile = Get-WmiObject Win32_NTEventlogFile | Where-Object {$_.logfilename -eq $logFileName}
 		$logFile.backupeventlog($path + $exportFileName) -ErrorAction SilentlyContinue
-		Clear-Eventlog "$logFileName"
 	}
-
 }
 
-function exporteventlog(){
-	$path = "C:\OpenStack\Logs\Eventlog"
-	mkdir $path -ErrorAction SilentlyContinue
-	rm $path\*
-	get-eventlog -list | ForEach-Object {
+function exporteventlog($path){
+
+	Get-Eventlog -list | ForEach-Object {
 		$logname = $_.LogDisplayName
 		$logfilename = "eventlog_" + $_.LogDisplayName + ".txt"
 		$logfilename = $logfilename.replace(" ","_")
 		Get-EventLog -Logname $logname | fl | out-file $path\$logfilename -ErrorAction SilentlyContinue
 	}
 }
-exporteventlog
-dumpeventlog
+
+function cleareventlog(){
+	Get-Eventlog -list | ForEach-Object {
+		Clear-Eventlog $_.LogDisplayName -ErrorAction SilentlyContinue
+	}
+}
+
+
+
+$hasEventlogDir = Test-Path -PathType Container $eventlogPath
+if (!$hasEventlogDir){
+	New-Item -ItemType Directory -Force -Path $eventlogPath
+}
+else {
+	Remove-Item $eventlogPath\* -recurse
+}
+
+exporteventlog $eventlogPath
+dumpeventlog $eventlogPath
+cleareventlog
