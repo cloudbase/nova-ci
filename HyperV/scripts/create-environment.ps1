@@ -219,7 +219,7 @@ Write-Host "BuildDir is: $buildDir"
 Write-Host "ProjectName is: $projectName"
 Write-Host "Listing $buildDir parent directory:"
 Get-ChildItem ( Get-Item $buildDir ).Parent.FullName
-Write-Host "Listing $buildDir:"
+Write-Host "Listing $buildDir before install"
 Get-ChildItem $buildDir
 
 ExecRetry {
