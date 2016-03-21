@@ -4,6 +4,7 @@ function dumpeventlog(){
 		$logFileName = $_.LogDisplayName
 		$path = "C:\OpenStack\Logs\Eventlog\"
 		$exportFileName = "eventlog_" + $logFileName + (get-date -f yyyyMMdd) + ".evt"
+		$exportFileName = $exportFileName.replace(" ","_")
 		$logFile = Get-WmiObject Win32_NTEventlogFile | Where-Object {$_.logfilename -eq $logFileName}
 		$logFile.backupeventlog($path + $exportFileName) -ErrorAction SilentlyContinue
 		Clear-Eventlog "$logFileName"
@@ -18,6 +19,7 @@ function exporteventlog(){
 	get-eventlog -list | ForEach-Object {
 		$logname = $_.LogDisplayName
 		$logfilename = "eventlog_" + $_.LogDisplayName + ".txt"
+		$logfilename = $logfilename.replace(" ","_")
 		Get-EventLog -Logname $logname | fl | out-file $path\$logfilename -ErrorAction SilentlyContinue
 	}
 }
