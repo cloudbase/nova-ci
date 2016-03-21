@@ -51,6 +51,11 @@ function archive_devstack_logs() {
 
 function archive_devstack_configs() {
 
+    if [ ! -d "$LOG_DST_DEVSTACK" ]
+    then
+        mkdir -p "$CONFIG_DST_DEVSTACK" || emit_warning "L38: Failed to archive devstack configs"
+    fi
+    
     for i in ceilometer cinder glance keystone neutron nova swift openvswitch
     do
         # mkdir -p $CONFIG_DST_DEVSTACK/$i || emit_error "L30: Failed to create $CONFIG_DST_DEVSTACK/$i"
