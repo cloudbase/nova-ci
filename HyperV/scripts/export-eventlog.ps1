@@ -34,13 +34,12 @@ function cleareventlog(){
 
 
 
-$hasEventlogDir = Test-Path -PathType Container $eventlogPath
+
 if (Test-Path $eventlogPath){
-	Remove-Item $eventlogPath\* -recurse -force
+	Remove-Item $eventlogPath -recurse -force
 }
-else {
-	New-Item -ItemType Directory -Force -Path $eventlogPath
-}
+
+New-Item -ItemType Directory -Force -Path $eventlogPath
 
 exporteventlog $eventlogPath
 dumpeventlog $eventlogPath
