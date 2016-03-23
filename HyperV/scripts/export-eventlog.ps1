@@ -12,7 +12,7 @@ function dumpeventlog($path){
 		try{
 			$logFile.backupeventlog($exportFileName)
 		} catch {
-			break
+			Write-Host "Could not dump $_.LogDisplayName (it might not exist)."
 		}
 	}
 }
