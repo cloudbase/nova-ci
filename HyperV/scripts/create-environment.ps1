@@ -1,13 +1,16 @@
 Param(
     [Parameter(Mandatory=$true)][string]$devstackIP,
     [string]$branchName='master',
-    [string]$buildFor='openstack/nova'
+    [string]$buildFor='openstack/nova',
+    [string]$isDebug='no'
 )
 
-Write-Host "Debug info:"
-Write-Host "devstackIP: $devstackIP"
-Write-Host "branchName: $branchName"
-Write-Host "buildFor: $buildFor"
+if ($isDebug -eq  'yes') {
+    Write-Host "Debug info:"
+    Write-Host "devstackIP: $devstackIP"
+    Write-Host "branchName: $branchName"
+    Write-Host "buildFor: $buildFor"
+}
 
 $projectName = $buildFor.split('/')[-1]
 
@@ -215,16 +218,20 @@ function cherry_pick($commit) {
     $ErrorActionPreference = $eapSet
 }
 
-Write-Host "BuildDir is: $buildDir"
-Write-Host "ProjectName is: $projectName"
-Write-Host "Listing $buildDir parent directory:"
-Get-ChildItem ( Get-Item $buildDir ).Parent.FullName
-Write-Host "Listing $buildDir before install"
-Get-ChildItem $buildDir
+if ($isDebug -eq  'yes') {
+    Write-Host "BuildDir is: $buildDir"
+    Write-Host "ProjectName is: $projectName"
+    Write-Host "Listing $buildDir parent directory:"
+    Get-ChildItem ( Get-Item $buildDir ).Parent.FullName
+    Write-Host "Listing $buildDir before install"
+    Get-ChildItem $buildDir
+}
 
 ExecRetry {
-    Write-Host "Content of $buildDir\neutron"
-    Get-ChildItem $buildDir\neutron
+    if ($isDebug -eq  'yes') {
+        Write-Host "Content of $buildDir\neutron"
+        Get-ChildItem $buildDir\neutron
+    }
     pushd $buildDir\neutron
     & pip install $buildDir\neutron
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
@@ -232,8 +239,10 @@ ExecRetry {
 }
 
 ExecRetry {
-    Write-Host "Content of $buildDir\networking-hyperv:"
-    Get-ChildItem $buildDir\networking-hyperv
+    if ($isDebug -eq  'yes') {
+        Write-Host "Content of $buildDir\networking-hyperv"
+        Get-ChildItem $buildDir\networking-hyperv
+    }
     pushd $buildDir\networking-hyperv
     & pip install $buildDir\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
@@ -241,8 +250,10 @@ ExecRetry {
 }
 
 ExecRetry {
-    Write-Host "Content of $buildDir\nova:"
-    Get-ChildItem $buildDir\nova
+    if ($isDebug -eq  'yes') {
+        Write-Host "Content of $buildDir\nova"
+        Get-ChildItem $buildDir\nova
+    }
     pushd $buildDir\nova
 
     # This patch attempts to fix the issue that is causing the nova-service to hang.
