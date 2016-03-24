@@ -51,7 +51,7 @@ function archive_devstack_logs() {
 
 function archive_devstack_configs() {
 
-    if [ ! -d "$LOG_DST_DEVSTACK" ]
+    if [ ! -d "$CONFIG_DST_DEVSTACK" ]
     then
         mkdir -p "$CONFIG_DST_DEVSTACK" || emit_warning "L38: Failed to archive devstack configs"
     fi
