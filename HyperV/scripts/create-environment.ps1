@@ -120,6 +120,11 @@ if ($hasNeutronTemplate -eq $false){
     Throw "Neutron template not found"
 }
 
+if ($isDebug -eq  'yes') {
+    Write-Host "Status of $buildDir before GitClonePull"
+    Get-ChildItem $buildDir
+}
+
 git config --global user.email "hyper-v_ci@microsoft.com"
 git config --global user.name "Hyper-V CI"
 
@@ -276,7 +281,7 @@ if ($? -eq $false){
 
 Set-Content $configDir\neutron_hyperv_agent.conf $neutronConfig
 if ($? -eq $false){
-    Throw "Error writting neutron_hyperv_agent.conf"
+    Throw "Error writting $configDir\neutron_hyperv_agent.conf"
 }
 
 cp "$templateDir\policy.json" "$configDir\"
@@ -284,12 +289,12 @@ cp "$templateDir\interfaces.template" "$configDir\"
 
 $hasNovaExec = Test-Path "$pythonScripts\nova-compute.exe"
 if ($hasNovaExec -eq $false){
-    Throw "No nova exe found"
+    Throw "No nova-compute.exe found"
 }
 
 $hasNeutronExec = Test-Path "$pythonScripts\neutron-hyperv-agent.exe"
 if ($hasNeutronExec -eq $false){
-    Throw "No neutron exe found"
+    Throw "No neutron-hyperv-agent.exe found"
 }
 
 
