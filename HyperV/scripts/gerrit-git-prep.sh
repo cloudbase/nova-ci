@@ -37,6 +37,7 @@ then
     echo "ZUUL_REF ZUUL_CHANGE ZUUL_PROJECT are mandatory"
     exit 1
 fi
+
 echo "Starting gerrit-gitprep"
 BUILD_DIR="C:/OpenStack/build"
 echo "BUILD_DIR=$BUILD_DIR"
