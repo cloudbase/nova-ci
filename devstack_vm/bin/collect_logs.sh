@@ -137,7 +137,7 @@ function archive_hyperv_logs() {
     then
         mkdir -p "$LOG_DST_HV"
     fi
-    cp -r -L "$HYPERV_LOGS" "$LOG_DST_HV"
+    cp -r -L $HYPERV_LOGS/* $LOG_DST_HV
     for file in `find "$LOG_DST_HV" -type f`
     do
         $GZIP $file
