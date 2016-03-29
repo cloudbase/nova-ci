@@ -184,18 +184,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install -U --pre pymi
 & pip install cffi
 & pip install numpy
-& pip install oslo.messaging==4.5.0
 & pip install -U os-win
-
-# Temporary fix for stable/liberty, forcing ryu==3.26
-if (($branchName.ToLower().CompareTo($('stable/liberty').ToLower()) -eq 0)) {
-& pip install ryu==3.26
-}
-
-# Temporary fix for stable/kilo, forcing testtools==1.9.0
-if (($branchName.ToLower().CompareTo($('stable/kilo').ToLower()) -eq 0)) {
-& pip install -U testtools==1.9.0
-}
 
 popd
 
