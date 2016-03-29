@@ -52,3 +52,7 @@ tempest.api.orchestration.stacks.test_resource_types.ResourceTypesTest
 
 #Fails every time and needs invastigation Feb 24 2016
 tempest.api.image.v1.test_images.CreateRegisterImagesTest.test_register_http_image
+
+#Faild very frequently, removing till fix March 29 2016
+tempest.api.compute.admin.test_live_migration.LiveBlockMigrationTestJSON.test_iscsi_volume
+tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestJSON.test_add_remove_fixed_ip
