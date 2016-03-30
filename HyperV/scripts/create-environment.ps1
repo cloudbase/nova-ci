@@ -134,7 +134,12 @@ if ($buildFor -eq "openstack/nova"){
         GitClonePull "$buildDir\neutron" "https://git.openstack.org/openstack/neutron.git" $branchName
     }
     ExecRetry {
-        GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" $branchName
+        if (($branchName.ToLower().CompareTo($('stable/mitaka').ToLower()) -eq 0)) {
+            GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" "master"
+        }
+        else {
+            GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" $branchName
+        }
     }
 }else{
     Throw "Cannot build for project: $buildFor"
