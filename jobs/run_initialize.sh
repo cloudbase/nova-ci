@@ -200,7 +200,7 @@ pid_hv02=$!
 TIME_COUNT=0
 PROC_COUNT=3
 
-while [[ $TIME_COUNT -lt 45 ]] && [[ $PROC_COUNT -gt 0 ]]; do
+while [[ $TIME_COUNT -lt 90 ]] && [[ $PROC_COUNT -gt 0 ]]; do
 
     ps -p $pid_devstack > /dev/null 2>&1
     finished_devstack=$?
