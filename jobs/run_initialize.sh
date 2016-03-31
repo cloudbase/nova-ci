@@ -203,11 +203,11 @@ PROC_COUNT=3
 while [[ $TIME_COUNT -lt 45 ]] && [[ $PROC_COUNT -gt 0 ]]; do
 
     ps -p $pid_devstack > /dev/null 2>&1
-    finished_devstack = $?
+    finished_devstack=$?
     ps -p $pid_hv01 > /dev/null 2>&1
-    finished_hv01 = $?
+    finished_hv01=$?
     ps -p $pid_hv02 > /dev/null 2>&1
-    finished_hv02 = $?
+    finished_hv02=$?
     if [[ $finished_devstack -eq 1 ]]; then
         echo "Devstack finished building process."
         PROC_COUNT=$(( $PROC_COUNT - 1))
