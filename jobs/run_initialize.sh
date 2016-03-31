@@ -220,7 +220,7 @@ while [[ $TIME_COUNT -lt 45 ]] && [[ $PROC_COUNT -gt 0 ]]; do
         echo "Hyper-V node $hyperv02 finished building process."
         PROC_COUNT=$(( $PROC_COUNT - 1))
     fi
-    if [[ $PROC_COUNT -gt 0]]; then
+    if [[ $PROC_COUNT -gt 0 ]]; then
         sleep 1m
         TIME_COUNT=$(( $TIME_COUNT +1 ))
     fi
