@@ -203,13 +203,14 @@ PROC_COUNT=3
 echo `date -u +%H:%M:%S` "Start waiting for parallel init jobs."
 
 while [[ $TIME_COUNT -lt 90 ]] && [[ $PROC_COUNT -gt 0 ]]; do
-
+    set  +e
     ps -p $pid_devstack > /dev/null 2>&1
     finished_devstack=$?
     ps -p $pid_hv01 > /dev/null 2>&1
     finished_hv01=$?
     ps -p $pid_hv02 > /dev/null 2>&1
     finished_hv02=$?
+    set -e
     if [[ $finished_devstack -eq 1 ]]; then
         echo "Devstack finished building process."
         PROC_COUNT=$(( $PROC_COUNT - 1 ))
