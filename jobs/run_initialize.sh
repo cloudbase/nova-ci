@@ -31,7 +31,7 @@ fi
 echo FLOATING_IP=$FLOATING_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 NAME="nov-dvs-$ZUUL_CHANGE-$ZUUL_PATCHSET"
-if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB = "yes" ]]; then
+if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB == "yes" ]]; then
 	NAME="$NAME-dbg"
 fi
 export NAME=$NAME
@@ -228,7 +228,7 @@ done
 
 OSTACK_PROJECT=`echo "$ZUUL_PROJECT" | cut -d/ -f2`
 
-if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB = "yes" ]]
+if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB == "yes" ]]
     then
         echo "All build logs can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/"
     else
