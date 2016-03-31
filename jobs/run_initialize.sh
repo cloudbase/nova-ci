@@ -200,6 +200,8 @@ pid_hv02=$!
 TIME_COUNT=0
 PROC_COUNT=3
 
+echo `date -u +%H:%M:%S` "Start waiting for parallel init jobs."
+
 while [[ $TIME_COUNT -lt 90 ]] && [[ $PROC_COUNT -gt 0 ]]; do
 
     ps -p $pid_devstack > /dev/null 2>&1
@@ -210,21 +212,24 @@ while [[ $TIME_COUNT -lt 90 ]] && [[ $PROC_COUNT -gt 0 ]]; do
     finished_hv02=$?
     if [[ $finished_devstack -eq 1 ]]; then
         echo "Devstack finished building process."
-        PROC_COUNT=$(( $PROC_COUNT - 1))
+        PROC_COUNT=$(( $PROC_COUNT - 1 ))
     fi
     if [[ $finished_hv01 -eq 1 ]]; then
         echo "Hyper-V node $hyperv01 finished building process."
-        PROC_COUNT=$(( $PROC_COUNT - 1))
+        PROC_COUNT=$(( $PROC_COUNT - 1 ))
     fi
     if [[ $finished_hv02 -eq 1 ]]; then
         echo "Hyper-V node $hyperv02 finished building process."
-        PROC_COUNT=$(( $PROC_COUNT - 1))
+        PROC_COUNT=$(( $PROC_COUNT - 1 ))
     fi
     if [[ $PROC_COUNT -gt 0 ]]; then
         sleep 1m
         TIME_COUNT=$(( $TIME_COUNT +1 ))
     fi
 done
+
+echo `date -u +%H:%M:%S` "Finished waiting for the parallel init jobs."
+echo `date -u +%H:%M:%S` "We looped $TIME_COUNT times, and when finishing we have $PROC_COUNT threads still active"
 
 OSTACK_PROJECT=`echo "$ZUUL_PROJECT" | cut -d/ -f2`
 
