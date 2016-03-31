@@ -8,7 +8,7 @@ function dumpeventlog($path){
 	
 	Get-Eventlog -list | Where-Object { $_.Entries -ne '0' } | ForEach-Object {
 		$logFileName = $_.LogDisplayName
-		$exportFileName =$path + "\eventlog_" + $logFileName + (get-date -f yyyyMMdd) + ".evt"
+		$exportFileName =$path + "\eventlog_" + $logFileName + ".evt"
 		$exportFileName = $exportFileName.replace(" ","_")
 		$logFile = Get-WmiObject Win32_NTEventlogFile | Where-Object {$_.logfilename -eq $logFileName}
 		try{
@@ -64,7 +64,7 @@ if (Test-Path $eventlogPath){
 
 New-Item -ItemType Directory -Force -Path $eventlogPath
 
-exporteventlog $eventlogPath
+#exporteventlog $eventlogPath
 dumpeventlog $eventlogPath
 exporthtmleventlog $eventlogPath
 cleareventlog
