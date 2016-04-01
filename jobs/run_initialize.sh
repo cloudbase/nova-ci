@@ -209,14 +209,20 @@ while [[ $TIME_COUNT -lt 60 ]] && [[ $PROC_COUNT -gt 0 ]]; do
     if [[ $finished_devstack -eq 0 ]]; then
         ps -p $pid_devstack > /dev/null 2>&1 || finished_devstack=$?
         [[ $finished_devstack -ne 0 ]] && PROC_COUNT=$(( $PROC_COUNT - 1 ))
+    else
+        echo `date -u +%H:%M:%S` "Finished building devstack"
     fi
     if [[ $finished_hv01 -eq 0 ]]; then
         ps -p $pid_hv01 > /dev/null 2>&1 || finished_hv01=$?
         [[ $finished_hv01 -ne 0 ]] && PROC_COUNT=$(( $PROC_COUNT - 1 ))
+    else
+        echo `date -u +%H:%M:%S` "Finished building $hyperv01"
     fi
     if [[ $finished_hv02 -eq 0 ]]; then
         ps -p $pid_hv02 > /dev/null 2>&1 || finished_hv02=$?
         [[ $finished_hv02 -ne 0 ]] && PROC_COUNT=$(( $PROC_COUNT - 1 ))
+    else
+         echo `date -u +%H:%M:%S` "Finished building $hyperv02"
     fi
     if [[ $PROC_COUNT -gt 0 ]]; then
         sleep 1m
@@ -233,9 +239,7 @@ if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB == "yes" ]]
     then
         echo "All build logs can be found in http://64.119.130.115/debug/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/"
     else
-        echo "devstack build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/devstack-build-log-$ZUUL_UUID.log"
-        echo "$hyperv01 build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/hyperv-build-log-$ZUUL_UUID-$hyperv01.log"
-        echo "$hyperv02 build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/hyperv-build-log-$ZUUL_UUID-$hyperv02.log"
+        echo "devstack build log can be found in http://64.119.130.115/$OSTACK_PROJECT/$ZUUL_CHANGE/$ZUUL_PATCHSET/"
 fi
 
 if [[ $PROC_COUNT -gt 0 ]]; then
