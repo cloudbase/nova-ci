@@ -39,7 +39,7 @@ sudo pip install -U pbr
 # Clean devstack logs
 sudo rm -f "$DEVSTACK_LOGS/*"
 sudo rm -rf "$PBR_LOC"
-sudo echo "search openstack.tld" > /etc/resolv.conf
+sudo sed -i  "$ a search openstack.tld" /etc/resolv.conf
 
 MYIP=$(/sbin/ifconfig eth0 2>/dev/null| grep "inet addr:" 2>/dev/null| sed 's/.*inet addr://g;s/ .*//g' 2>/dev/null)
 
