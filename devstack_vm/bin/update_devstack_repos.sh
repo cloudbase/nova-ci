@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source /home/ubuntu/bin/config.sh
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
+source $DIR/config.sh
 
 while [ $# -gt 0 ];
 do

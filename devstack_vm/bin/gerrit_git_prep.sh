@@ -1,6 +1,6 @@
 #!/bin/bash -e
-
-source $HOME/bin/config.sh
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+source $DIR/config.sh
 
 function usage() {
         echo "$0 --zuul-site ZUUL_SITE --gerrit-site GERRIT_SITE --zuul-ref ZUUL_REF --zuul-change ZUUL_CHANGE --zuul-project ZUUL_PROJECT [--git-origin GIT_ORIGIN] [--zuul-newrev ZUUL_NEWREV]"
