@@ -61,4 +61,6 @@ Write-Host "Cleaning the config folder."
 Remove-Item -Recurse -Force $openstackDir\etc\*
 Write-Host "Cleaning the Instances folder."
 Remove-Item -Recurse -Force $openstackDir\Instances\*
+Write-Host "Cleaning eventlog"
+cleareventlog
 Write-Host "Cleaning up process finished."
