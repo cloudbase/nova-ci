@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 array_to_regex()
 {
     local ar=(${@})
@@ -18,8 +20,8 @@ array_to_regex()
 
 tests_dir=$1
 
-exclude_tests_file="/home/ubuntu/bin/excluded-tests.txt"
-isolated_tests_file="/home/ubuntu/bin/isolated-tests.txt"
+exclude_tests_file="$DIR/excluded-tests.txt"
+isolated_tests_file="$DIR/isolated-tests.txt"
 
 if [ -f "$exclude_tests_file" ]; then
     exclude_tests=(`awk 'NF && $1!~/^#/' $exclude_tests_file`)
