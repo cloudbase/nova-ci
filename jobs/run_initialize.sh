@@ -183,9 +183,16 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'mkdir -p /openstac
 echo `date -u +%H:%M:%S` "Started to unzip Fedora image.."
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "gzip --decompress --force /home/ubuntu/devstack/files/images/Fedora-x86_64-20-20140618-sda.vhdx.gz"
 
+#Get IP addresses of the two Hyper-V hosts
+
+hyperv01_ip=`run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS '(Get-NetIPAddress ^| Where-Object {$_.InterfaceAlias -like \"*br100*\" -and $_.AddressFamily -like \"IPv4\"}).IPAddress'`
+hyperv02_ip=`run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS '(Get-NetIPAddress ^| Where-Object {$_.InterfaceAlias -like \"*br100*\" -and $_.AddressFamily -like \"IPv4\"}).IPAddress'`
+echo `date -u +%H:%M:%S` "Data IP of $hyperv01 is $hyperv01_ip"
+echo `date -u +%H:%M:%S` "Data IP of $hyperv02 is $hyperv02_ip"
+
 # Building devstack as a threaded job
 echo `date -u +%H:%M:%S` "Started to build devstack as a threaded job"
-nohup /usr/local/src/nova-ci/jobs/build_devstack.sh $hyperv01 $hyperv02 > /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID 2>&1 &
+nohup /usr/local/src/nova-ci/jobs/build_devstack.sh $hyperv01_ip $hyperv02_ip > /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID 2>&1 &
 pid_devstack=$!
 
 # Building and joining HyperV nodes
