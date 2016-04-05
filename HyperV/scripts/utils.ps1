@@ -107,10 +107,10 @@ function exporthtmleventlog($path){
 	$css = Get-Content $eventlogcsspath -Raw
 	$js = Get-Content $eventlogjspath -Raw
 	$HTMLHeader = @"
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	<script type="text/javascript">$js</script>
-	<style type="text/css">$css</style>
-	"@
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<script type="text/javascript">$js</script>
+<style type="text/css">$css</style>
+"@
 
 	foreach ($i in (Get-EventLog -List | Where-Object { $_.Entries -ne '0' }).Log) {
 		$Report = Get-EventLog $i
