@@ -1,4 +1,8 @@
 #!/bin/bash
+
+hyperv01=$1
+hyperv02=$2
+
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/config.sh
 . $DIR/utils.sh
@@ -35,6 +39,7 @@ sudo pip install -U pbr
 # Clean devstack logs
 sudo rm -f "$DEVSTACK_LOGS/*"
 sudo rm -rf "$PBR_LOC"
+sudo echo "search openstack.tld" > /etc/resolv.conf
 
 MYIP=$(/sbin/ifconfig eth0 2>/dev/null| grep "inet addr:" 2>/dev/null| sed 's/.*inet addr://g;s/ .*//g' 2>/dev/null)
 
@@ -83,7 +88,8 @@ pid=$!
 wait $pid
 cat $STACK_LOG
 
-firewall_manage_ports "" add enable ${TCP_PORTS[@]}
+firewall_manage_ports $hyperv01 add enable ${TCP_PORTS[@]}
+firewall_manage_ports $hyperv02 add enable ${TCP_PORTS[@]}
 
 echo "Cleaning caches before starting tests; needed to avoid memory starvation"
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
