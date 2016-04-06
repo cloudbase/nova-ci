@@ -184,12 +184,19 @@ echo `date -u +%H:%M:%S` "Started to unzip Fedora image.."
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "gzip --decompress --force /home/ubuntu/devstack/files/images/Fedora-x86_64-20-20140618-sda.vhdx.gz"
 
 #Get IP addresses of the two Hyper-V hosts
+
+set +e
 IFS='' read -r -d '' PSCODE <<'_EOF'
 (Get-NetIPAddress ^| Where-Object {$_.InterfaceAlias -like \"*br100*\" -and $_.AddressFamily -like \"IPv4\"}).IPAddress.ToString()
 _EOF
 HYPERV_GET_DATA_IP=`echo "$PSCODE" | iconv -f ascii -t utf16le | base64 -w0`
+echo "Encoded request is: $HYPERV_GET_DATA_IP"
 hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>/dev/null`
+echo "Hyper-V01 IP: $hyperv01_ip"
 hyperv01_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>/dev/null`
+echo "Hyper-V02 IP: $hyperv02_ip"
+set -e
+
 echo `date -u +%H:%M:%S` "Data IP of $hyperv01 is $hyperv01_ip"
 echo `date -u +%H:%M:%S` "Data IP of $hyperv02 is $hyperv02_ip"
 if [[ ! $hyperv01_ip =~ ^10\.0\.[0-9]{1,2}\.[0-9]{1,3} ]]; then
