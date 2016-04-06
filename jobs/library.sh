@@ -38,16 +38,20 @@ function run_wsmancmd_with_retry () {
 
 function run_wsman_cmd() {
     local host=$1
-    local cmd=$2
+    local win_user=$2
+    local win_password=$3
+    local cmd=$4
 
-    $BASEDIR/wsmancmd.py -u $win_user -p $win_password -U https://$1:5986/wsman $cmd
+    "python /home/jenkins-slave/tools/wsman.py -u $win_user -p $win_password -U https://$1:5986/wsman $cmd"
 }
 
 function run_wsman_ps() {
     local host=$1
-    local cmd=$2
+    local win_user=$2
+    local win_password=$3
+    local cmd=$4
 
-    run_wsman_cmd $host "powershell -NonInteractive -ExecutionPolicy RemoteSigned -Command $cmd"
+    run_wsman_cmd $host $win_user $win_password "powershell -NonInteractive -ExecutionPolicy RemoteSigned -Command $cmd"
 }
 
 function wait_for_listening_port () {
