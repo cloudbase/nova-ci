@@ -193,7 +193,7 @@ Write-Host $IPAddr
 _EOF
 HYPERV_GET_DATA_IP=`echo "$PSCODE" | iconv -f ascii -t utf16le | base64 -w0`
 hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.0\.[0-9]{1,2}\.[0-9]{1,3}'`
-hyperv01_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.0\.[0-9]{1,2}\.[0-9]{1,3}'`
+hyperv02_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.0\.[0-9]{1,2}\.[0-9]{1,3}'`
 set -e
 
 echo `date -u +%H:%M:%S` "Data IP of $hyperv01 is $hyperv01_ip"
