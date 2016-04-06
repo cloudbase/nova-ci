@@ -1,7 +1,7 @@
 #!/bin/bash
 
-hyperv01=$1
-hyperv02=$2
+hyperv01=echo $1 | grep -E -o '10.0.[0-9]{1,2}\.[0-9]{1,3}'
+hyperv02=echo $2 | grep -E -o '10.0.[0-9]{1,2}\.[0-9]{1,3}'
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/config.sh
