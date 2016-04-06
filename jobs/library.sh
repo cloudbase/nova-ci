@@ -42,7 +42,7 @@ function run_wsman_cmd() {
     local win_password=$3
     local cmd=$4
 
-    "python /home/jenkins-slave/tools/wsman.py -u $win_user -p $win_password -U https://$1:5986/wsman $cmd"
+    python /home/jenkins-slave/tools/wsman.py -u $win_user -p $win_password -U https://$host:5986/wsman $cmd
 }
 
 function run_wsman_ps() {
