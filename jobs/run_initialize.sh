@@ -185,8 +185,8 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "gzip --decompress 
 
 #Get IP addresses of the two Hyper-V hosts
 
-hyperv01_ip=`run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned (Get-NetIPAddress ^| Where-Object {$_.InterfaceAlias -like \"*br100*\" -and $_.AddressFamily -like \"IPv4\"}).IPAddress' 2>&1 >/dev/null`
-hyperv02_ip=`run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned (Get-NetIPAddress ^| Where-Object {$_.InterfaceAlias -like \"*br100*\" -and $_.AddressFamily -like \"IPv4\"}).IPAddress' 2>&1 >/dev/null`
+hyperv01_ip=`run_wsman_ps $hyperv01 $WIN_USER $WIN_PASS '(Get-NetIPAddress ^| Where-Object {$_.InterfaceAlias -like \"*br100*\" -and $_.AddressFamily -like \"IPv4\"}).IPAddress.ToString()' | grep -E -o '10\.0\.[0-9]{1,2}\.[0-9]{1,3}'` 
+hyperv02_ip=`run_wsman_ps $hyperv02 $WIN_USER $WIN_PASS '(Get-NetIPAddress ^| Where-Object {$_.InterfaceAlias -like \"*br100*\" -and $_.AddressFamily -like \"IPv4\"}).IPAddress.ToString()' | grep -E -o '10\.0\.[0-9]{1,2}\.[0-9]{1,3}'`
 echo `date -u +%H:%M:%S` "Data IP of $hyperv01 is $hyperv01_ip"
 echo `date -u +%H:%M:%S` "Data IP of $hyperv02 is $hyperv02_ip"
 
