@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+
 array_to_regex()
 {
     local ar=(${@})
@@ -18,9 +20,9 @@ array_to_regex()
 
 tests_dir=$1
 
-exclude_tests_file="/home/ubuntu/bin/excluded-tests.txt"
-isolated_tests_file="/home/ubuntu/bin/isolated-tests.txt"
-include_tests_file="/home/ubuntu/bin/include-tests.txt"
+exclude_tests_file="$DIR/excluded-tests.txt"
+isolated_tests_file="$DIR/isolated-tests.txt"
+include_tests_file="$DIR/include-tests.txt"
 
 include_tests=(`awk 'NF && $1!~/^#/' $include_tests_file`)
 

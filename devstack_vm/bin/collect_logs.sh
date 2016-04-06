@@ -1,6 +1,7 @@
 #!/bin/bash
 
-. /home/ubuntu/bin/config.sh
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+. $DIR/config.sh
 
 TAR=$(which tar)
 GZIP=$(which gzip)

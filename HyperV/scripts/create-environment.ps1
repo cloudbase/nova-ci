@@ -14,8 +14,9 @@ if ($isDebug -eq  'yes') {
 
 $projectName = $buildFor.split('/')[-1]
 
-. "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
-. "C:\OpenStack\nova-ci\HyperV\scripts\utils.ps1"
+$scriptLocation = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
+. "$scriptLocation\config.ps1"
+. "$scriptLocation\utils.ps1"
 
 $hasProject = Test-Path $buildDir\$projectName
 $hasNova = Test-Path $buildDir\nova
@@ -292,23 +293,25 @@ Copy-Item -Recurse $configDir "$remoteConfigs\$hostname"
 
 Write-Host "Starting the services"
 
-Write-Host "Starting nova-compute service"
+$currDate = (Get-Date).ToString()
+Write-Host "$currDate Starting nova-compute service"
 Try
 {
     Start-Service nova-compute
 }
 Catch
 {
-    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
-    Start-Sleep -s 30
-    if (! $proc.HasExited) {Stop-Process -Id $proc.Id -Force}
-    Throw "Can not start the nova-compute service"
+    Write-Host "Can not start the nova-compute service."
 }
 Start-Sleep -s 30
 if ($(get-service nova-compute).Status -eq "Stopped")
 {
-    Write-Host "We try to start:"
+    Write-Host "nova-compute service is not running."
+    $currDate = (Get-Date).ToString()
+    Write-Host "$currDate We try to start:"
     Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
+    $currDate = (Get-Date).ToString()
+    Add-Content "$openstackLogs\nova-compute.log" "`n$currDate Starting nova-compute as a python process."
     Try
     {
     	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
@@ -336,16 +339,17 @@ Try
 }
 Catch
 {
-    $proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
-    Start-Sleep -s 30
-    if (! $proc.HasExited) {Stop-Process -Id $proc.Id -Force}
-    Throw "Can not start the neutron-hyperv-agent service"
+    Write-Host "Can not start the neutron-hyperv-agent service."
 }
 Start-Sleep -s 30
 if ($(get-service neutron-hyperv-agent).Status -eq "Stopped")
 {
-    Write-Host "We try to start:"
-    Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    Write-Host "neutron-hyperv-agent service is not running."
+    $currDate = (Get-Date).ToString()
+    Write-Host "$currDate We try to start:"
+     Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
+    $currDate = (Get-Date).ToString()
+    Add-Content "$openstackLogs\neutron-hyperv-agent.log" "`n$currDate starting neutron-hyperv-agent as a python process."
     Try
     {
     	$proc = Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonScripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
