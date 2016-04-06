@@ -88,8 +88,8 @@ pid=$!
 wait $pid
 cat $STACK_LOG
 
-firewall_manage_ports "" add enable ${TCP_PORTS[@]}
-firewall_manage_ports "" add enable ${TCP_PORTS[@]}
+firewall_manage_ports $hyperv01 add enable ${TCP_PORTS[@]}
+firewall_manage_ports $hyperv02 add enable ${TCP_PORTS[@]}
 
 echo "Cleaning caches before starting tests; needed to avoid memory starvation"
 sudo sh -c 'sync; echo 3 > /proc/sys/vm/drop_caches'
