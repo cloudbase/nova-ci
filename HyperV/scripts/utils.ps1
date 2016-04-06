@@ -117,7 +117,7 @@ function exporthtmleventlog($path){
 		$Report = $Report | ConvertTo-Html -Title "${i}" -Head $HTMLHeader -As Table
 		$Report = $Report | ForEach-Object {$_ -replace "<body>", '<body id="body">'}
 		$Report = $Report | ForEach-Object {$_ -replace "<table>", '<table class="sortable" id="table" cellspacing="0">'}
-		$logName = $i  + ".html"
+		$logName = "eventlog_" + $i + ".html"
 		$logName = $logName.replace(" ","_")
 		$bkup = Join-Path $path $logName
 		$Report = $Report | Set-Content $bkup
