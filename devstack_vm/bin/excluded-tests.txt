@@ -1,6 +1,5 @@
 # See Tempest bug: https://bugs.launchpad.net/tempest/+bug/1363986
-tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps.test_cross_tenant_traffic
-tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps.test_multiple_security_groups
+tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps
 
 # Fails on DevStack. Not related to Hyper-V
 tempest.scenario.test_load_balancer_basic.TestLoadBalancerBasic.test_load_balancer_basic
@@ -25,8 +24,6 @@ tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTest
 tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_resize
 tempest.scenario.test_network_basic_ops.TestNetworkBasicOps
 tempest.scenario.test_network_v6.TestGettingAddress
-tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps
-tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps.test_cross_tenant_traffic
 tempest.scenario.test_shelve_instance.TestShelveInstance
 tempest.scenario.test_snapshot_pattern.TestSnapshotPattern
 tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern
@@ -47,7 +44,3 @@ tempest.api.orchestration.stacks.test_resource_types.ResourceTypesTest
 
 #Fails every time and needs invastigation Feb 24 2016
 tempest.api.image.v1.test_images.CreateRegisterImagesTest.test_register_http_image
-
-#Faild very frequently, removing till fix March 29 2016
-tempest.api.compute.admin.test_live_migration.LiveBlockMigrationTestJSON.test_iscsi_volume
-tempest.api.compute.servers.test_attach_interfaces.AttachInterfacesTestJSON.test_add_remove_fixed_ip
