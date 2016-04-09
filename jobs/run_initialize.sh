@@ -45,8 +45,6 @@ echo FLOATING_IP=$FLOATING_IP
 echo NAME=$NAME
 echo NET_ID=$NET_ID
 
-echo "Deploying devstack $NAME"
-
 devstack_image="devstack-76v1"
 
 echo "Image used is: $devstack_image"
