@@ -1,16 +1,6 @@
 # See Tempest bug: https://bugs.launchpad.net/tempest/+bug/1363986
 tempest.scenario.test_security_groups_basic_ops.TestSecurityGroupsBasicOps
 
-# Fails on DevStack. Not related to Hyper-V
-tempest.scenario.test_load_balancer_basic.TestLoadBalancerBasic.test_load_balancer_basic
-
-# Fails on DevStack. requires investigation.
-tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_rebuild
-
-# Fails on DevStack. requires investigation.
-tempest.api.compute.admin.test_simple_tenant_usage.TenantUsagesTestJSON.test_get_usage_tenant
-tempest.api.compute.admin.test_simple_tenant_usage.TenantUsagesTestJSON.test_get_usage_tenant_with_non_admin_user
-
 #disabled due ot console-log issue
 tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_get_console_output
 tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_get_console_output_server_id_in_shutoff_status
@@ -21,26 +11,8 @@ tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.
 tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON.
 
 # Tests needing further investigation:
-tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps.test_server_connectivity_resize
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
 tempest.scenario.test_network_basic_ops.TestNetworkBasicOps
 tempest.scenario.test_network_v6.TestGettingAddress
-tempest.scenario.test_shelve_instance.TestShelveInstance
-tempest.scenario.test_snapshot_pattern.TestSnapshotPattern
 tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern
 tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_volume_boot_pattern
-tempest.scenario.test_rebuild_instance_with_volume.TestRebuildInstanceWithVolume.test_rebuild_instance_with_volume
-
-# Excluded for further investigation - Dec.07 2015
-tempest.scenario.test_server_multinode.TestServerMultinode
-
-#Fails constantly atm - Dec 29 2015
-tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
-
-#Fails due to tempest config - Jan 04 2016
-tempest.api.orchestration.stacks.test_neutron_resources
-
-#Fails very often and needs invastigation Jan 21 2016
-tempest.api.orchestration.stacks.test_resource_types.ResourceTypesTest
-
-#Fails every time and needs invastigation Feb 24 2016
-tempest.api.image.v1.test_images.CreateRegisterImagesTest.test_register_http_image
