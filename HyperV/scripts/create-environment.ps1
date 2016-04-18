@@ -187,6 +187,10 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install numpy
 & pip install -U os-win
 
+if (($branchName.ToLower().CompareTo($('stable/mitaka').ToLower()) -and  $branchName.ToLower().CompareTo($('stable/liberty').ToLower()) -eq 0)) {
+    & pip install Babel==2.2.0
+}
+
 popd
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
