@@ -187,7 +187,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install numpy
 & pip install -U os-win
 
-if (($branchName.ToLower().CompareTo($('stable/mitaka').ToLower()) -or  $branchName.ToLower().CompareTo($('stable/liberty').ToLower()) -eq 0)) {
+if (($branchName.ToLower().CompareTo($('stable/mitaka').ToLower()) -eq 0) -or ($branchName.ToLower().CompareTo($('stable/liberty').ToLower()) -eq 0)) {
     & pip install Babel==2.2.0
 }
 
