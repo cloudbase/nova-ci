@@ -185,6 +185,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install -U --pre pymi
 & pip install cffi
 & pip install numpy
+& pip install pycrypto
 & pip install -U os-win
 
 if (($branchName.ToLower().CompareTo($('stable/mitaka').ToLower()) -eq 0) -or ($branchName.ToLower().CompareTo($('stable/liberty').ToLower()) -eq 0)) {
