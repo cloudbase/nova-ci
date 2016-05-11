@@ -31,8 +31,7 @@ sudo cp $HOME/.pip/pip.conf /root/.pip/
 sudo chown -R root:root /root/.pip
 
 # Update packages to latest version
-sudo easy_install -U pip
-sudo pip install pip==8.1.1
+sudo easy_install -U pip==8.1.1
 sudo pip install -U six
 sudo pip install -U kombu
 sudo pip install -U pbr
