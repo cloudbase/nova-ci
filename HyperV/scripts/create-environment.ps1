@@ -180,8 +180,7 @@ else
 }
 Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
-& easy_install -U pip
-& pip install pip==8.1.1
+& easy_install -U pip==8.1.1
 & pip install -U setuptools
 & pip install -U --pre pymi
 & pip install cffi
