@@ -24,12 +24,6 @@ source /usr/local/src/nova-ci/jobs/library.sh
 
 set -e
 
-FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
-if [ -z "$FLOATING_IP" ]; then
-   exit 1
-fi
-echo FLOATING_IP=$FLOATING_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-
 NAME="nov-dvs-$ZUUL_CHANGE-$ZUUL_PATCHSET"
 if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB == "yes" ]]; then
 	NAME="$NAME-dbg"
@@ -41,7 +35,6 @@ echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo FLOATING_IP=$FLOATING_IP
 echo NAME=$NAME
 echo NET_ID=$NET_ID
 
@@ -67,6 +60,24 @@ echo "Showing details of the new created instance: $VMID"
 nova show "$VMID"
 
 echo "Fetching devstack VM fixed IP address"
+
+FIP=$(nova show "$VMID" | grep "private network" | awk '{print $6}')
+FIP=${FIP//,}
+if [[ ! $FIP =~ .*\|.* ]]; then
+    sleep 30
+fi
+
+sleep 10
+FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
+if [ -z "$FLOATING_IP" ]; then
+   exit 1
+fi
+echo FLOATING_IP=$FLOATING_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+
+echo FLOATING_IP=$FLOATING_IP
+exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
+
+sleep 10
 FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
 export FIXED_IP="${FIXED_IP//,}"
 
@@ -101,9 +112,6 @@ done
 
 echo FIXED_IP=$FIXED_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 echo "FIXED_IP=$FIXED_IP"
-
-sleep 10
-exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
 
 echo "nova show $VMID:"
 nova show "$VMID"
