@@ -30,9 +30,9 @@ $hasQemuImg = Test-Path $binDir\qemu-img.exe
 
 $pip_conf_content = @"
 [global]
-index-url = http://dl.openstack.tld:8080/cloudbase/CI/+simple/
+index-url = http://10.0.110.1:8080/cloudbase/CI/+simple/
 [install]
-trusted-host = dl.openstack.tld
+trusted-host = 10.0.110.1
 "@
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -102,7 +102,7 @@ if ($hasBinDir -eq $false){
 }
 
 if (($hasMkisoFs -eq $false) -or ($hasQemuImg -eq $false)){
-    Invoke-WebRequest -Uri "http://dl.openstack.tld/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
+    Invoke-WebRequest -Uri "http://10.0.110.1/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
     if (Test-Path "$7zExec"){
         pushd $bindir
         & $7zExec x -y "$bindir\openstack_bin.zip"
@@ -156,7 +156,7 @@ if (Test-Path $pythonArchive)
 {
     Remove-Item -Force $pythonArchive
 }
-Invoke-WebRequest -Uri http://dl.openstack.tld/python27new.tar.gz -OutFile $pythonArchive
+Invoke-WebRequest -Uri http://10.0.110.1/python27new.tar.gz -OutFile $pythonArchive
 if (Test-Path $pythonTar)
 {
     Remove-Item -Force $pythonTar
