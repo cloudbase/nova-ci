@@ -344,7 +344,7 @@ $ServiceChangeErrors.Add(24, "Service Already Paused")
 $openstackDir = "C:\OpenStack"
 $virtualenv = "C:\Python27"
 $configDir = "$openstackDir\etc"
-$downloadLocation = "http://dl.openstack.tld/"
+$downloadLocation = "http://10.0.110.1/"
 
 $novaServiceName = "nova-compute"
 $novaServiceDescription = "OpenStack nova Compute Service"
