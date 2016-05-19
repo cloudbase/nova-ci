@@ -7,8 +7,8 @@ tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_get_c
 tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_get_console_output_with_unlimited_size
 
 # Rescue (to be removed when the feature is added)
-#tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.
-#tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON.
+tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.
+tempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON.
 
 # Tests needing further investigation:
 tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
