@@ -38,7 +38,7 @@ echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 echo NAME=$NAME
 echo NET_ID=$NET_ID
 
-devstack_image="devstack-76v1"
+devstack_image="devstack-77v3"
 
 echo "Image used is: $devstack_image"
 echo "Deploying devstack $NAME"
