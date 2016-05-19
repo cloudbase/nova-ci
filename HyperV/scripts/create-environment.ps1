@@ -260,6 +260,11 @@ ExecRetry {
     git fetch https://review.openstack.org/openstack/nova refs/changes/68/291668/2
     cherry_pick FETCH_HEAD
 
+    # nova-rescue tests are enabled. This patch adds nova-rescue feature.
+    # remove it once it merges.
+    git fetch https://review.openstack.org/openstack/nova refs/changes/59/127159/40
+    cherry_pick FETCH_HEAD
+
     & pip install $buildDir\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
