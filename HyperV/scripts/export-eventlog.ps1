@@ -1,7 +1,8 @@
 # Loading config and utils
 
-. "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
-. "C:\OpenStack\nova-ci\HyperV\scripts\utils.ps1"
+$scriptLocation = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
+ . "$scriptLocation\config.ps1"
+ . "$scriptLocation\utils.ps1"
 
 
 if (Test-Path $eventlogPath){
