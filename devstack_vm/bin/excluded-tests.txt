@@ -18,5 +18,3 @@ neutron_fwaas.tests.tempest_plugin.tests.api.test_fwaas_extensions.FWaaSExtensio
 neutron_fwaas.tests.tempest_plugin.tests.api.test_fwaas_extensions.FWaaSExtensionTestJSON.test_firewall_insertion_mode_add_remove_router
 neutron_fwaas.tests.tempest_plugin.tests.api.test_fwaas_extensions.FWaaSExtensionTestJSON.test_firewall_insertion_mode_one_firewall_per_router
 
-# Tests needing further investigation (10/05/2016 - Trello card: https://trello.com/c/A0WNHgWM/33-bug-hyperv-compute-nova-novaexception-remote-wmi-job-failed-with-status-10 ):
-tempest.api.compute.admin.test_live_migration.LiveBlockMigrationTestJSON.test_iscsi_volume
