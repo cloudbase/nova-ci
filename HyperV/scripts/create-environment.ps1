@@ -276,7 +276,6 @@ if ($? -eq $false){
 }
 
 cp "$templateDir\policy.json" "$configDir\"
-cp "$templateDir\interfaces.template" "$configDir\"
 
 $hasNovaExec = Test-Path "$pythonScripts\nova-compute.exe"
 if ($hasNovaExec -eq $false){
