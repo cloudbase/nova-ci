@@ -187,6 +187,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install numpy
 & pip install pycrypto
 & pip install -U os-win
+& pip install amqp==1.4.9
 
 popd
 
