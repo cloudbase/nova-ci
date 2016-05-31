@@ -5,5 +5,5 @@ results_html_file=$2
 
 f=$(tempfile)
 cat $log_file | subunit-2to1 > $f
-python subunit2html.py $f $results_html_file
+subunit2html $f $results_html_file
 rm $f
