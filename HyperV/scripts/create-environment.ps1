@@ -200,7 +200,7 @@ else
 }
 Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
-cp $templateDir\distutils.cfg "$pythonDir\Lib\distutils\distutils.cfg"
+#cp $templateDir\distutils.cfg "$pythonDir\Lib\distutils\distutils.cfg"
 
 function cherry_pick($commit) {
     $eapSet = $ErrorActionPreference
