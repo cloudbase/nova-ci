@@ -2,7 +2,8 @@ Param(
     [Parameter(Mandatory=$true)][string]$devstackIP,
     [string]$branchName='master',
     [string]$buildFor='openstack/nova',
-    [string]$isDebug='no'
+    [string]$isDebug='no',
+    [string]$zuulChange=''
 )
 
 if ($isDebug -eq  'yes') {
@@ -244,6 +245,20 @@ ExecRetry {
     & pip install $buildDir\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
+}
+
+if ($zuulChange -eq '273504') {
+    ExecRetry {
+        GitClonePull "$buildDir\os-brick" "https://git.openstack.org/openstack/os-brick.git" $branchName
+
+        pushd $buildDir\os-brick
+
+        git fetch https://git.openstack.org/openstack/os-brick refs/changes/22/272522/26
+        cherry_pick FETCH_HEAD
+
+        & pip install $buildDir\os-brick
+        popd
+    }
 }
 
 ExecRetry {
