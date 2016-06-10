@@ -80,11 +80,11 @@ exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova s
 sleep 10
 
 if ! ping -c 3 $FLOATING_IP; then
-    echo "Cant ping $FLOATING_IP rebooting VM"
+    echo "Can not ping $FLOATING_IP, rebooting VM"
     nova reboot $VMID
 fi
 
-sleep 60 
+sleep 180
 
 FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
 export FIXED_IP="${FIXED_IP//,}"
