@@ -275,7 +275,8 @@ if ($? -eq $false){
     Throw "Error writting $configDir\neutron_hyperv_agent.conf"
 }
 
-cp "$templateDir\policy.json" "$configDir\"
+#cp "$templateDir\policy.json" "$configDir\"
+cp \\$devstackIP\openstack\policy.json "$configDir\"
 
 $hasNovaExec = Test-Path "$pythonScripts\nova-compute.exe"
 if ($hasNovaExec -eq $false){
