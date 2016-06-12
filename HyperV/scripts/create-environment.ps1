@@ -253,7 +253,7 @@ if ($zuulChange -eq '273504') {
 
         pushd $buildDir\os-brick
 
-        git fetch https://git.openstack.org/openstack/os-brick refs/changes/22/272522/26
+        git fetch https://git.openstack.org/openstack/os-brick refs/changes/22/272522/29
         cherry_pick FETCH_HEAD
 
         & pip install $buildDir\os-brick
