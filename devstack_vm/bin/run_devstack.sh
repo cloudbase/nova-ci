@@ -36,6 +36,7 @@ sudo easy_install -U pip
 sudo pip install -U six
 sudo pip install -U kombu
 sudo pip install -U pbr
+sudo pip install -U os-testr
 
 # Clean devstack logs
 sudo rm -f "$DEVSTACK_LOGS/*"

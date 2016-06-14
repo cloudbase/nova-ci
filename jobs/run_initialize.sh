@@ -150,7 +150,7 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo ln -fs /usr/s
 scp -v -r -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i $DEVSTACK_SSH_KEY /usr/local/src/nova-ci/devstack_vm/* ubuntu@$FLOATING_IP:/home/ubuntu/
 
 if [ "$ZUUL_BRANCH" != "master" ]; then
-    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo -e "tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.\ntempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON." >> /home/ubuntu/bin/excluded-tests.txt'
+    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo -e "tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.\ntempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON." >> /home/ubuntu/bin/testLists/excluded-tests.txt'
 fi
 
 ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
