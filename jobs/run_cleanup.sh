@@ -21,7 +21,7 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
         
             echo "Removing devstack VM"
         nova delete "$VMID"
-        /usr/local/src/nova-ci/vlan_allocation.py -r $VMID
+        /usr/local/src/ci-tools/vlan_allocation.py -r $VMID
         
             echo "Deleting devstack floating IP"
         nova floating-ip-delete "$FLOATING_IP"

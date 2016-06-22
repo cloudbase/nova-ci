@@ -149,7 +149,7 @@ ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
 echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 set +e
-VLAN_RANGE=`/usr/local/src/nova-ci/vlan_allocation.py -a $VMID`
+VLAN_RANGE=`/usr/local/src/ci-tools/vlan_allocation.py -a $VMID`
 if [ ! -z "$VLAN_RANGE" ]; then
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sed -i 's/TENANT_VLAN_RANGE.*/TENANT_VLAN_RANGE='$VLAN_RANGE'/g' /home/ubuntu/devstack/local.conf" 3
 fi
