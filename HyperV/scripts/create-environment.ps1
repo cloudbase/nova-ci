@@ -278,7 +278,11 @@ ExecRetry {
     popd
 }
 
-$cores_count = (gwmi -class Win32_Processor).count * (gwmi -class Win32_Processor)[0].NumberOfCores
+# Note: be careful as WMI queries may return only one element, in which case we
+# won't get an array. To make it easier, we can just make sure we always have an
+# array.
+$cpu_array = ([array](gwmi -class Win32_Processor))
+$cores_count = $cpu_array.count * $cpu_array[0].NumberOfCores
 $novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
 $neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser).replace('[CORES_COUNT]', "$cores_count")
 
