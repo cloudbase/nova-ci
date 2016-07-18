@@ -52,6 +52,7 @@ Write-Host "Clearing any VMs that might have been left."
 Get-VM | where {$_.State -eq 'Running' -or $_.State -eq 'Paused'} | Stop-Vm -Force
 Remove-VM * -Force
 
+destroy_planned_vms
 cleanup_iscsi_targets
 
 Write-Host "Cleaning the build folder."
