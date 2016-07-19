@@ -139,11 +139,7 @@ function cleareventlog(){
 }
 
 function log_message($message){
-    echo "[$(Get-Date)] $message"
-}
-
-function log_message($message) {
-    echo $message
+    Write-Host "[$(Get-Date)] $message"
 }
 
 function destroy_planned_vms() {

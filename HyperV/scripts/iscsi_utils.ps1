@@ -25,16 +25,20 @@ function get_iscsi_persistent_targets() {
         % { $_ -match 'Total of ([0-9]*) .*'} | Out-Null
 
     $count = $matches[1]
-    $targets = (1..$count) | % { new-object PersistentTarget}
-    parse_iscsicli_output $out "Target Name" | `
-        % {$i = 0} {$targets[$i].name = $_; $i++}
-    parse_iscsicli_output $out "Initiator Name" | `
-        % {$i = 0} {$targets[$i].initiator = $_; $i++}
-    parse_iscsicli_output $out "Address and Socket" | `
-        % {$i = 0} `
-          {$targets[$i].portalAddr, `
-           $targets[$i].portalPort = $_.split(" ");
-           $i++}
+    $targets = @()
+
+    if ($count -ne "0") {
+        $targets = (1..$count) | % { new-object PersistentTarget}
+        parse_iscsicli_output $out "Target Name" | `
+            % {$i = 0} {$targets[$i].name = $_; $i++}
+        parse_iscsicli_output $out "Initiator Name" | `
+            % {$i = 0} {$targets[$i].initiator = $_; $i++}
+        parse_iscsicli_output $out "Address and Socket" | `
+            % {$i = 0} `
+              {$targets[$i].portalAddr, `
+               $targets[$i].portalPort = $_.split(" ");
+               $i++}
+    }
     return $targets
 }
 
