@@ -2,6 +2,7 @@
 
 . "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
 . "C:\OpenStack\nova-ci\HyperV\scripts\utils.ps1"
+. "C:\OpenStack\nova-ci\HyperV\scripts\iscsi_utils.ps1"
 
 # end Loading config
 
@@ -50,6 +51,9 @@ if ($(Get-Service neutron-hyperv-agent).Status -ne "Stopped"){
 Write-Host "Clearing any VMs that might have been left."
 Get-VM | where {$_.State -eq 'Running' -or $_.State -eq 'Paused'} | Stop-Vm -Force
 Remove-VM * -Force
+
+destroy_planned_vms
+cleanup_iscsi_targets
 
 Write-Host "Cleaning the build folder."
 Remove-Item -Recurse -Force $buildDir\*
