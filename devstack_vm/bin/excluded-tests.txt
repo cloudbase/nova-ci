@@ -9,7 +9,6 @@ tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_get_c
 # Tests needing further investigation:
 tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
 tempest.scenario.test_network_basic_ops.TestNetworkBasicOps
-tempest.scenario.test_network_v6.TestGettingAddress
 tempest.scenario.test_volume_boot_pattern.TestVolumeBootPattern.test_volume_boot_pattern
 tempest.scenario.test_volume_boot_pattern.TestVolumeBootPatternV2.test_volume_boot_pattern
 
