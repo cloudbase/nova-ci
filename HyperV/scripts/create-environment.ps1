@@ -143,6 +143,12 @@ if ($buildFor -eq "openstack/nova"){
     ExecRetry {
         GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" $branchName
     }
+    ExecRetry {
+        GitClonePull "$buildDir\requirements" "https://git.openstack.org/openstack/requirements.git" $branchName
+    }
+    ExecRetry {
+        GitClonePull "$buildDir\os-win" "https://git.openstack.org/openstack/os-win.git" $branchName
+    }
 }else{
     Throw "Cannot build for project: $buildFor"
 }
@@ -180,7 +186,7 @@ $hasPipConf = Test-Path "$env:APPDATA\pip"
 if ($hasPipConf -eq $false){
     mkdir "$env:APPDATA\pip"
 }
-else 
+else
 {
     Remove-Item -Force "$env:APPDATA\pip\*"
 }
@@ -189,12 +195,6 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & easy_install -U pip
 & pip install -U setuptools
 & pip install -U --pre pymi
-& pip install cffi
-& pip install numpy
-& pip install pycrypto
-& pip install -U os-win
-& pip install amqp==1.4.9
-& pip install cffi==1.6.0
 
 popd
 
@@ -202,7 +202,7 @@ $hasPipConf = Test-Path "$env:APPDATA\pip"
 if ($hasPipConf -eq $false){
     mkdir "$env:APPDATA\pip"
 }
-else 
+else
 {
     Remove-Item -Force "$env:APPDATA\pip\*"
 }
@@ -231,13 +231,38 @@ if ($isDebug -eq  'yes') {
     Get-ChildItem $buildDir
 }
 
+ExecRetry
+{
+    pushd "$buildDir\requirements"
+    Write-Host "Installing OpenStack/Requirements..."
+    & pip install -c upper-constraints.txt -U pbr virtualenv httplib2 prettytable>=0.7
+    & pip install -c upper-constraints.txt -U .
+    if ($LastExitCode) { Throw "Failed to install openstack/requirements from repo" }
+    popd
+}
+
+ExecRetry {
+    if ($isDebug -eq  'yes') {
+        Write-Host "Content of $buildDir\os-win"
+        Get-ChildItem $buildDir\os-win
+    }
+    pushd $buildDir\os-win
+    Write-Host "Installing OpenStack\os-win..."
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    if ($LastExitCode) { Throw "Failed to install os-win fom repo" }
+    popd
+}
+
 ExecRetry {
     if ($isDebug -eq  'yes') {
         Write-Host "Content of $buildDir\neutron"
         Get-ChildItem $buildDir\neutron
     }
     pushd $buildDir\neutron
-    & pip install $buildDir\neutron
+    Write-Host "Installing OpenStack\neutron..."
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
 }
@@ -248,23 +273,15 @@ ExecRetry {
         Get-ChildItem $buildDir\networking-hyperv
     }
     pushd $buildDir\networking-hyperv
-    & pip install $buildDir\networking-hyperv
+    Write-Host "Installing OpenStack\networking-hyperv..."
+    & update-requirements.exe --source $buildDir\requirements .
+    if (($branchName -eq 'stable/mitaka') -or ($branchName -eq 'stable/liberty' )) {
+        & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    } else {
+        & pip install -c $buildDir\requirements\upper-constraints.txt -Ue .
+    }
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
-}
-
-if ($zuulChange -eq '273504') {
-    ExecRetry {
-        GitClonePull "$buildDir\os-brick" "https://git.openstack.org/openstack/os-brick.git" $branchName
-
-        pushd $buildDir\os-brick
-
-        git fetch https://git.openstack.org/openstack/os-brick refs/changes/22/272522/31
-        cherry_pick FETCH_HEAD
-
-        & pip install $buildDir\os-brick
-        popd
-    }
 }
 
 ExecRetry {
@@ -273,12 +290,9 @@ ExecRetry {
         Get-ChildItem $buildDir\nova
     }
     pushd $buildDir\nova
-
-    # This patch attempts to fix the issue that is causing the nova-service to hang.
-    git fetch https://review.openstack.org/openstack/nova refs/changes/68/291668/2
-    cherry_pick FETCH_HEAD
-
-    & pip install $buildDir\nova
+    Write-Host "Installing OpenStack\nova"
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
 }
