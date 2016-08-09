@@ -274,8 +274,8 @@ ExecRetry {
     }
     pushd $buildDir\nova
 
-    # This patch attempts to fix the issue that is causing the nova-service to hang.
-    git fetch https://review.openstack.org/openstack/nova refs/changes/68/291668/2
+    # This patch fixes deadlock on shelve instances
+    git fetch https://review.openstack.org/openstack/nova refs/changes/37/352837/1
     cherry_pick FETCH_HEAD
 
     & pip install $buildDir\nova
