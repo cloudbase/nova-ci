@@ -273,11 +273,11 @@ ExecRetry {
         Get-ChildItem $buildDir\nova
     }
     pushd $buildDir\nova
-
-    # This patch fixes deadlock on shelve instances
-    git fetch https://review.openstack.org/openstack/nova refs/changes/37/352837/1
-    cherry_pick FETCH_HEAD
-
+    if ($branchName -eq 'master') {
+        # This patch fixes deadlock on shelve instances
+        git fetch https://review.openstack.org/openstack/nova refs/changes/37/352837/1
+        cherry_pick FETCH_HEAD
+    }
     & pip install $buildDir\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
