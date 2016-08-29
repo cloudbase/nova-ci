@@ -188,7 +188,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
 & easy_install -U pip
 & pip install setuptools==26.0.0
-& pip install -U --pre pymi
+& pip install pymi
 & pip install cffi
 & pip install numpy
 & pip install pycrypto
