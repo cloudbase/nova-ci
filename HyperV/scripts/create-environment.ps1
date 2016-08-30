@@ -169,7 +169,8 @@ if (Test-Path $pythonTar)
 }
 if (Test-Path $pythonDir)
 {
-    Remove-Item -Recurse -Force $pythonDir
+    Cmd /C "rmdir /S /Q $pythonDir"
+    #Remove-Item -Recurse -Force $pythonDir
 }
 Write-Host "Ensure Python folder is up to date"
 Write-Host "Extracting archive.."
