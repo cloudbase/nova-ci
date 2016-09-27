@@ -20,3 +20,6 @@ neutron_fwaas.tests.tempest_plugin.tests.api.test_fwaas_extensions.FWaaSExtensio
 
 # Tests needing further investigation (26/07/2016) https://trello.com/c/BPJyyfdg/47-bug-nova-nova-api-throws-compute-host-tempest-host-1785662647-could-not-be-found
 tempest.api.compute.test_live_block_migration_negative.LiveBlockMigrationNegativeTestJSON.test_invalid_host_for_migration
+
+# Tests needing further investigation (27/09/2016)
+tempest.api.compute.admin.test_auto_allocate_network.AutoAllocateNetworkTest.test_server_multi_create_auto_allocate
