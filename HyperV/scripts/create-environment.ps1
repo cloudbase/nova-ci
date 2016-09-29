@@ -275,8 +275,8 @@ ExecRetry {
     }
     pushd $buildDir\nova
     if ($branchName -eq 'master') {
-        # This patch fixes deadlock on shelve instances
-        git fetch https://review.openstack.org/openstack/nova refs/changes/37/352837/1
+        # This patch fixes os_type image property requirement
+        git fetch https://review.openstack.org/openstack/nova refs/changes/26/379326/1
         cherry_pick FETCH_HEAD
     }
     & pip install $buildDir\nova
