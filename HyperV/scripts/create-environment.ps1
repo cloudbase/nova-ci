@@ -28,6 +28,7 @@ $hasConfigDir = Test-Path $configDir
 $hasBinDir = Test-Path $binDir
 $hasMkisoFs = Test-Path $binDir\mkisofs.exe
 $hasQemuImg = Test-Path $binDir\qemu-img.exe
+$OSWIN_STABLE_RELEASES=@("stable/mitaka","stable/newton", "master")
 
 $pip_conf_content = @"
 [global]
@@ -143,6 +144,12 @@ if ($buildFor -eq "openstack/nova"){
     ExecRetry {
         GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" $branchName
     }
+    if ($OSWIN_STABLE_RELEASES -contains $branchName.ToLower()) {
+        ExecRetry {
+            # os-win only exists on stable/mitaka and higher.
+            GitClonePull "$buildDir\os-win" "https://git.openstack.org/openstack/os-win.git" $branchName
+        }
+    }
 }else{
     Throw "Cannot build for project: $buildFor"
 }
@@ -193,7 +200,6 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install cffi
 & pip install numpy
 & pip install pycrypto
-& pip install -U os-win
 & pip install amqp==1.4.9
 & pip install cffi==1.6.0
 
@@ -281,6 +287,20 @@ ExecRetry {
     }
     & pip install $buildDir\nova
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
+    popd
+}
+
+ExecRetry {
+    if ($isDebug -eq  'yes') {
+        Write-Host "Content of $buildDir\os-win"
+        Get-ChildItem $buildDir\os-win
+    }
+    pushd $buildDir\os-win
+    if ($OSWIN_STABLE_RELEASES -contains $branchName.ToLower()) {
+        # only install os-win on stable/mitaka or master.
+        & pip install $buildDir\os-win
+    }
+    if ($LastExitCode) { Throw "Failed to install os-win fom repo" }
     popd
 }
 
