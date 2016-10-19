@@ -56,6 +56,18 @@ then
         sed -i 's/^HOST_IP=.*/HOST_IP='$MYIP'/g' "$LOCALRC"
 fi
 
+git config --global user.email hyper-v_ci@microsoft.com
+git config --global user.name 'Hyper-V CI'
+
+cd $tests_dir
+# Apply patch "wait for port status to be ACTIVE"
+git fetch git://git.openstack.org/openstack/tempest refs/changes/49/383049/7
+git cherry-pick FETCH_HEAD
+
+# Apply patch "Adds protocol options for test_cross_tenant_traffic"
+git fetch git://git.openstack.org/openstack/tempest refs/changes/28/384528/5
+git cherry-pick FETCH_HEAD
+
 cd /home/ubuntu/devstack
 git pull
 
