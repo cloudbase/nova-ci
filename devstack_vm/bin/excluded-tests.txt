@@ -15,3 +15,6 @@ tempest.scenario.test_network_basic_ops.TestNetworkBasicOps.test_update_router_a
 
 tempest.scenario.test_network_v6.TestGettingAddress
 
+# Tests added on 19.10.2016 https://trello.com/c/Dp6DazAK/53-bug-nova-hypervportnotfoundexception-switch-port-not-found
+tempest.scenario.test_network_advanced_server_ops.TestNetworkAdvancedServerOps
+
