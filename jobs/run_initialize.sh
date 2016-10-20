@@ -49,7 +49,7 @@ echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstac
 echo "Deploying devstack $NAME"
 
 # Boot the new 10G of RAM flavor
-VMID=$(nova boot --availability-zone hyper-v --flavor nova.devstack --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
+VMID=$(nova boot --flavor nova.devstack --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
 NOVABOOT_EXIT=$?
 export VMID=$VMID
 echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
@@ -76,18 +76,10 @@ FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | ta
 if [ -z "$FLOATING_IP" ]; then
    exit 1
 fi
-echo FLOATING_IP=$FLOATING_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
 
 sleep 10
-
-if ! ping -c 3 $FLOATING_IP; then
-    echo "Can not ping $FLOATING_IP, rebooting VM"
-    nova reboot $VMID
-fi
-
-sleep 180
 
 FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
 export FIXED_IP="${FIXED_IP//,}"
@@ -127,13 +119,17 @@ echo "nova show $VMID:"
 nova show "$VMID"
 
 sleep 60
+FLOATING_IP=$FIXED_IP
+
+echo FLOATING_IP=$FLOATING_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+
 wait_for_listening_port $FLOATING_IP 22 30 || { echo "nova console-log $VMID:"; nova console-log "$VMID"; echo "Failed listening for ssh port on devstack";exit 1; }
 
 echo "adding $NAME to /etc/hosts"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'VMNAME=$(hostname); sudo sed -i "s/127.0.0.1 localhost/127.0.0.1 localhost $VMNAME/g" /etc/hosts' 1
 
 echo "adding apt-cacher-ng:"
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo "Acquire::http { Proxy \"http://10.0.110.1:3142\" };" | sudo tee --append /etc/apt/apt.conf.d/90-apt-proxy.conf' 1
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo "Acquire::http { Proxy \"http://10.21.7.214:3142\" };" | sudo tee --append /etc/apt/apt.conf.d/90-apt-proxy.conf' 1
 
 echo "clean any apt files:"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo rm -rf /var/lib/apt/lists/*" 1
@@ -172,7 +168,7 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/u
 
 # Set ZUUL IP in hosts file
 if  ! grep -qi zuul /etc/hosts ; then
-    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "echo '10.21.7.8 zuul.openstack.tld' | sudo tee -a /etc/hosts"
+    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "echo '10.20.1.12 logs.openstack.tld' | sudo tee -a /etc/hosts"
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "echo '10.9.1.27 zuul-ssd-0.openstack.tld' | sudo tee -a /etc/hosts"
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "echo '10.9.1.29 zuul-ssd-1.openstack.tld' | sudo tee -a /etc/hosts"
 fi
@@ -182,8 +178,8 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/g
 
 # get locally the vhdx files used by tempest
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "mkdir -p /home/ubuntu/devstack/files/images"
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "wget http://10.0.110.1/cirros-0.3.3-x86_64.vhdx -O /home/ubuntu/devstack/files/images/cirros-0.3.3-x86_64.vhdx"
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "wget http://10.0.110.1/Fedora-x86_64-20-20140618-sda.vhdx.gz -O /home/ubuntu/devstack/files/images/Fedora-x86_64-20-20140618-sda.vhdx.gz"
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "wget http://10.21.7.214/cirros-0.3.3-x86_64.vhdx -O /home/ubuntu/devstack/files/images/cirros-0.3.3-x86_64.vhdx"
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "wget http://10.21.7.214/Fedora-x86_64-20-20140618-sda.vhdx.gz -O /home/ubuntu/devstack/files/images/Fedora-x86_64-20-20140618-sda.vhdx.gz"
 
 # install neutron pip package as it is external
 # run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo pip install -U networking-hyperv --pre"
@@ -207,17 +203,17 @@ $IPAddr = $NetIPAddr.IPAddress
 Write-Host $IPAddr
 _EOF
 HYPERV_GET_DATA_IP=`echo "$PSCODE" | iconv -f ascii -t utf16le | base64 -w0`
-hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.0\.[0-9]{1,2}\.[0-9]{1,3}'`
-hyperv02_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.0\.[0-9]{1,2}\.[0-9]{1,3}'`
+hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
+hyperv02_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
 set -e
 
 echo `date -u +%H:%M:%S` "Data IP of $hyperv01 is $hyperv01_ip"
 echo `date -u +%H:%M:%S` "Data IP of $hyperv02 is $hyperv02_ip"
-if [[ ! $hyperv01_ip =~ ^10\.0\.[0-9]{1,2}\.[0-9]{1,3} ]]; then
+if [[ ! $hyperv01_ip =~ ^10\.250\.[0-9]{1,2}\.[0-9]{1,3} ]]; then
     echo "Did not receive a good IP for Hyper-V host $hyperv01 : $hyperv01_ip"
     exit 1
 fi
-if [[ ! $hyperv02_ip =~ ^10\.0\.[0-9]{1,2}\.[0-9]{1,3} ]]; then
+if [[ ! $hyperv02_ip =~ ^10\.250\.[0-9]{1,2}\.[0-9]{1,3} ]]; then
     echo "Did not receive a good IP for Hyper-V host $hyperv02 : $hyperv02_ip"
     exit 1
 fi

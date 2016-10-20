@@ -20,6 +20,7 @@ $scriptLocation = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Def
 . "$scriptLocation\utils.ps1"
 
 $hasProject = Test-Path $buildDir\$projectName
+$hasBuildDir = Test-Path $buildDir
 $hasNova = Test-Path $buildDir\nova
 $hasNeutron = Test-Path $buildDir\neutron
 $hasNeutronTemplate = Test-Path $neutronTemplate
@@ -32,9 +33,9 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $pip_conf_content = @"
 [global]
-index-url = http://10.0.110.1:8080/cloudbase/CI/+simple/
+index-url = http://10.20.1.8:8080/cloudbase/CI/+simple/
 [install]
-trusted-host = 10.0.110.1
+trusted-host = 10.20.1.8
 "@
 
 $ErrorActionPreference = "SilentlyContinue"
@@ -97,7 +98,9 @@ if ($hasConfigDir -eq $false) {
         Throw "Can not clean the config folder"
     }
 }
-
+if ($hasBuildDir -eq $false){
+   mkdir $buidDir
+}
 if ($hasProject -eq $false){
     Get-ChildItem $buildDir
     Get-ChildItem ( Get-Item $buildDir ).Parent.FullName
@@ -109,7 +112,7 @@ if ($hasBinDir -eq $false){
 }
 
 if (($hasMkisoFs -eq $false) -or ($hasQemuImg -eq $false)){
-    Invoke-WebRequest -Uri "http://10.0.110.1/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
+    Invoke-WebRequest -Uri "http://10.21.7.214/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
     [System.IO.Compression.ZipFile]::ExtractToDirectory("$bindir\openstack_bin.zip", "$bindir")
     Remove-Item -Force "$bindir\openstack_bin.zip"
 }
@@ -157,7 +160,7 @@ if (Test-Path $pythonArchive)
 {
     Remove-Item -Force $pythonArchive
 }
-Invoke-WebRequest -Uri http://10.0.110.1/python.zip -OutFile $pythonArchive
+Invoke-WebRequest -Uri http://10.21.7.214/python.zip -OutFile $pythonArchive
 if (Test-Path $pythonDir)
 {
     Cmd /C "rmdir /S /Q $pythonDir"
