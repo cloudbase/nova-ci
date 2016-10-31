@@ -135,9 +135,15 @@ if ($buildFor -eq "openstack/nova"){
     ExecRetry {
         GitClonePull "$buildDir\neutron" "https://git.openstack.org/openstack/neutron.git" $branchName
     }
+    Get-ChildItem $buildDir
     ExecRetry {
         GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" $branchName
     }
+    Get-ChildItem $buildDir
+    ExecRetry {
+        GitClonePull "$buildDir\requirements" "https://git.openstack.org/openstack/requirements.git" $branchName
+    }
+    Get-ChildItem $buildDir
 }else{
     Throw "Cannot build for project: $buildFor"
 }
@@ -223,12 +229,23 @@ if ($isDebug -eq  'yes') {
 }
 
 ExecRetry {
+    pushd "$buildDir\requirements"
+    Write-Host "Installing OpenStack/Requirements..."
+    & pip install -c upper-constraints.txt -U pbr virtualenv httplib2 prettytable>=0.7 setuptools
+    & pip install -c upper-constraints.txt -U .
+    if ($LastExitCode) { Throw "Failed to install openstack/requirements from repo" }
+    popd
+}
+
+ExecRetry {
     if ($isDebug -eq  'yes') {
         Write-Host "Content of $buildDir\neutron"
         Get-ChildItem $buildDir\neutron
     }
     pushd $buildDir\neutron
-    & pip install $buildDir\neutron
+    Write-Host "Installing openstack/neutron..."
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
 }
@@ -239,7 +256,13 @@ ExecRetry {
         Get-ChildItem $buildDir\networking-hyperv
     }
     pushd $buildDir\networking-hyperv
-    & pip install $buildDir\networking-hyperv
+    Write-Host "Installing openstack/networking-hyperv..."
+    & update-requirements.exe --source $buildDir\requirements .
+    if (($branchName -eq 'stable/liberty') -or ($branchName -eq 'stable/mitaka')) {
+        & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    } else {
+        & pip install -e $buildDir\networking-hyperv
+    }
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
 }
@@ -269,7 +292,9 @@ ExecRetry {
         git fetch https://review.openstack.org/openstack/nova refs/changes/26/379326/1
         cherry_pick FETCH_HEAD
     }
-    & pip install $buildDir\nova
+    Write-Host "Installing openstack/nova..."
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
 }
