@@ -30,25 +30,29 @@ if [[ ! -z $IS_DEBUG_JOB ]] && [[ $IS_DEBUG_JOB == "yes" ]]; then
 fi
 export NAME=$NAME
 
-echo NAME=$NAME >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo NAME=$NAME | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo ZUUL_PROJECT=$ZUUL_PROJECT | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo ZUUL_CHANGE=$ZUUL_CHANGE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo ZUUL_PATCHSET=$ZUUL_PATCHSET | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo ZUUL_UUID=$ZUUL_UUID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo IS_DEBUG_JOB=$IS_DEBUG_JOB | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
+echo ZUUL_SITE=$ZUUL_SITE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+
 
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
-echo NET_ID=$NET_ID >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo NAME=$NAME
-echo NET_ID=$NET_ID
+devstack_image="devstack-78v1"
+echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-devstack_image="devstack-77v3"
-
-echo "Image used is: $devstack_image"
 echo "Deploying devstack $NAME"
 
 # Boot the new 10G of RAM flavor
 VMID=$(nova boot --availability-zone hyper-v --flavor nova.devstack --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
 NOVABOOT_EXIT=$?
 export VMID=$VMID
-echo VMID=$VMID >>  /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-echo VMID=$VMID
+echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 if [ $NOVABOOT_EXIT -ne 0 ]; then
     echo "Failed to create devstack VM: $VMID"
@@ -72,12 +76,19 @@ FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | ta
 if [ -z "$FLOATING_IP" ]; then
    exit 1
 fi
-echo FLOATING_IP=$FLOATING_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo FLOATING_IP=$FLOATING_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo FLOATING_IP=$FLOATING_IP
 exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
 
 sleep 10
+
+if ! ping -c 3 $FLOATING_IP; then
+    echo "Can not ping $FLOATING_IP, rebooting VM"
+    nova reboot $VMID
+fi
+
+sleep 180
+
 FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
 export FIXED_IP="${FIXED_IP//,}"
 
@@ -110,8 +121,7 @@ while [ -z "$FIXED_IP" ]; do
     fi
 done
 
-echo FIXED_IP=$FIXED_IP >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-echo "FIXED_IP=$FIXED_IP"
+echo FIXED_IP=$FIXED_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 echo "nova show $VMID:"
 nova show "$VMID"
@@ -145,9 +155,6 @@ if [ "$ZUUL_BRANCH" != "master" ]; then
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo -e "tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.\ntempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON." >> /home/ubuntu/bin/excluded-tests.txt'
 fi
 
-ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
-echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-
 set +e
 VLAN_RANGE=`/usr/local/src/nova-ci/vlan_allocation.py -a $VMID`
 if [ ! -z "$VLAN_RANGE" ]; then
@@ -162,8 +169,6 @@ nova interface-attach --net-id "$NET_ID" "$VMID"
 
 # update repos
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/update_devstack_repos.sh --branch $ZUUL_BRANCH --build-for $ZUUL_PROJECT" 1
-
-echo ZUUL_SITE=$ZUUL_SITE >> /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 # Set ZUUL IP in hosts file
 if  ! grep -qi zuul /etc/hosts ; then

@@ -56,17 +56,29 @@ then
         sed -i 's/^HOST_IP=.*/HOST_IP='$MYIP'/g' "$LOCALRC"
 fi
 
+git config --global user.email hyper-v_ci@microsoft.com
+git config --global user.name 'Hyper-V CI'
+
+cd $tests_dir
+# Apply patch "wait for port status to be ACTIVE"
+git fetch git://git.openstack.org/openstack/tempest refs/changes/49/383049/7
+git cherry-pick FETCH_HEAD
+
+# Apply patch "Adds protocol options for test_cross_tenant_traffic"
+git fetch git://git.openstack.org/openstack/tempest refs/changes/28/384528/5
+git cherry-pick FETCH_HEAD
+
 cd /home/ubuntu/devstack
 git pull
 
 ./unstack.sh
 
-#Fix for unproper ./unstack.sh
 screen_pid=$(ps auxw | grep -i screen | grep -v grep | awk '{print $2}')
-if [[ -n $screen_pid ]] 
-then
+if [[ -n $screen_pid ]]; then
     kill -9 $screen_pid
-    #In case there are "DEAD ????" screens, we remove them
+fi
+
+if `screen -ls | grep "Dead"`; then
     screen -wipe
 fi
 

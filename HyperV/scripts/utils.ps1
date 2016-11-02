@@ -137,3 +137,18 @@ function cleareventlog(){
 		Clear-Eventlog $_.LogDisplayName -ErrorAction SilentlyContinue
 	}
 }
+
+function log_message($message){
+    Write-Host "[$(Get-Date)] $message"
+}
+
+function destroy_planned_vms() {
+    $planned_vms = [array] (gwmi -ns root/virtualization/v2 -class Msvm_PlannedComputerSystem)
+    $svc = gwmi -ns root/virtualization/v2 -class Msvm_VirtualSystemManagementService
+
+    $pvm_count = $planned_vms.Count
+    log_message "Found $pvm_count planned vms."
+    foreach($pvm in $planned_vms) {
+        $svc.DestroySystem($pvm)
+    }
+}

@@ -2,7 +2,8 @@ Param(
     [Parameter(Mandatory=$true)][string]$devstackIP,
     [string]$branchName='master',
     [string]$buildFor='openstack/nova',
-    [string]$isDebug='no'
+    [string]$isDebug='no',
+    [string]$zuulChange=''
 )
 
 if ($isDebug -eq  'yes') {
@@ -27,6 +28,7 @@ $hasConfigDir = Test-Path $configDir
 $hasBinDir = Test-Path $binDir
 $hasMkisoFs = Test-Path $binDir\mkisofs.exe
 $hasQemuImg = Test-Path $binDir\qemu-img.exe
+Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $pip_conf_content = @"
 [global]
@@ -44,6 +46,11 @@ Stop-Service -Name neutron-hyperv-agent -Force
 
 Write-Host "Stopping any possible python processes left."
 Stop-Process -Name python -Force
+
+# At the moment, nova may leak planned vms in case of failed live migrations.
+# We'll have to clean them up, otherwise spawning instances at the same
+# location will fail.
+destroy_planned_vms
 
 if (Get-Process -Name nova-compute){
     Throw "Nova is still running on this host"
@@ -103,14 +110,8 @@ if ($hasBinDir -eq $false){
 
 if (($hasMkisoFs -eq $false) -or ($hasQemuImg -eq $false)){
     Invoke-WebRequest -Uri "http://10.0.110.1/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
-    if (Test-Path "$7zExec"){
-        pushd $bindir
-        & $7zExec x -y "$bindir\openstack_bin.zip"
-        Remove-Item -Force "$bindir\openstack_bin.zip"
-        popd
-    } else {
-        Throw "Required binary files (mkisofs, qemuimg etc.)  are missing"
-    }
+    [System.IO.Compression.ZipFile]::ExtractToDirectory("$bindir\openstack_bin.zip", "$bindir")
+    Remove-Item -Force "$bindir\openstack_bin.zip"
 }
 
 if ($hasNovaTemplate -eq $false){
@@ -134,9 +135,15 @@ if ($buildFor -eq "openstack/nova"){
     ExecRetry {
         GitClonePull "$buildDir\neutron" "https://git.openstack.org/openstack/neutron.git" $branchName
     }
+    Get-ChildItem $buildDir
     ExecRetry {
         GitClonePull "$buildDir\networking-hyperv" "https://git.openstack.org/openstack/networking-hyperv.git" $branchName
     }
+    Get-ChildItem $buildDir
+    ExecRetry {
+        GitClonePull "$buildDir\requirements" "https://git.openstack.org/openstack/requirements.git" $branchName
+    }
+    Get-ChildItem $buildDir
 }else{
     Throw "Cannot build for project: $buildFor"
 }
@@ -156,19 +163,15 @@ if (Test-Path $pythonArchive)
 {
     Remove-Item -Force $pythonArchive
 }
-Invoke-WebRequest -Uri http://10.0.110.1/python27new.tar.gz -OutFile $pythonArchive
-if (Test-Path $pythonTar)
-{
-    Remove-Item -Force $pythonTar
-}
+Invoke-WebRequest -Uri http://10.0.110.1/python.zip -OutFile $pythonArchive
 if (Test-Path $pythonDir)
 {
-    Remove-Item -Recurse -Force $pythonDir
+    Cmd /C "rmdir /S /Q $pythonDir"
+    #Remove-Item -Recurse -Force $pythonDir
 }
 Write-Host "Ensure Python folder is up to date"
 Write-Host "Extracting archive.."
-& $7zExec x -y "$pythonArchive"
-& $7zExec x -y "$pythonTar"
+[System.IO.Compression.ZipFile]::ExtractToDirectory("C:\$pythonArchive", "C:\")
 
 $hasPipConf = Test-Path "$env:APPDATA\pip"
 if ($hasPipConf -eq $false){
@@ -181,12 +184,14 @@ else
 Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
 & easy_install -U pip
-& pip install -U setuptools
-& pip install -U --pre pymi
+& pip install setuptools==26.0.0
+& pip install pymi
 & pip install cffi
 & pip install numpy
 & pip install pycrypto
 & pip install -U os-win
+& pip install amqp==1.4.9
+& pip install cffi==1.6.0
 
 popd
 
@@ -224,12 +229,23 @@ if ($isDebug -eq  'yes') {
 }
 
 ExecRetry {
+    pushd "$buildDir\requirements"
+    Write-Host "Installing OpenStack/Requirements..."
+    & pip install -c upper-constraints.txt -U pbr virtualenv httplib2 prettytable>=0.7 setuptools
+    & pip install -c upper-constraints.txt -U .
+    if ($LastExitCode) { Throw "Failed to install openstack/requirements from repo" }
+    popd
+}
+
+ExecRetry {
     if ($isDebug -eq  'yes') {
         Write-Host "Content of $buildDir\neutron"
         Get-ChildItem $buildDir\neutron
     }
     pushd $buildDir\neutron
-    & pip install $buildDir\neutron
+    Write-Host "Installing openstack/neutron..."
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
     popd
 }
@@ -240,9 +256,29 @@ ExecRetry {
         Get-ChildItem $buildDir\networking-hyperv
     }
     pushd $buildDir\networking-hyperv
-    & pip install $buildDir\networking-hyperv
+    Write-Host "Installing openstack/networking-hyperv..."
+    & update-requirements.exe --source $buildDir\requirements .
+    if (($branchName -eq 'stable/liberty') -or ($branchName -eq 'stable/mitaka')) {
+        & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    } else {
+        & pip install -e $buildDir\networking-hyperv
+    }
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
+}
+
+if ($zuulChange -eq '273504') {
+    ExecRetry {
+        GitClonePull "$buildDir\os-brick" "https://git.openstack.org/openstack/os-brick.git" $branchName
+
+        pushd $buildDir\os-brick
+
+        git fetch https://git.openstack.org/openstack/os-brick refs/changes/22/272522/31
+        cherry_pick FETCH_HEAD
+
+        & pip install $buildDir\os-brick
+        popd
+    }
 }
 
 ExecRetry {
@@ -251,19 +287,29 @@ ExecRetry {
         Get-ChildItem $buildDir\nova
     }
     pushd $buildDir\nova
-
-    # This patch attempts to fix the issue that is causing the nova-service to hang.
-    git fetch https://review.openstack.org/openstack/nova refs/changes/68/291668/2
-    cherry_pick FETCH_HEAD
-
-    & pip install $buildDir\nova
+    if ($branchName -eq 'master') {
+        # This patch fixes os_type image property requirement
+        git fetch https://review.openstack.org/openstack/nova refs/changes/26/379326/1
+        cherry_pick FETCH_HEAD
+    }
+    Write-Host "Installing openstack/nova..."
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
 }
 
-$cores_count = (gwmi -class Win32_Processor).count * (gwmi -class Win32_Processor)[0].NumberOfCores
+# Note: be careful as WMI queries may return only one element, in which case we
+# won't get an array. To make it easier, we can just make sure we always have an
+# array.
+$cpu_array = ([array](gwmi -class Win32_Processor))
+$cores_count = $cpu_array.count * $cpu_array[0].NumberOfCores
 $novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
 $neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser).replace('[CORES_COUNT]', "$cores_count")
+
+if (($branchName -ne 'stable/liberty') -and ($branchName -ne 'stable/mitaka')) {
+    $novaConfig = $novaConfig.replace('network_api_class', '#network_api_class')
+}
 
 Set-Content $configDir\nova.conf $novaConfig
 if ($? -eq $false){
