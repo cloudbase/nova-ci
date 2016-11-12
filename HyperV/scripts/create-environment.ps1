@@ -99,7 +99,7 @@ if ($hasConfigDir -eq $false) {
     }
 }
 if ($hasBuildDir -eq $false){
-   mkdir $buidDir
+   mkdir $buildDir
 }
 if ($hasProject -eq $false){
     Get-ChildItem $buildDir
