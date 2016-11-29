@@ -49,7 +49,7 @@ echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstac
 echo "Deploying devstack $NAME"
 
 # Boot the new 10G of RAM flavor
-VMID=$(nova boot --flavor devstack.xxl --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
+VMID=$(nova boot --config-drive true --flavor devstack.xxl --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
 NOVABOOT_EXIT=$?
 export VMID=$VMID
 echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
