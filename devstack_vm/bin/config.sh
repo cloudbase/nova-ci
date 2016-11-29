@@ -29,7 +29,7 @@ STACK_LOG="/opt/stack/logs/stack.sh.txt"
 STACK_ROTATE_LIMIT=5
 
 tests_dir="/opt/stack/tempest"
-parallel_tests=8
+parallel_tests=16
 max_attempts=3
 test_suite="default"
 log_file="/home/ubuntu/tempest/subunit-output.log"
