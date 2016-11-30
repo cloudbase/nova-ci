@@ -43,13 +43,13 @@ echo ZUUL_SITE=$ZUUL_SITE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUU
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-devstack_image="devstack-78v1"
+devstack_image="devstack-80v4"
 echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 echo "Deploying devstack $NAME"
 
 # Boot the new 10G of RAM flavor
-VMID=$(nova boot --config-drive true --flavor devstack.xxl --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
+VMID=$(nova boot --config-drive true --flavor devstack.xxl --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
 NOVABOOT_EXIT=$?
 export VMID=$VMID
 echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
@@ -159,9 +159,6 @@ fi
 set -e
 
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sed -i 's/export OS_AUTH_URL.*/export OS_AUTH_URL=http:\/\/127.0.0.1:5000\/v2.0\//g' /home/ubuntu/keystonerc" 3
-
-# Add 1 more interface after successful SSH
-nova interface-attach --net-id "$NET_ID" "$VMID"
 
 # update repos
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/update_devstack_repos.sh --branch $ZUUL_BRANCH --build-for $ZUUL_PROJECT" 1

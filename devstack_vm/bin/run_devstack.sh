@@ -9,9 +9,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 
 set -x
 set -e
-#sudo ifconfig eth0 promisc up
 sudo ifconfig eth1 promisc up
-sudo dhclient -v eth1
 
 HOSTNAME=$(hostname)
 
@@ -58,8 +56,10 @@ fi
 
 git config --global user.email hyper-v_ci@microsoft.com
 git config --global user.name 'Hyper-V CI'
-
 cd $tests_dir
+
+set +e
+
 # Apply patch "wait for port status to be ACTIVE"
 git fetch git://git.openstack.org/openstack/tempest refs/changes/49/383049/10
 git cherry-pick FETCH_HEAD
@@ -67,6 +67,8 @@ git cherry-pick FETCH_HEAD
 # Apply patch "Adds protocol options for test_cross_tenant_traffic"
 git fetch git://git.openstack.org/openstack/tempest refs/changes/28/384528/5
 git cherry-pick FETCH_HEAD
+
+set -e
 
 cd /home/ubuntu/devstack
 git pull
