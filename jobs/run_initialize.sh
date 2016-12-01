@@ -38,92 +38,119 @@ echo ZUUL_UUID=$ZUUL_UUID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUU
 echo IS_DEBUG_JOB=$IS_DEBUG_JOB | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
 echo ZUUL_SITE=$ZUUL_SITE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-
-
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-
 devstack_image="devstack-80v4"
 echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-echo "Deploying devstack $NAME"
-
-# Boot the new 10G of RAM flavor
-VMID=$(nova boot --config-drive true --flavor devstack.xxl --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
-NOVABOOT_EXIT=$?
-export VMID=$VMID
-echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-
-if [ $NOVABOOT_EXIT -ne 0 ]; then
-    echo "Failed to create devstack VM: $VMID"
-    nova show "$VMID"
-    exit 1
-fi
-
-echo "Showing details of the new created instance: $VMID"
-nova show "$VMID"
-
-echo "Fetching devstack VM fixed IP address"
-
-FIP=$(nova show "$VMID" | grep "private network" | awk '{print $6}')
-FIP=${FIP//,}
-if [[ ! $FIP =~ .*\|.* ]]; then
-    sleep 30
-fi
-
-sleep 10
 FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
 if [ -z "$FLOATING_IP" ]; then
    exit 1
 fi
 
-exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
+echo "Deploying devstack $NAME"
 
-sleep 10
+VM_OK=1
+while [ $VM_OK -ne 0 ]; do
+    VMID=$(nova boot --config-drive true --flavor devstack.xxl --image $devstack_image --key-name default --security-groups devstack --nic net-id="$NET_ID" --nic net-id="$NET_ID" "$NAME" --poll | awk '{if (NR == 21) {print $4}}')
+    NOVABOOT_EXIT=$?
+    export VMID=$VMID
 
-FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
-export FIXED_IP="${FIXED_IP//,}"
+    if [ $NOVABOOT_EXIT -ne 0 ]; then
+        echo "Failed to create devstack VM: $VMID"
+        nova show "$VMID"
+        exit 1
+    fi
 
-COUNT=1
-while [ -z "$FIXED_IP" ]; do
-    if [ $COUNT -lt 10 ]; then
-        sleep 15
-        FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
-        export FIXED_IP="${FIXED_IP//,}"
-        COUNT=$(($COUNT + 1))
-    else
-        echo "Failed to get fixed IP using nova show $VMID"
-        echo "Trying to get the IP from console-log and port-list"
-        FIXED_IP1=`nova console-log $VMID | grep "ci-info" | grep "eth0" | grep "True" | awk '{print $7}'`
-        echo "From console-log we got IP: $FIXED_IP1"
-        FIXED_IP2=`neutron port-list -D -c device_id -c fixed_ips | grep $VMID | awk '{print $7}' | tr -d \" | tr -d }`
-        echo "From neutron port-list we got IP: $FIXED_IP2"
-        if [[ -z "$FIXED_IP1" || -z "$FIXED_IP2" ||  "$FIXED_IP1" != "$FIXED_IP2" ]]; then
-            echo "Failed to get fixed IP"
-            echo "nova show output:"
-            nova show "$VMID"
-            echo "nova console-log output:"
-            nova console-log "$VMID"
-            echo "neutron port-list output:"
-            neutron port-list -D -c device_id -c fixed_ips | grep $VMID
-            exit 1
+    echo "Showing details of the new created instance: $VMID"
+    nova show "$VMID"
+
+    echo "Fetching devstack VM fixed IP address"
+
+    FIP=$(nova show "$VMID" | grep "private network" | awk '{print $6}')
+    FIP=${FIP//,}
+    if [[ ! $FIP =~ .*\|.* ]]; then
+        sleep 30
+    fi
+
+    exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
+
+    sleep 10
+
+    FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
+    export FIXED_IP="${FIXED_IP//,}"
+
+    COUNT=1
+    while [ -z "$FIXED_IP" ]; do
+        if [ $COUNT -lt 10 ]; then
+            sleep 15
+            FIXED_IP=$(nova show "$VMID" | grep "private network" | awk '{print $5}')
+            export FIXED_IP="${FIXED_IP//,}"
+            COUNT=$(($COUNT + 1))
         else
-            export FIXED_IP=$FIXED_IP1
+            echo "Failed to get fixed IP using nova show $VMID"
+            echo "Trying to get the IP from console-log and port-list"
+            FIXED_IP1=`nova console-log $VMID | grep "ci-info" | grep "eth0" | grep "True" | awk '{print $7}'`
+            echo "From console-log we got IP: $FIXED_IP1"
+            FIXED_IP2=`neutron port-list -D -c device_id -c fixed_ips | grep $VMID | awk '{print $7}' | tr -d \" | tr -d }`
+            echo "From neutron port-list we got IP: $FIXED_IP2"
+            if [[ -z "$FIXED_IP1" || -z "$FIXED_IP2" ||  "$FIXED_IP1" != "$FIXED_IP2" ]]; then
+                echo "Failed to get fixed IP"
+                echo "nova show output:"
+                nova show "$VMID"
+                echo "nova console-log output:"
+                nova console-log "$VMID"
+                echo "neutron port-list output:"
+                neutron port-list -D -c device_id -c fixed_ips | grep $VMID
+                exit 1
+            else
+                export FIXED_IP=$FIXED_IP1
+            fi
+        fi
+    done
+
+
+    echo "nova show $VMID:"
+    nova show "$VMID"
+
+    sleep 60
+
+    echo "Probing for connectivity on IP $FLOATING_IP"
+    set +e
+    wait_for_listening_port $FIXED_IP 22 30
+    status=$?
+    set -e
+    if [ $status -eq 0 ]; then
+        VM_OK=0
+    echo "VM connectivity OK"
+    else
+    echo "VM connectivity NOT OK, rebooting VM"
+        nova reboot "$VMID"
+        sleep 120
+        set +e
+        wait_for_listening_port $FIXED_IP 22 30
+        status=$?
+        set -e
+        if [ $status -eq 0 ]; then
+            VM_OK=0
+            echo "VM connectivity OK"
+        else
+
+            exec_with_retry "nova floating-ip-disassociate $VMID $FLOATING_IP" 15 5
+            echo "nova console-log $VMID:"; nova console-log "$VMID"; echo "Failed listening for ssh port on devstack"
+            echo "Deleting VM $VMID"
+            nova delete $VMID
         fi
     fi
+
 done
 
-echo FIXED_IP=$FIXED_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-
-echo "nova show $VMID:"
-nova show "$VMID"
-
-sleep 60
 FLOATING_IP=$FIXED_IP
-
 echo FLOATING_IP=$FLOATING_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo FIXED_IP=$FIXED_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-wait_for_listening_port $FLOATING_IP 22 30 || { echo "nova console-log $VMID:"; nova console-log "$VMID"; echo "Failed listening for ssh port on devstack";exit 1; }
+
 
 echo "adding $NAME to /etc/hosts"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'VMNAME=$(hostname); sudo sed -i "s/127.0.0.1 localhost/127.0.0.1 localhost $VMNAME/g" /etc/hosts' 1
