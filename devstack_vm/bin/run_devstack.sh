@@ -71,6 +71,11 @@ git cherry-pick FETCH_HEAD
 cd /home/ubuntu/devstack
 git pull
 
+set +e
+git fetch git://git.openstack.org/openstack-dev/devstack refs/changes/93/406893/1
+git cherry-pick FETCH_HEAD
+set -e
+
 ./unstack.sh
 
 screen_pid=$(ps auxw | grep -i screen | grep -v grep | awk '{print $2}')
