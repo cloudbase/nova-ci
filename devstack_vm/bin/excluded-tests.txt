@@ -15,3 +15,5 @@ tempest.scenario.test_network_basic_ops.TestNetworkBasicOps.test_update_router_a
 
 tempest.scenario.test_network_v6.TestGettingAddress
 
+# Removed heat code from devstack tree causes orchestration tests to fail https://github.com/openstack-dev/devstack/commit/77a7296248b2aae4ce878e33e05575748e7e4131
+tempest.api.orchestration
