@@ -57,7 +57,7 @@ rm $tests_file
 
 isolated_tests_list_file=$basedir/isolated-tests.txt
 if [ -f "$isolated_tests_list_file" ]; then
-    echo "Running isolated tests from: $isolated_tests_list_file"
+    echo `timestamp` "Running isolated tests from: $isolated_tests_list_file"
     isolated_tests_file=$(tempfile)
     $basedir/get-isolated-tests.sh $tests_dir > $isolated_tests_file
     log_tmp=$(tempfile)
@@ -69,7 +69,7 @@ if [ -f "$isolated_tests_list_file" ]; then
     rm $log_tmp
 fi
 
-echo "Generating HTML report..."
+echo `timestamp` "Generating HTML report..."
 $basedir/get-results-html.sh $log_file $results_html_file
 
 cat $log_file | subunit-trace -n -f > $tempest_output_file 2>&1 || true
@@ -77,7 +77,7 @@ cat $log_file | subunit-trace -n -f > $tempest_output_file 2>&1 || true
 subunit-stats $log_file > $subunit_stats_file
 exit_code=$?
 
-echo "Total execution time: $SECONDS seconds."
+echo `timestamp` "Total execution time: $SECONDS seconds."
 
 popd
 

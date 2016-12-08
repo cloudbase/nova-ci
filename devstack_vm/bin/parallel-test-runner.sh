@@ -1,5 +1,8 @@
 #!/bin/bash
 
+basedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+. $basedir/utils.sh
+
 # Make sure we kill the entire process tree when exiting
 trap 'kill 0' SIGINT SIGTERM
 
@@ -83,7 +86,7 @@ function parallel_test_runner() {
 
         local tmp_log_file="$tmp_log_file_base"_"$range_start"
 
-        echo "Test runner $runner_id is starting tests from $((range_start+1)) to $((range_end+1)) out of ${#tests[@]}:"
+        echo `timestamp` "Test runner $runner_id is starting tests from $((range_start+1)) to $((range_end+1)) out of ${#tests[@]}:"
         cat $tmp_tests_file
         echo
 
