@@ -33,7 +33,7 @@ function run_wsmancmd_with_retry () {
     local PASSWORD=$3
     local CMD=$4
 
-    exec_with_retry "python /home/jenkins-slave/tools/wsman.py -U https://$HOST:5986/wsman -a certificate -c /home/jenkins-slave/tools/ssl.crt -k  /home/jenkins-slave/tools/ssl.key $CMD"
+    exec_with_retry "python /home/jenkins-slave/tools/wsman.py -U https://$HOST:5986/wsman -u $USERNAME -p $PASSWORD $CMD"
 }
 
 function run_wsman_cmd() {
@@ -42,7 +42,7 @@ function run_wsman_cmd() {
     local win_password=$3
     local cmd=$4
 
-    python /home/jenkins-slave/tools/wsman.py -a certificate -c /home/jenkins-slave/tools/ssl.crt -k /home/jenkins-slave/tools/ssl.key -U https://$host:5986/wsman $cmd
+    python /home/jenkins-slave/tools/wsman.py -u $win_user -p $win_password -U https://$host:5986/wsman $cmd
 }
 
 function run_wsman_ps() {
