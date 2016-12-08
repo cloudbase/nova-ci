@@ -196,6 +196,10 @@ function check_copy_dir() {
     fi
 }
 
+function timestamp(){
+    echo `date -u +%H:%M:%S`
+}
+
 function add_user_to_passwordless_sudoers() {
     local user_name=$1
     local file_name=$2
