@@ -93,7 +93,7 @@ function parallel_test_runner() {
         local test_exit_code=$(run_test_retry $tmp_tests_file $tmp_log_file)
         rm $tmp_tests_file
 
-        echo "Test runner $runner_id finished tests from $((range_start+1)) to $((range_end+1)) out of ${#tests[@]} with exit code: $test_exit_code"
+        echo `timestamp` "Test runner $runner_id finished tests from $((range_start+1)) to $((range_end+1)) out of ${#tests[@]} with exit code: $test_exit_code"
     done
 }
 
