@@ -118,7 +118,7 @@ while [ $VM_OK -ne 0 ]; do
 
     echo "Probing for connectivity on IP $FLOATING_IP"
     set +e
-    wait_for_listening_port $FIXED_IP 22 30
+    wait_for_listening_port $FLOATING_IP 22 30
     status=$?
     set -e
     if [ $status -eq 0 ]; then
@@ -129,7 +129,7 @@ while [ $VM_OK -ne 0 ]; do
         nova reboot "$VMID"
         sleep 120
         set +e
-        wait_for_listening_port $FIXED_IP 22 30
+        wait_for_listening_port $FLOATING_IP 22 30
         status=$?
         set -e
         if [ $status -eq 0 ]; then
@@ -146,12 +146,9 @@ while [ $VM_OK -ne 0 ]; do
 
 done
 
-FLOATING_IP=$FIXED_IP
 echo FLOATING_IP=$FLOATING_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 echo FIXED_IP=$FIXED_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-
-
 
 echo "adding $NAME to /etc/hosts"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'VMNAME=$(hostname); sudo sed -i "s/127.0.0.1 localhost/127.0.0.1 localhost $VMNAME/g" /etc/hosts' 1
@@ -313,4 +310,7 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'source /home/ubunt
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "url=\$(grep transport_url /etc/nova/nova-dhcpbridge.conf | awk '{print \$3}'); nova-manage cell_v2 simple_cell_setup --transport-url \$url >> /opt/stack/logs/screen/create_cell.log"
 
 # Call create_cell after init phase is done
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "url=\$(grep transport_url /etc/nova/nova-dhcpbridge.conf | awk '{print \$3}'); nova-manage cell_v2 simple_cell_setup --transport-url \$url"
+if [ $ZUUL_BRANCH == "master" ]; then
+    run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "url=\$(grep transport_url /etc/nova/nova-dhcpbridge.conf | awk '{print \$3}'); nova-manage cell_v2 simple_cell_setup --transport-url \$url"
+fi
+
