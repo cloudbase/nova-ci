@@ -44,10 +44,10 @@ echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID
 devstack_image="devstack-80v4"
 echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
-if [ -z "$FLOATING_IP" ]; then
-   exit 1
-fi
+#FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
+#if [ -z "$FLOATING_IP" ]; then
+#   exit 1
+#fi
 
 echo "Deploying devstack $NAME"
 
@@ -74,7 +74,7 @@ while [ $VM_OK -ne 0 ]; do
         sleep 30
     fi
 
-    exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
+    #exec_with_retry "nova add-floating-ip $VMID $FLOATING_IP" 15 5 || { echo "nova show $VMID:"; nova show "$VMID"; echo "nova console-log $VMID:"; nova console-log "$VMID"; exit 1; }
 
     sleep 10
 
@@ -116,9 +116,9 @@ while [ $VM_OK -ne 0 ]; do
 
     sleep 60
 
-    echo "Probing for connectivity on IP $FLOATING_IP"
+    echo "Probing for connectivity on IP $FIXED_IP"
     set +e
-    wait_for_listening_port $FLOATING_IP 22 30
+    wait_for_listening_port $FIXED_IP 22 30
     status=$?
     set -e
     if [ $status -eq 0 ]; then
@@ -129,15 +129,14 @@ while [ $VM_OK -ne 0 ]; do
         nova reboot "$VMID"
         sleep 120
         set +e
-        wait_for_listening_port $FLOATING_IP 22 30
+        wait_for_listening_port $FIXED_IP 22 30
         status=$?
         set -e
         if [ $status -eq 0 ]; then
             VM_OK=0
             echo "VM connectivity OK"
         else
-
-            exec_with_retry "nova floating-ip-disassociate $VMID $FLOATING_IP" 15 5
+            #exec_with_retry "nova floating-ip-disassociate $VMID $FLOATING_IP" 15 5
             echo "nova console-log $VMID:"; nova console-log "$VMID"; echo "Failed listening for ssh port on devstack"
             echo "Deleting VM $VMID"
             nova delete $VMID
@@ -146,6 +145,7 @@ while [ $VM_OK -ne 0 ]; do
 
 done
 
+FLOATING_IP=$FIXED_IP
 echo FLOATING_IP=$FLOATING_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 echo FIXED_IP=$FIXED_IP | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 echo VMID=$VMID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
