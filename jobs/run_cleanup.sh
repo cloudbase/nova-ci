@@ -2,6 +2,12 @@ source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 source /home/jenkins-slave/tools/keystonerc_admin
 source /usr/local/src/nova-ci/jobs/library.sh
 
+echo "devstack params loaded from /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt :"
+cat /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
+echo "VM ID: $VMID"
+echo "VMs matching that VM ID:"
+nova list | grep "$VMID"
+
 set +e
 
 if [ "$IS_DEBUG_JOB" != "yes" ]
