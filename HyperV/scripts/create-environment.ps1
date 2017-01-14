@@ -186,6 +186,7 @@ else
 }
 Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
+$ErrorActionPreference = "Continue"
 & easy_install -U pip
 & pip install setuptools==26.0.0
 & pip install pymi
@@ -195,6 +196,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 & pip install -U os-win
 & pip install amqp==1.4.9
 & pip install cffi==1.6.0
+$ErrorActionPreference = "Stop"
 
 popd
 
