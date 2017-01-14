@@ -156,10 +156,10 @@ if ($hasLogDir -eq $false){
     mkdir $openstackLogs
 }
 
-$hasConfigDir = Test-Path $remoteConfigs\$hostname
-if ($hasConfigDir -eq $false){
-    mkdir $remoteConfigs\$hostname
-}
+#$hasConfigDir = Test-Path $remoteConfigs\$hostname
+#if ($hasConfigDir -eq $false){
+#    mkdir $remoteConfigs\$hostname
+#}
 
 pushd C:\
 if (Test-Path $pythonArchive)
