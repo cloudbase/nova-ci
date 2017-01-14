@@ -2,7 +2,7 @@
 jen_date=$(date +%d/%m/%Y-%H:%M)
 export IS_DEBUG_JOB
 set +e
-/usr/local/src/nova-ci/jobs/run_initialize.sh 2>&1
+/usr/local/src/nova-ci-2016/jobs/run_initialize.sh 2>&1
 result_init=$?
 echo "$ZUUL_PROJECT;$ZUUL_BRANCH;$jen_date;$ZUUL_CHANGE;$ZUUL_PATCHSET;init;$result_init" >> /home/jenkins-slave/nova-statistics.log
 echo "Init job finished with exit code $result_init"

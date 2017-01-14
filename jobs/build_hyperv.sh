@@ -2,12 +2,12 @@
 #
 hyperv_node=$1
 # Loading all the needed functions
-source /usr/local/src/nova-ci/jobs/library.sh
+source /usr/local/src/nova-ci-2016/jobs/library.sh
 
 # Loading parameters
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-LOG_DIR='C:\Openstack\log\'
+export LOG_DIR='C:\Openstack\log\'
 
 # building HyperV node
 echo $hyperv_node
