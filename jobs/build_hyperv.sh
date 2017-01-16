@@ -7,7 +7,7 @@ source /usr/local/src/nova-ci-2016/jobs/library.sh
 # Loading parameters
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
-export LOG_DIR='C:\Openstack\log\'
+export LOG_DIR='C:\Openstack\logs\'
 
 # building HyperV node
 echo $hyperv_node
