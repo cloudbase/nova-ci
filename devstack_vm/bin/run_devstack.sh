@@ -10,7 +10,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 set -x
 set -e
 sudo ifconfig eth1 promisc up
-
+echo "Hyper-V host are $hyperv01 and $hyperv02"
 HOSTNAME=$(hostname)
 
 sudo sed -i '2i127.0.0.1  '$HOSTNAME'' /etc/hosts

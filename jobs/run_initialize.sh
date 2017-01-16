@@ -163,6 +163,7 @@ echo "apt-get update:"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo apt-get update -y" 1
 
 echo "apt-get upgrade:"
+run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install smbclient' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" autoremove' 1
 
@@ -170,7 +171,7 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=no
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime" 1
 
 # copy files to devstack
-scp -v -r -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i $DEVSTACK_SSH_KEY /usr/local/src/nova-ci/devstack_vm/* ubuntu@$FLOATING_IP:/home/ubuntu/
+scp -v -r -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i $DEVSTACK_SSH_KEY /usr/local/src/nova-ci-2016/devstack_vm/* ubuntu@$FLOATING_IP:/home/ubuntu/
 
 if [ "$ZUUL_BRANCH" != "master" ]; then
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo -e "tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.\ntempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON." >> /home/ubuntu/bin/excluded-tests.txt'

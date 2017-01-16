@@ -1,7 +1,11 @@
 #!/bin/bash
 
+hyperv01=$1
+hyperv02=$2
+echo "Hyper-Vs are $hyperv01 and $hyperv02"
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/config.sh
+. $DIR/utils.sh
 
 TAR=$(which tar)
 GZIP=$(which gzip)
@@ -174,6 +178,14 @@ function archive_tempest_files() {
 # Clean
 [ -d "$LOG_DST" ] && rm -rf "$LOG_DST"
 mkdir -p "$LOG_DST"
+
+echo Getting Hyper-V logs
+get_win_files $hyperv01 "\OpenStack\logs" "$LOG_DST_HV\\$hyperv01"
+get_win_files $hyperv02 "\OpenStack\logs" "$LOG_DST_HV\\$hyperv02"
+
+echo Getting Hyper-V configs
+get_win_files $hyperv01 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv01"
+get_win_files $hyperv02 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv02"
 
 archive_devstack_logs
 archive_devstack_configs
