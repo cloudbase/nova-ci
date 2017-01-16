@@ -4,8 +4,6 @@ source /usr/local/src/nova-ci-2016/jobs/library.sh
 
 logs_project=nova
 set +e
-echo "Hyper-Vs are $hyperv01 and $hyperv02"
-echo "Hyper-Vs 2 are ${hyperv01%%[.]*} ${hyperv02%%[.]*}"
 
 ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP "mkdir -p /openstack/logs/${hyperv01%%[.]*}"
 ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK_SSH_KEY ubuntu@$FLOATING_IP "mkdir -p /openstack/logs/${hyperv02%%[.]*}"
@@ -15,6 +13,8 @@ ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK
 set -f
 
 #run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned Copy-Item -Recurse C:\OpenStack\Log\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
+run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service nova-compute'
+run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service neutron-hyperv-agent'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\export-eventlog.ps1'
 #run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned cp -Recurse -Container  C:\OpenStack\Logs\Eventlog\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
 
@@ -33,6 +33,8 @@ run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpoli
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'sc qc nova-compute >> C:\openstack\logs\nova_compute_service.log'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'sc qc neutron-hyperv-agent >> C:\openstack\logs\neutron_hyperv_agent_service.log'
 
+run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service nova-compute'
+run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service neutron-hyperv-agent'
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\export-eventlog.ps1'
 #run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned cp -Recurse -Container  C:\OpenStack\Logs\Eventlog\* \\'$FLOATING_IP'\openstack\logs\'${hyperv02%%[.]*}'\'
 

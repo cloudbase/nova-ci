@@ -41,7 +41,7 @@ ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
 echo ZUUL_SITE=$ZUUL_SITE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-devstack_image="devstack-80v4"
+devstack_image="devstack-81v1"
 echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 #FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
@@ -163,7 +163,6 @@ echo "apt-get update:"
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo apt-get update -y" 1
 
 echo "apt-get upgrade:"
-run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" install smbclient' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" upgrade' 1
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=noninteractive && DEBIAN_PRIORITY=critical && sudo apt-get -q -y -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold" autoremove' 1
 
@@ -213,14 +212,14 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "gzip --decompress 
 #Get IP addresses of the two Hyper-V hosts
 
 set +e
-IFS='' read -r -d '' PSCODE <<'_EOF'
-$NetIPAddr = Get-NetIPAddress | Where-Object {$_.InterfaceAlias -like "*br100*" -and $_.AddressFamily -like "IPv4"}
-$IPAddr = $NetIPAddr.IPAddress
-Write-Host $IPAddr
-_EOF
-HYPERV_GET_DATA_IP=`echo "$PSCODE" | iconv -f ascii -t utf16le | base64 -w0`
-hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
-hyperv02_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
+#IFS='' read -r -d '' PSCODE <<'_EOF'
+#$NetIPAddr = Get-NetIPAddress | Where-Object {$_.InterfaceAlias -like "*br100*" -and $_.AddressFamily -like "IPv4"}
+#$IPAddr = $NetIPAddr.IPAddress
+#Write-Host $IPAddr
+#_EOF
+#HYPERV_GET_DATA_IP=`echo "$PSCODE" | iconv -f ascii -t utf16le | base64 -w0`
+hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned (Get-NetIPAddress -InterfaceAlias "*br100*" -AddressFamily "IPv4").IPAddress' 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
+hyperv02_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned (Get-NetIPAddress -InterfaceAlias "*br100*" -AddressFamily "IPv4").IPAddress' 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
 set -e
 
 echo `date -u +%H:%M:%S` "Data IP of $hyperv01 is $hyperv01_ip"

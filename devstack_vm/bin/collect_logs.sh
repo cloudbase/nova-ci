@@ -2,7 +2,7 @@
 
 hyperv01=$1
 hyperv02=$2
-echo "Hyper-Vs are $hyperv01 and $hyperv02"
+
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/config.sh
 . $DIR/utils.sh
@@ -179,9 +179,15 @@ function archive_tempest_files() {
 [ -d "$LOG_DST" ] && rm -rf "$LOG_DST"
 mkdir -p "$LOG_DST"
 
+echo "Stop devstack services"
+cd /home/ubuntu/devstack
+./unstack.sh
+
+set +e
+
 echo Getting Hyper-V logs
-get_win_files $hyperv01 "\OpenStack\logs" "$LOG_DST_HV\\$hyperv01"
-get_win_files $hyperv02 "\OpenStack\logs" "$LOG_DST_HV\\$hyperv02"
+get_win_files $hyperv01 "\OpenStack\logs" "$LOG_DST_HV/$hyperv01"
+get_win_files $hyperv02 "\OpenStack\logs" "$LOG_DST_HV/$hyperv02"
 
 echo Getting Hyper-V configs
 get_win_files $hyperv01 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv01"
@@ -192,6 +198,8 @@ archive_devstack_configs
 archive_hyperv_configs
 archive_hyperv_logs
 archive_tempest_files
+
+set -e
 
 pushd "$LOG_DST"
 $TAR -czf "$LOG_DST.tar.gz" . || emit_error "L147: Failed to archive aggregate logs"
