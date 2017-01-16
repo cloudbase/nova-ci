@@ -12,12 +12,12 @@ if ($isDebug -eq  'yes') {
     Write-Host "branchName: $branchName"
     Write-Host "buildFor: $buildFor"
 }
-
 $projectName = $buildFor.split('/')[-1]
 
 $scriptLocation = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
 . "$scriptLocation\config.ps1"
 . "$scriptLocation\utils.ps1"
+Write-host "remote config: $remoteConfigs"
 
 $hasProject = Test-Path $buildDir\$projectName
 $hasBuildDir = Test-Path $buildDir
@@ -340,8 +340,8 @@ if ($hasNeutronExec -eq $false){
 }
 
 
-Remove-Item -Recurse -Force "$remoteConfigs\$hostname\*"
-Copy-Item -Recurse $configDir "$remoteConfigs\$hostname"
+#Remove-Item -Recurse -Force "$remoteConfigs\$hostname\*"
+#Copy-Item -Recurse $configDir "$remoteConfigs\$hostname"
 
 Write-Host "Starting the services"
 

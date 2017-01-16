@@ -20,7 +20,7 @@
 source /home/jenkins-slave/tools/keystonerc_admin
 
 # Loading all the needed functions
-source /usr/local/src/nova-ci/jobs/library.sh
+source /usr/local/src/nova-ci-2016/jobs/library.sh
 
 set -e
 
@@ -41,7 +41,7 @@ ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
 echo ZUUL_SITE=$ZUUL_SITE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-devstack_image="devstack-80v4"
+devstack_image="devstack-81v1"
 echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 #FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
@@ -170,7 +170,7 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'DEBIAN_FRONTEND=no
 run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sudo ln -fs /usr/share/zoneinfo/UTC /etc/localtime" 1
 
 # copy files to devstack
-scp -v -r -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i $DEVSTACK_SSH_KEY /usr/local/src/nova-ci/devstack_vm/* ubuntu@$FLOATING_IP:/home/ubuntu/
+scp -v -r -o "StrictHostKeyChecking no" -o "UserKnownHostsFile /dev/null" -i $DEVSTACK_SSH_KEY /usr/local/src/nova-ci-2016/devstack_vm/* ubuntu@$FLOATING_IP:/home/ubuntu/
 
 if [ "$ZUUL_BRANCH" != "master" ]; then
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY 'echo -e "tempest.api.compute.servers.test_server_rescue.ServerRescueTestJSON.\ntempest.api.compute.servers.test_server_rescue_negative.ServerRescueNegativeTestJSON." >> /home/ubuntu/bin/excluded-tests.txt'
@@ -212,14 +212,14 @@ run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "gzip --decompress 
 #Get IP addresses of the two Hyper-V hosts
 
 set +e
-IFS='' read -r -d '' PSCODE <<'_EOF'
-$NetIPAddr = Get-NetIPAddress | Where-Object {$_.InterfaceAlias -like "*br100*" -and $_.AddressFamily -like "IPv4"}
-$IPAddr = $NetIPAddr.IPAddress
-Write-Host $IPAddr
-_EOF
-HYPERV_GET_DATA_IP=`echo "$PSCODE" | iconv -f ascii -t utf16le | base64 -w0`
-hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
-hyperv02_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS "powershell -ExecutionPolicy RemoteSigned -EncodedCommand $HYPERV_GET_DATA_IP" 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
+#IFS='' read -r -d '' PSCODE <<'_EOF'
+#$NetIPAddr = Get-NetIPAddress | Where-Object {$_.InterfaceAlias -like "*br100*" -and $_.AddressFamily -like "IPv4"}
+#$IPAddr = $NetIPAddr.IPAddress
+#Write-Host $IPAddr
+#_EOF
+#HYPERV_GET_DATA_IP=`echo "$PSCODE" | iconv -f ascii -t utf16le | base64 -w0`
+hyperv01_ip=`run_wsman_cmd $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned (Get-NetIPAddress -InterfaceAlias "*br100*" -AddressFamily "IPv4").IPAddress' 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
+hyperv02_ip=`run_wsman_cmd $hyperv02 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned (Get-NetIPAddress -InterfaceAlias "*br100*" -AddressFamily "IPv4").IPAddress' 2>&1 | grep -E -o '10\.250\.[0-9]{1,2}\.[0-9]{1,3}'`
 set -e
 
 echo `date -u +%H:%M:%S` "Data IP of $hyperv01 is $hyperv01_ip"
@@ -235,16 +235,16 @@ fi
 
 # Building devstack as a threaded job
 echo `date -u +%H:%M:%S` "Started to build devstack as a threaded job"
-nohup /usr/local/src/nova-ci/jobs/build_devstack.sh $hyperv01_ip $hyperv02_ip > /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID 2>&1 &
+nohup /usr/local/src/nova-ci-2016/jobs/build_devstack.sh $hyperv01_ip $hyperv02_ip > /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID 2>&1 &
 pid_devstack=$!
 
 # Building and joining HyperV nodes
 echo `date -u +%H:%M:%S` "Started building & joining Hyper-V node: $hyperv01"
-nohup /usr/local/src/nova-ci/jobs/build_hyperv.sh $hyperv01 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01 2>&1 &
+nohup /usr/local/src/nova-ci-2016/jobs/build_hyperv.sh $hyperv01 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01 2>&1 &
 pid_hv01=$!
 
 echo `date -u +%H:%M:%S` "Started building & joining Hyper-V node: $hyperv02"
-nohup /usr/local/src/nova-ci/jobs/build_hyperv.sh $hyperv02 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02 2>&1 &
+nohup /usr/local/src/nova-ci-2016/jobs/build_hyperv.sh $hyperv02 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02 2>&1 &
 pid_hv02=$!
 
 TIME_COUNT=0
