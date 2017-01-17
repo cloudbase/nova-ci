@@ -94,6 +94,7 @@ function run_ssh_cmd_with_retry () {
 }
 
 function join_hyperv (){
+    run_wsmancmd_with_retry $1 $2 $3 'powershell if (-Not (test-path '$LOG_DIR')){mkdir '$LOG_DIR'}'
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\nova-ci ; git clone https://github.com/cloudbase/nova-ci C:\OpenStack\nova-ci ; cd C:\OpenStack\nova-ci ; git checkout cambridge-2016 >> '$LOG_DIR'\create-environment-'$1'.log 2>&1'
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1'
     [ "$IS_DEBUG_JOB" == "yes" ] && run_wsmancmd_with_retry $1 $2 $3 '"powershell Write-Host Calling gerrit with zuul-site='$ZUUL_SITE' gerrit-site='$ZUUL_SITE' zuul-ref='$ZUUL_REF' zuul-change='$ZUUL_CHANGE' zuul-project='$ZUUL_PROJECT' >> '$LOG_DIR'\create-environment-'$1'.log 2>&1"'
