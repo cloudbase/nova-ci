@@ -278,9 +278,6 @@ if ($zuulChange -eq '273504') {
 
         pushd $buildDir\os-brick
 
-        git fetch https://git.openstack.org/openstack/os-brick refs/changes/22/272522/31
-        cherry_pick FETCH_HEAD
-
         & pip install $buildDir\os-brick
         popd
     }
@@ -292,13 +289,10 @@ ExecRetry {
         Get-ChildItem $buildDir\nova
     }
     pushd $buildDir\nova
-    if ($branchName -eq 'master') {
-        # This patch fixes os_type image property requirement
-        git fetch https://review.openstack.org/openstack/nova refs/changes/26/379326/1
-        cherry_pick FETCH_HEAD
-    }
+
     Write-Host "Installing openstack/nova..."
     & update-requirements.exe --source $buildDir\requirements .
+
     & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
     popd
