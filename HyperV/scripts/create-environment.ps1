@@ -269,16 +269,6 @@ ExecRetry {
     popd
 }
 
-ExecRetry {
-    pushd "$buildDir\os-win"
-    Write-Host "Installing OpenStack/os-win..."
-
-    & update-requirements.exe --source $buildDir\requirements .
-    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
-    if ($LastExitCode) { Throw "Failed to install openstack/os-win from repo" }
-    popd
-}
-
 if ($zuulChange -eq '273504') {
     ExecRetry {
         GitClonePull "$buildDir\os-brick" "https://git.openstack.org/openstack/os-brick.git" $branchName
@@ -302,6 +292,16 @@ ExecRetry {
 
     & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install nova fom repo" }
+    popd
+}
+
+ExecRetry {
+    pushd "$buildDir\os-win"
+    Write-Host "Installing OpenStack/os-win..."
+
+    & update-requirements.exe --source $buildDir\requirements .
+    & pip install -c $buildDir\requirements\upper-constraints.txt -U .
+    if ($LastExitCode) { Throw "Failed to install openstack/os-win from repo" }
     popd
 }
 
