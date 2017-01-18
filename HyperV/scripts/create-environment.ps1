@@ -143,6 +143,10 @@ if ($buildFor -eq "openstack/nova"){
     }
     Get-ChildItem $buildDir
     ExecRetry {
+        GitClonePull "$buildDir\os-win" "https://git.openstack.org/openstack/os-win.git" $branchName
+    }
+    Get-ChildItem $buildDir
+    ExecRetry {
         GitClonePull "$buildDir\requirements" "https://git.openstack.org/openstack/requirements.git" $branchName
     }
     Get-ChildItem $buildDir
@@ -187,7 +191,6 @@ $ErrorActionPreference = "Continue"
 & pip install cffi
 & pip install numpy
 & pip install pycrypto
-& pip install -U os-win
 & pip install amqp==1.4.9
 & pip install cffi==1.6.0
 $ErrorActionPreference = "Stop"
@@ -263,6 +266,18 @@ ExecRetry {
         & pip install -e $buildDir\networking-hyperv
     }
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
+    popd
+}
+
+ExecRetry {
+    pushd "$buildDir\os-win"
+    Write-Host "Installing OpenStack/os-win..."
+
+    git fetch git://git.openstack.org/openstack/os-win refs/changes/67/421867/1
+    git cherry-pick FETCH_HEAD
+
+    & pip install -c upper-constraints.txt -U .
+    if ($LastExitCode) { Throw "Failed to install openstack/os-win from repo" }
     popd
 }
 
