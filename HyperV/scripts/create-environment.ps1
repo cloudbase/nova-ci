@@ -17,7 +17,6 @@ $projectName = $buildFor.split('/')[-1]
 $scriptLocation = [System.IO.Path]::GetDirectoryName($myInvocation.MyCommand.Definition)
 . "$scriptLocation\config.ps1"
 . "$scriptLocation\utils.ps1"
-Write-host "remote config: $remoteConfigs"
 
 $hasProject = Test-Path $buildDir\$projectName
 $hasBuildDir = Test-Path $buildDir
@@ -155,11 +154,6 @@ $hasLogDir = Test-Path $openstackLogs
 if ($hasLogDir -eq $false){
     mkdir $openstackLogs
 }
-
-#$hasConfigDir = Test-Path $remoteConfigs\$hostname
-#if ($hasConfigDir -eq $false){
-#    mkdir $remoteConfigs\$hostname
-#}
 
 pushd C:\
 if (Test-Path $pythonArchive)
