@@ -12,47 +12,15 @@ ssh -o "UserKnownHostsFile /dev/null" -o "StrictHostKeyChecking no" -i $DEVSTACK
 
 set -f
 
-#run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned Copy-Item -Recurse C:\OpenStack\Log\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service nova-compute'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service neutron-hyperv-agent'
 run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\export-eventlog.ps1'
-#run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned cp -Recurse -Container  C:\OpenStack\Logs\Eventlog\* \\'$FLOATING_IP'\openstack\logs\'${hyperv01%%[.]*}'\'
-
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'systeminfo >> C:\openstack\logs\systeminfo.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'wmic qfe list >> C:\openstack\logs\windows_hotfixes.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'pip freeze >> C:\openstack\logs\pip_freeze.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'ipconfig /all >> C:\openstack\logs\ipconfig.log'
-
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-netadapter ^| Select-object * >> C:\openstack\logs\get_netadapter.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-vmswitch ^| Select-object * >> C:\openstack\logs\get_vmswitch.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-WmiObject win32_logicaldisk ^| Select-object * >> C:\openstack\logs\disk_free.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-netfirewallprofile ^| Select-Object * >> C:\openstack\logs\firewall.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-process ^| Select-Object * >> C:\openstack\logs\get_process.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-service ^| Select-Object * >> C:\openstack\logs\get_service.log'
-
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'sc qc nova-compute >> C:\openstack\logs\nova_compute_service.log'
-run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'sc qc neutron-hyperv-agent >> C:\openstack\logs\neutron_hyperv_agent_service.log'
+run_wsmancmd_with_retry $hyperv01 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\collect_systemlogs.ps1'
 
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service nova-compute'
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned Stop-Service neutron-hyperv-agent'
 run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\export-eventlog.ps1'
-#run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned cp -Recurse -Container  C:\OpenStack\Logs\Eventlog\* \\'$FLOATING_IP'\openstack\logs\'${hyperv02%%[.]*}'\'
-
-#run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned Copy-Item -Recurse C:\OpenStack\Log\* \\'$FLOATING_IP'\openstack\logs\'${hyperv02%%[.]*}'\'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'systeminfo >> C:\openstack\logs\systeminfo.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'wmic qfe list >> C:\openstack\logs\windows_hotfixes.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'pip freeze >> C:\openstack\logs\pip_freeze.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'ipconfig /all >> C:\openstack\logs\ipconfig.log'
-
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-netadapter ^| Select-object * >> C:\openstack\logs\get_netadapter.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-vmswitch ^| Select-object * >> C:\openstack\logs\get_vmswitch.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-WmiObject win32_logicaldisk ^| Select-object * >> C:\openstack\logs\disk_free.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-netfirewallprofile ^| Select-Object * >> C:\openstack\logs\firewall.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-process ^| Select-Object * >> C:\openstack\logs\get_process.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned get-service ^| Select-Object * >> C:\openstack\logs\get_service.log'
-
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'sc qc nova-compute >> C:\openstack\logs\nova_compute_service.log'
-run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'sc qc neutron-hyperv-agent >> C:\openstack\logs\neutron_hyperv_agent_service.log'
+run_wsmancmd_with_retry $hyperv02 $WIN_USER $WIN_PASS 'powershell -executionpolicy remotesigned C:\OpenStack\nova-ci\HyperV\scripts\collect_systemlogs.ps1'
 
 set +f
 echo "Collecting logs"
