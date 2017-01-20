@@ -2,6 +2,7 @@
 
 hyperv01=$1
 hyperv02=$2
+IS_DEBUG_JOB=$3
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/config.sh
@@ -121,9 +122,11 @@ function archive_tempest_files() {
 [ -d "$LOG_DST" ] && rm -rf "$LOG_DST"
 mkdir -p "$LOG_DST"
 
-echo "Stop devstack services"
-cd /home/ubuntu/devstack
-./unstack.sh
+if [ "$IS_DEBUG_JOB" != "yes" ]; then 
+    echo "Stop devstack services"
+    cd /home/ubuntu/devstack
+    ./unstack.sh
+fi
 
 set +e
 
