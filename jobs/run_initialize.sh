@@ -235,16 +235,16 @@ fi
 
 # Building devstack as a threaded job
 echo `date -u +%H:%M:%S` "Started to build devstack as a threaded job"
-nohup /usr/local/src/nova-ci-2016/jobs/build_devstack.sh $hyperv01_ip $hyperv02_ip > /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID 2>&1 &
+nohup /usr/local/src/nova-ci-2016/jobs/build_devstack.sh $hyperv01_ip $hyperv02_ip > /home/jenkins-slave/logs/devstack-build-log-$ZUUL_UUID.log 2>&1 &
 pid_devstack=$!
 
 # Building and joining HyperV nodes
 echo `date -u +%H:%M:%S` "Started building & joining Hyper-V node: $hyperv01"
-nohup /usr/local/src/nova-ci-2016/jobs/build_hyperv.sh $hyperv01 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01 2>&1 &
+nohup /usr/local/src/nova-ci-2016/jobs/build_hyperv.sh $hyperv01 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv01.log 2>&1 &
 pid_hv01=$!
 
 echo `date -u +%H:%M:%S` "Started building & joining Hyper-V node: $hyperv02"
-nohup /usr/local/src/nova-ci-2016/jobs/build_hyperv.sh $hyperv02 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02 2>&1 &
+nohup /usr/local/src/nova-ci-2016/jobs/build_hyperv.sh $hyperv02 > /home/jenkins-slave/logs/hyperv-build-log-$ZUUL_UUID-$hyperv02.log 2>&1 &
 pid_hv02=$!
 
 TIME_COUNT=0
