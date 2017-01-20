@@ -63,16 +63,6 @@ function archive_devstack_configs() {
     
     for i in ceilometer cinder glance keystone neutron nova swift openvswitch
     do
-        # mkdir -p $CONFIG_DST_DEVSTACK/$i || emit_error "L30: Failed to create $CONFIG_DST_DEVSTACK/$i"
-        # for j in `ls -A /etc/$i`
-        # do
-        #    if [ -d /etc/$i/$j ]
-        #    then
-        #        $TAR cvzf "$CONFIG_DST_DEVSTACK/$i/$j.tar.gz" "/etc/$i/$j"
-        #    else
-        #        $GZIP -c "/etc/$i/$j" > "$CONFIG_DST_DEVSTACK/$i/$j.gz" || emit_warning "L38: Failed to archive devstack configs"
-        #    fi
-        # done
         cp -r -L "/etc/$i" "$CONFIG_DST_DEVSTACK/$i"
     done
     for file in `find "$CONFIG_DST_DEVSTACK/$i" -type f`
@@ -118,10 +108,13 @@ function archive_hyperv_logs() {
     done
 }
 function archive_tempest_files() {
-    for i in `ls -A $TEMPEST_LOGS`
-    do
-        $GZIP "$TEMPEST_LOGS/$i" -c > "$LOG_DST/$i.gz" || emit_error "L133: Failed to archive tempest logs"
-    done
+    if [ -d "$TEMPEST_LOGS" ]
+    then
+        pushd "$TEMPEST_LOGS"
+        find . -type f -exec gzip "{}" \;
+        popd
+        cp -r "$TEMPEST_LOGS" "$LOG_DST"
+    fi
 }
 
 # Clean
