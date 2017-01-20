@@ -78,64 +78,43 @@ function GitClonePull($path, $url, $branch="master")
     }
 }
 
-
 function dumpeventlog($path){
-	
-	Get-Eventlog -list | Where-Object { $_.Entries -ne '0' } | ForEach-Object {
-		$logFileName = $_.LogDisplayName
-		$exportFileName =$path + "\eventlog_" + $logFileName + ".evt"
-		$exportFileName = $exportFileName.replace(" ","_")
-		$logFile = Get-WmiObject Win32_NTEventlogFile | Where-Object {$_.logfilename -eq $logFileName}
-		try{
-			$logFile.backupeventlog($exportFileName)
-		} catch {
-			Write-Host "Could not dump $_.LogDisplayName (it might not exist)."
-		}
-	}
-}
 
-function exporteventlog($path){
-
-	Get-Eventlog -list | Where-Object { $_.Entries -ne '0' } | ForEach-Object {
-		$logfilename = "eventlog_" + $_.LogDisplayName + ".txt"
-		$logfilename = $logfilename.replace(" ","_")
-		Get-EventLog -Logname $_.LogDisplayName | fl | out-file $path\$logfilename -ErrorAction SilentlyContinue
-	}
+    foreach ($i in (get-winevent -ListLog * |  ? {$_.RecordCount -gt 0 })) {
+        $logName = "eventlog_" + $i.LogName + ".evtx"
+        $logName = $logName.replace(" ","-").replace("/", "-").replace("\", "-")
+        Write-Host "exporting "$i.LogName" as "$logName
+        $bkup = Join-Path $path $logName
+        wevtutil epl $i.LogName $bkup
+    }
 }
 
 function exporthtmleventlog($path){
-	$css = Get-Content $eventlogcsspath -Raw
-	$js = Get-Content $eventlogjspath -Raw
-	$HTMLHeader = @"
+    $css = Get-Content $eventlogcsspath -Raw
+    $js = Get-Content $eventlogjspath -Raw
+    $HTMLHeader = @"
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <script type="text/javascript">$js</script>
 <style type="text/css">$css</style>
 "@
 
-	foreach ($i in (Get-EventLog -List | Where-Object { $_.Entries -ne '0' }).Log) {
-		$Report = Get-EventLog $i
-		$Report = $Report | ConvertTo-Html -Title "${i}" -Head $HTMLHeader -As Table
-		$Report = $Report | ForEach-Object {$_ -replace "<body>", '<body id="body">'}
-		$Report = $Report | ForEach-Object {$_ -replace "<table>", '<table class="sortable" id="table" cellspacing="0">'}
-		$logName = "eventlog_" + $i + ".html"
-		$logName = $logName.replace(" ","_")
-		$bkup = Join-Path $path $logName
-		$Report = $Report | Set-Content $bkup
-	}
-	#Also getting the hyper-v logs
-	$rep = Get-WinEvent -FilterHashtable @{LogName="Microsoft-Windows-Hyper-V*"}
-	$rep = $rep | ConvertTo-Html -Title "Hyper-V" -Head $HTMLHeader -As Table
- 	$rep = $rep | ForEach-Object {$_ -replace "<body>", '<body id="body">'}
-	$rep = $rep | ForEach-Object {$_ -replace "<table>", '<table class="sortable" id="table" cellspacing="0">'}
-	$logName = "eventlog_hyperv.html"
-	$bkup = Join-Path $path $logName
-	$rep = $rep | Set-Content $bkup
+    foreach ($i in (get-winevent -ListLog * |  ? {$_.RecordCount -gt 0 })) {
+        $Report = (get-winevent -LogName $i.LogName)
+        $logName = "eventlog_" + $i.LogName + ".html"
+        $logName = $logName.replace(" ","-").replace("/", "-").replace("\", "-")
+        Write-Host "exporting "$i.LogName" as "$logName
+        $Report = $Report | ConvertTo-Html -Title "${i}" -Head $HTMLHeader -As Table
+        $Report = $Report | ForEach-Object {$_ -replace "<body>", '<body id="body">'}
+        $Report = $Report | ForEach-Object {$_ -replace "<table>", '<table class="sortable" id="table" cellspacing="0">'}
+        $bkup = Join-Path $path $logName
+        $Report = $Report | Set-Content $bkup
+    }
 }
 
 function cleareventlog(){
-	Get-Eventlog -list | ForEach-Object {
-		Clear-Eventlog $_.LogDisplayName -ErrorAction SilentlyContinue
-	}
+    foreach ($i in (get-winevent -ListLog * |  ? {$_.RecordCount -gt 0 })) {
+        wevtutil cl $i.LogName
+    }
 }
 
 function log_message($message){

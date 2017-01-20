@@ -60,9 +60,9 @@ Remove-Item -Recurse -Force $buildDir\*
 Write-Host "Cleaning the virtualenv folder."
 Remove-Item -Recurse -Force $virtualenv
 Write-Host "Cleaning the logs folder."
-Remove-Item -Recurse -Force $openstackDir\Log\*
+Remove-Item -Recurse -Force $openstackLogs\*
 Write-Host "Cleaning the config folder."
-Remove-Item -Recurse -Force $openstackDir\etc\*
+Remove-Item -Recurse -Force $configDir\*
 Write-Host "Cleaning the Instances folder."
 Remove-Item -Recurse -Force $openstackDir\Instances\*
 Write-Host "Cleaning eventlog"
