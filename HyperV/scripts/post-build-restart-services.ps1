@@ -14,7 +14,8 @@ Stop-Service neutron-hyperv-agent
 
 Write-Host "post-build: Cleaning previous logs!"
 
-Remove-Item -Force C:\OpenStack\Log\*.log
+Remove-Item -Force "$openstackLogs\nova-compute.log"
+Remove-Item -Force "$openstackLogs\neutron-hyperv-agent.log"
 
 Write-Host "post-build: Starting the services!"
 
