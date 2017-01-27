@@ -8,7 +8,7 @@
 Write-Host "post-build: Starting the services!"
 
 $currDate = (Get-Date).ToString()
-Write-Host "$currDate Starting nova-compute service
+Write-Host "$currDate Starting nova-compute service"
 Try
 {
     Start-Service nova-compute
