@@ -339,7 +339,7 @@ if ($hasNeutronExec -eq $false){
     Throw "No neutron-hyperv-agent.exe found"
 }
 
-#Write-Host "Starting the services"
+Write-Host "Done building env"
 #
 #$currDate = (Get-Date).ToString()
 #Write-Host "$currDate Starting nova-compute service"
