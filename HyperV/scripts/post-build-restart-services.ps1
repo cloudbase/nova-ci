@@ -5,21 +5,10 @@
 . "C:\OpenStack\nova-ci\HyperV\scripts\config.ps1"
 . "C:\OpenStack\nova-ci\HyperV\scripts\utils.ps1"
 
-
-Write-Host "post-build: Stoping the services!"
-
-Stop-Service nova-compute
-
-Stop-Service neutron-hyperv-agent
-
-Write-Host "post-build: Cleaning previous logs!"
-
-Remove-Item -Force "$openstackLogs\nova-compute.log"
-Remove-Item -Force "$openstackLogs\neutron-hyperv-agent.log"
-
 Write-Host "post-build: Starting the services!"
 
-Write-Host "Starting nova-compute service"
+$currDate = (Get-Date).ToString()
+Write-Host "$currDate Starting nova-compute service
 Try
 {
     Start-Service nova-compute
@@ -34,7 +23,8 @@ Catch
 Start-Sleep -s 30
 if ($(get-service nova-compute).Status -eq "Stopped")
 {
-    Write-Host "We try to start:"
+    $currDate = (Get-Date).ToString()
+    Write-Host "$currDate We try to start:"
     Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\nova-compute.exe" -ArgumentList "--config-file $configDir\nova.conf"
     Try
     {
@@ -56,7 +46,8 @@ if ($(get-service nova-compute).Status -eq "Stopped")
     }
 }
 
-Write-Host "Starting neutron-hyperv-agent service"
+$currDate = (Get-Date).ToString()
+Write-Host "$currDate Starting neutron-hyperv-agent service"
 Try
 {
     Start-Service neutron-hyperv-agent
@@ -71,7 +62,8 @@ Catch
 Start-Sleep -s 30
 if ($(get-service neutron-hyperv-agent).Status -eq "Stopped")
 {
-    Write-Host "We try to start:"
+    $currDate = (Get-Date).ToString()
+    Write-Host "$currDate We try to start:"
     Write-Host Start-Process -PassThru -RedirectStandardError "$openstackLogs\process_error.txt" -RedirectStandardOutput "$openstackLogs\process_output.txt" -FilePath "$pythonDir\Scripts\neutron-hyperv-agent.exe" -ArgumentList "--config-file $configDir\neutron_hyperv_agent.conf"
     Try
     {
