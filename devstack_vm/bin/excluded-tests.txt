@@ -17,3 +17,6 @@ tempest.scenario.test_network_v6.TestGettingAddress
 
 # Removed heat code from devstack tree causes orchestration tests to fail https://github.com/openstack-dev/devstack/commit/77a7296248b2aae4ce878e33e05575748e7e4131
 tempest.api.orchestration
+
+# Removed test on 31/01/2017 https://trello.com/c/TvxiYkl1/61-bug-nova-volume-id-failed-to-reach-available-status
+tempest.api.compute.admin.test_volume_swap.TestVolumeSwap.test_volume_swap
