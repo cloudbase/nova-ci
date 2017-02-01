@@ -41,7 +41,7 @@ ZUUL_SITE=`echo "$ZUUL_URL" |sed 's/.\{2\}$//'`
 echo ZUUL_SITE=$ZUUL_SITE | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 NET_ID=$(nova net-list | grep private| awk '{print $2}')
 echo NET_ID=$NET_ID | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
-devstack_image="devstack-81v1"
+devstack_image="devstack-81v2"
 echo "devstack_image=$devstack_image"  | tee -a /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 #FLOATING_IP=$(nova floating-ip-create public | awk '{print $2}'|sed '/^$/d' | tail -n 1) || echo `date -u +%H:%M:%S` "Failed to alocate floating IP"
