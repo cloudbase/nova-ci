@@ -10,6 +10,7 @@ DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 set -x
 set -e
 sudo ifconfig eth1 promisc up
+sudo ip -f inet r replace default via 10.250.0.1 dev eth0
 
 HOSTNAME=$(hostname)
 
