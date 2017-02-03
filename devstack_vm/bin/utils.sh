@@ -133,7 +133,7 @@ function get_neutron_agent_hosts() {
     neutron agent-list |  awk 'BEGIN { FS = "[ ]*\\|[ ]+" }; {if (NR > 3 && $3 == agent_type && $5 == ":-)"){ print $4 }}' agent_type="$agent_type"
 }
 
-function exec_with_retry () {
+function exec_with_retry() {
     local max_retries=$1
     local interval=${2}
     local cmd=${@:3}
@@ -204,7 +204,7 @@ function check_copy_dir() {
     fi
 }
 
-function timestamp(){
+function timestamp() {
     echo `date -u +%H:%M:%S`
 }
 
@@ -218,7 +218,7 @@ function add_user_to_passwordless_sudoers() {
     fi
 }
 
-rotate_log () {
+function rotate_log() {
     local file="$1"
     local limit="$2"
     #We set $new_file as $file without extension 
@@ -239,4 +239,18 @@ rotate_log () {
         mv $file ${new_file}.1.txt
         touch $file
     fi
+}
+
+function cherry_pick() {
+    commit=$1
+    set +e
+    git cherry-pick $commit
+
+    if [ $? -ne 0 ]
+    then
+        echo "Ignoring failed git cherry-pick $commit"
+        git checkout --force
+    fi
+
+    set -e
 }
