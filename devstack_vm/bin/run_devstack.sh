@@ -56,9 +56,15 @@ fi
 
 git config --global user.email hyper-v_ci@microsoft.com
 git config --global user.name 'Hyper-V CI'
-cd $tests_dir
 
-set +e
+set +e 
+
+cd /opt/stack/cinder
+
+git fetch git://git.openstack.org/openstack/os-win refs/changes/87/421787/2 
+git cherry-pick FETCH_HEAD
+
+cd $tests_dir
 
 # Apply patch "wait for port status to be ACTIVE"
 git fetch git://git.openstack.org/openstack/tempest refs/changes/49/383049/10
