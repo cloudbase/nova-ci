@@ -63,7 +63,7 @@ set +e
 
 # Apply patch "wait for port status to be ACTIVE"
 if [[ "$patch" != "383049" ]]; then
-	git fetch https://git.openstack.org/openstack/tempest refs/changes/49/383049/10
+	git fetch https://git.openstack.org/openstack/tempest refs/changes/49/383049/11
 	cherry_pick FETCH_HEAD
 fi
 
