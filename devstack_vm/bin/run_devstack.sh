@@ -2,6 +2,7 @@
 
 hyperv01=$1
 hyperv02=$2
+patch=$3
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/config.sh
