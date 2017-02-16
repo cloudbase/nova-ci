@@ -241,6 +241,26 @@ function rotate_log() {
     fi
 }
 
+function git_timed {
+    local count=0
+    local timeout=0
+
+    if [[ -n "${GIT_TIMEOUT}" ]]; then
+        timeout=${GIT_TIMEOUT}
+    fi
+
+    until timeout -s SIGINT ${timeout} git "$@"; do
+        echo "Command exited with '$?' [git $@] ... retrying"
+        count=$(($count + 1))
+        echo "timeout ${count} for git call: [git $@]"
+        if [ $count -eq 3 ]; then
+            echo $LINENO "Maximum of 3 git retries reached"
+            exit 1
+        fi
+        sleep 5
+    done
+}
+
 function cherry_pick() {
     commit=$1
     set +e
