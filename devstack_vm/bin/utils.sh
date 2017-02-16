@@ -269,7 +269,7 @@ function cherry_pick() {
     if [ $? -ne 0 ]
     then
         echo "Ignoring failed git cherry-pick $commit"
-        git checkout --force
+        git cherry-pick --abort
     fi
 
     set -e
