@@ -130,12 +130,14 @@ fi
 
 set +e
 
-echo Getting Hyper-V logs
+echo "Getting Hyper-V logs for $hyperv01"
 get_win_files $hyperv01 "\OpenStack\logs" "$LOG_DST_HV/$hyperv01-compute01"
+echo "Getting Hyper-V logs for $hyperv02"
 get_win_files $hyperv02 "\OpenStack\logs" "$LOG_DST_HV/$hyperv02-compute02"
 
-echo Getting Hyper-V configs
+echo "Getting Hyper-V configs for $hyperv01"
 get_win_files $hyperv01 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv01-compute01"
+echo "Getting Hyper-V configs for $hyperv02"
 get_win_files $hyperv02 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv02-compute02"
 
 archive_devstack_logs
