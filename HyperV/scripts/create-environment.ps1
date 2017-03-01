@@ -298,8 +298,9 @@ ExecRetry {
 ExecRetry {
     pushd "$buildDir\os-win"
     Write-Host "Installing OpenStack/os-win..."
-
-    & pip install -U .
+    & update-requirements.exe --source $buildDir\requirements .
+    sls -n os-win $buildDir\requirements\upper-constraints.txt | select line > $buildDir\requirements\upper-constraints-oswin.txt
+    & pip install -c $buildDir\requirements\upper-constraints-oswin.txt -U .
     if ($LastExitCode) { Throw "Failed to install openstack/os-win from repo" }
     popd
 }
