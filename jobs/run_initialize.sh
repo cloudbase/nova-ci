@@ -177,7 +177,7 @@ if [ "$ZUUL_BRANCH" != "master" ]; then
 fi
 
 set +e
-VLAN_RANGE=`/usr/local/src/nova-ci/vlan_allocation.py -a $VMID`
+VLAN_RANGE=`/usr/local/src/nova-ci-2016/vlan_allocation.py -a $VMID`
 if [ ! -z "$VLAN_RANGE" ]; then
     run_ssh_cmd_with_retry ubuntu@$FLOATING_IP $DEVSTACK_SSH_KEY "sed -i 's/TENANT_VLAN_RANGE.*/TENANT_VLAN_RANGE='$VLAN_RANGE'/g' /home/ubuntu/devstack/local.conf" 3
 fi
