@@ -186,12 +186,10 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
 $ErrorActionPreference = "Continue"
 & easy_install -U pip
-& pip install setuptools==26.0.0
 & pip install pymi
 & pip install cffi
 & pip install numpy
 & pip install pycrypto
-& pip install amqp==1.4.9
 & pip install cffi==1.6.0
 $ErrorActionPreference = "Stop"
 
@@ -307,6 +305,8 @@ ExecRetry {
 
 # Temporary fix for os-win 
 pip install setuptools==33.1.1
+pip install kombu==4.0.1
+pip install amqp==2.1.3
 
 # Note: be careful as WMI queries may return only one element, in which case we
 # won't get an array. To make it easier, we can just make sure we always have an
