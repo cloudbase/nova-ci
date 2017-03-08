@@ -1,6 +1,6 @@
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 source /home/jenkins-slave/tools/keystonerc_admin
-source /usr/local/src/nova-ci/jobs/library.sh
+source /usr/local/src/nova-ci-2016/jobs/library.sh
 
 echo "devstack_params file:"
 ls -lia /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
@@ -26,7 +26,7 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
         
         echo "Removing devstack VM"
         nova delete "$VMID"
-        /usr/local/src/nova-ci/vlan_allocation.py -r $VMID
+        /usr/local/src/nova-ci-2016/vlan_allocation.py -r $VMID
 
         rm -f /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 fi
