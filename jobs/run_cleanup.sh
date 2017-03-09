@@ -1,6 +1,7 @@
+basedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 source /home/jenkins-slave/tools/keystonerc_admin
-source /usr/local/src/nova-ci-2016/jobs/library.sh
+source $basedir/library.sh
 
 echo "devstack_params file:"
 ls -lia /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
@@ -26,7 +27,7 @@ if [ "$IS_DEBUG_JOB" != "yes" ]
         
         echo "Removing devstack VM"
         nova delete "$VMID"
-        /usr/local/src/nova-ci-2016/vlan_allocation.py -r $VMID
+        $basedir/../vlan_allocation.py -r $VMID
 
         rm -f /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 fi
