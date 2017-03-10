@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-
+basedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 # Loading all the needed functions
-source /usr/local/src/nova-ci-2016/jobs/library.sh
+source $basedir/library.sh
 
 # Loading parameters
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt

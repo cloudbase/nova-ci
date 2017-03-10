@@ -1,6 +1,7 @@
+basedir=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 source /home/jenkins-slave/tools/keystonerc_admin
-source /usr/local/src/nova-ci-2016/jobs/library.sh
+source $basedir/library.sh
 
 logs_project=nova
 set +e
