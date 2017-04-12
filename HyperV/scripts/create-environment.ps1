@@ -306,7 +306,7 @@ ExecRetry {
 }
 
 # Temporary fix for os-win 
-pip install setuptools==33.1.1
+pip install setuptools==33.1.1 oslo.log==3.23.0
 
 if ($branchName -eq 'master') {
     pip install kombu==4.0.1
