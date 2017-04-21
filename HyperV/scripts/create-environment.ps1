@@ -267,17 +267,6 @@ ExecRetry {
     popd
 }
 
-if ($zuulChange -eq '273504') {
-    ExecRetry {
-        GitClonePull "$buildDir\os-brick" "https://git.openstack.org/openstack/os-brick.git" $branchName
-
-        pushd $buildDir\os-brick
-
-        & pip install $buildDir\os-brick
-        popd
-    }
-}
-
 ExecRetry {
     if ($isDebug -eq  'yes') {
         Write-Host "Content of $buildDir\nova"
