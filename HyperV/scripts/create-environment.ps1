@@ -286,8 +286,6 @@ ExecRetry {
     pushd $buildDir\nova
 
     Write-Host "Installing openstack/nova..."
-    git fetch git://git.openstack.org/openstack/nova refs/changes/83/443583/2
-    cherry_pick FETCH_HEAD
     & update-requirements.exe --source $buildDir\requirements .
 
     & pip install -c $buildDir\requirements\upper-constraints.txt -U .
