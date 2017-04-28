@@ -47,27 +47,31 @@ find . -name *pyc -print0 | xargs -0 rm -f
 # Update all repositories except the one testing the patch.
 for i in `ls -A`
 do
-	if [ "$i" != "$PROJECT_NAME" ]
+	if [[ "$i" != "$PROJECT_NAME" ]] && [[ -d $i ]]
 	then
-		pushd "$i"
-	        if [ -d ".git" ]
-        	then
-        		git reset --hard
-        		git clean -f -d
-        		git fetch
-        		git checkout "$ZUUL_BRANCH" || echo "Failed to switch branch $ZUUL_BRANCH"
-			git pull
-        	fi
-		echo "Folder: $BUILDDIR/$i"
-		echo "Git branch output:"
-		git branch
-		echo "Git Log output:"
-		if ! [[ $i =~ .*noVNC.* ]]
+		if pushd "$i"
 		then
-			git status
-			git log -10 --pretty=format:"%h - %an, %ae,  %ar : %s"
+	        	if [ -d ".git" ]
+        		then
+        			git reset --hard
+        			git clean -f -d
+        			git fetch
+        			git checkout "$ZUUL_BRANCH" || echo "Failed to switch branch $ZUUL_BRANCH"
+				git pull
+        		fi
+			echo "Folder: $BUILDDIR/$i"
+			echo "Git branch output:"
+			git branch
+			echo "Git Log output:"
+			if ! [[ $i =~ .*noVNC.* ]]
+			then
+				git status
+				git log -10 --pretty=format:"%h - %an, %ae,  %ar : %s"
+			fi
+			popd
+		else
+			echo "Error trying to update $i"
 		fi
-		popd
 	fi
 done
 
