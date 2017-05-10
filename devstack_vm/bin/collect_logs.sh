@@ -127,6 +127,12 @@ function archive_tempest_files() {
 [ -d "$LOG_DST" ] && rm -rf "$LOG_DST"
 mkdir -p "$LOG_DST"
 
+# get openstack services logs
+for u in `sudo systemctl list-unit-files | grep devstack | awk '{print $1}'`; do
+    name=$(echo $u | sed 's/devstack@/screen-/' | sed 's/\.service//')
+    sudo journalctl -o short-precise --unit $u | sudo tee /opt/stack/logs/$name.txt > /dev/null
+done
+
 if [ "$IS_DEBUG_JOB" != "yes" ]; then 
     echo "Stop devstack services"
     cd /home/ubuntu/devstack
@@ -144,12 +150,6 @@ echo "Getting Hyper-V configs for $hyperv01"
 get_win_files $hyperv01 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv01-compute01"
 echo "Getting Hyper-V configs for $hyperv02"
 get_win_files $hyperv02 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv02-compute02"
-
-# get openstack services logs
-for u in `sudo systemctl list-unit-files | grep devstack | awk '{print $1}'`; do
-    name=$(echo $u | sed 's/devstack@/screen-/' | sed 's/\.service//')
-    sudo journalctl -o short-precise --unit $u | sudo tee /opt/stack/logs/$name.txt > /dev/null
-done
 
 archive_devstack_logs
 archive_devstack_configs
