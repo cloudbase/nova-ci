@@ -32,8 +32,13 @@ function archive_devstack_logs() {
         if [ -h "$DEVSTACK_LOGS/$i" ]
         then
                 REAL=$(readlink "$DEVSTACK_LOGS/$i")
-                $GZIP -c "$REAL" > "$LOG_DST_DEVSTACK/$i.gz" || emit_warning "L38: Failed to archive devstack logs"
+                if [ -f "$REAL" ]; then
+                    $GZIP -c "$REAL" > "$LOG_DST_DEVSTACK/$i.gz" || emit_warning "L36: Failed to archive devstack logs"
+                fi
         fi
+    done
+    for screen_log in `ls -A $DEVSTACK_LOG_DIR | grep screen-*.txt`; do
+        $GZIP -c "$screen_log" > "$LOG_DST_DEVSTACK/$screen_log.log.gz" || emit_warning "L41: Failed to archive devstack logs"
     done
     $GZIP -c /var/log/mysql/error.log > "$LOG_DST_DEVSTACK/mysql_error.log.gz"
     $GZIP -c /var/log/cloud-init.log > "$LOG_DST_DEVSTACK/cloud-init.log.gz"
