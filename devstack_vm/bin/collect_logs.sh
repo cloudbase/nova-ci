@@ -38,7 +38,7 @@ function archive_devstack_logs() {
         fi
     done
     for screen_log in `ls -A $DEVSTACK_LOG_DIR | grep screen-.*.txt`; do
-        $GZIP -c "$DEVSTACK_LOG_DIR/$screen_log" > "$LOG_DST_DEVSTACK/$screen_log.log.gz" || emit_warning "L41: Failed to archive devstack logs"
+        $GZIP -c "$DEVSTACK_LOG_DIR/$screen_log" > "$LOG_DST_DEVSTACK/$screen_log.gz" || emit_warning "L41: Failed to archive devstack logs"
     done
     $GZIP -c /var/log/mysql/error.log > "$LOG_DST_DEVSTACK/mysql_error.log.gz"
     $GZIP -c /var/log/cloud-init.log > "$LOG_DST_DEVSTACK/cloud-init.log.gz"
