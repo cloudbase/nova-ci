@@ -35,6 +35,7 @@ iniset $TEMPEST_CONFIG compute allow_tenant_isolation True
 echo "Activating virtual env."
 set +u
 source $tests_dir/.tox/tempest/bin/activate
+pip install -c /opt/stack/requirements/upper-constraints.txt babel
 set -u
 
 tests_file=$(tempfile)
