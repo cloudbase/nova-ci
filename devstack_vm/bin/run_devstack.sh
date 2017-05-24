@@ -81,6 +81,10 @@ set -e
 
 cd /home/ubuntu/devstack
 git pull
+set +e
+git_timed fetch git://git.openstack.org/openstack-dev/devstack refs/changes/22/467522/1
+cherry_pick FETCH_HEAD
+set -e
 
 ./unstack.sh
 
