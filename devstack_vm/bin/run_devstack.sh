@@ -73,6 +73,10 @@ cherry_pick FETCH_HEAD
 git_timed fetch https://git.openstack.org/openstack/tempest refs/changes/13/433213/3
 cherry_pick FETCH_HEAD
 
+cd /opt/stack/nova
+git_timed fetch git://git.openstack.org/openstack/nova refs/changes/69/467369/1
+cherry_pick FETCH_HEAD
+
 set -e
 
 cd /home/ubuntu/devstack
