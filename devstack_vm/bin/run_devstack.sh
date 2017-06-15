@@ -80,6 +80,9 @@ git pull
 set +e
 git_timed fetch git://git.openstack.org/openstack-dev/devstack refs/changes/22/467522/2
 cherry_pick FETCH_HEAD
+
+git_timed fetch git://git.openstack.org/openstack-dev/devstack refs/changes/25/473525/1
+cherry_pick FETCH_HEAD
 set -e
 
 ./unstack.sh
