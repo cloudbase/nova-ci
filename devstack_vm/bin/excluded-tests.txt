@@ -22,3 +22,6 @@ tempest.api.orchestration
 tempest.api.compute.admin.test_volume_swap.TestVolumeSwap.test_volume_swap
 # This test started failing when https://review.openstack.org/#/c/442162/ got merged
 tempest.api.compute.admin.test_services.ServicesAdminTestJSON.test_get_service_by_service_and_host_name
+# This functionality is not supported yet
+tempest.api.compute.admin.test_server_diagnostics.ServerDiagnosticsTest
+tempest.api.compute.admin.test_server_diagnostics.ServerDiagnosticsV248Test
