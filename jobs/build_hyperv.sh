@@ -9,6 +9,7 @@ source $basedir/library.sh
 source /home/jenkins-slave/runs/devstack_params.$ZUUL_UUID.txt
 
 export LOG_DIR='C:\Openstack\logs\'
+export BUILD_DIR='C:\Openstack\build\'
 
 # building HyperV node
 echo $hyperv_node

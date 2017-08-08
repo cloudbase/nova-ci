@@ -21,4 +21,5 @@ $openstackLogs="$openstackDir\Logs"
 $eventlogPath="C:\OpenStack\Logs\Eventlog"
 $eventlogcsspath = "$templateDir\eventlog_css.txt"
 $eventlogjspath = "$templateDir\eventlog_js.txt"
-$downloadLocation = "http://10.0.110.1/"
+$downloadLocation = "http://144.76.59.195:8088/"
+

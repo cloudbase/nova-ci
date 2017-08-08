@@ -94,14 +94,15 @@ function run_ssh_cmd_with_retry () {
 }
 
 function join_hyperv (){
-    run_wsmancmd_with_retry $1 $2 $3 'powershell if (-Not (test-path '$LOG_DIR')){mkdir '$LOG_DIR'}'
-    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\nova-ci ; git clone https://github.com/cloudbase/nova-ci C:\OpenStack\nova-ci ; cd C:\OpenStack\nova-ci ; git checkout cambridge-2016 >> '$LOG_DIR'\create-environment.log 2>&1'
-    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1'
-    [ "$IS_DEBUG_JOB" == "yes" ] && run_wsmancmd_with_retry $1 $2 $3 '"powershell Write-Host Calling gerrit with zuul-site='$ZUUL_SITE' gerrit-site='$ZUUL_SITE' zuul-ref='$ZUUL_REF' zuul-change='$ZUUL_CHANGE' zuul-project='$ZUUL_PROJECT' >> '$LOG_DIR'\create-environment.log 2>&1"'
-    run_wsmancmd_with_retry $1 $2 $3 '"bash C:\OpenStack\nova-ci\HyperV\scripts\gerrit-git-prep.sh --zuul-site '$ZUUL_SITE' --gerrit-site '$ZUUL_SITE' --zuul-ref '$ZUUL_REF' --zuul-change '$ZUUL_CHANGE' --zuul-project '$ZUUL_PROJECT' >> '$LOG_DIR'\create-environment.log 2>&1"'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell if (-Not (test-path '$LOG_DIR')){mkdir '$LOG_DIR'} ; if (-Not (test-path '$BUILD_DIR')){mkdir '$BUILD_DIR'}'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\nova-ci ; git clone https://github.com/andreibacos/hetzner-nova-ci C:\OpenStack\nova-ci ; cd C:\OpenStack\nova-ci >> '$LOG_DIR'\create-environment.log 2>&1'
+#    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned pip install zuul==2.5.2'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned zuul-cloner -m C:\OpenStack\nova-ci\jobs\clonemap.yaml -v git://git.openstack.org '$ZUUL_PROJECT' --zuul-branch '$ZUUL_BRANCH' --zuul-ref '$ZUUL_REF' --zuul-url '$ZUUL_SITE'/p --workspace c:\openstack\build'
+
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\EnsureOpenStackServices.ps1 '$2' '$3' >> '$LOG_DIR'\create-environment.log 2>&1'
-    [ "$IS_DEBUG_JOB" == "yes" ] && run_wsmancmd_with_retry $1 $2 $3 '"powershell Write-Host Calling create-environment with devstackIP='$FIXED_IP' branchName='$ZUUL_BRANCH' buildFor='$ZUUL_PROJECT' zuulChange='$ZUUL_CHANGE' '$IS_DEBUG_JOB' >> '$LOG_DIR'\create-environment.log 2>&1"'
-    run_wsmancmd_with_retry $1 $2 $3 '"powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\create-environment.ps1 -devstackIP '$FIXED_IP' -branchName '$ZUUL_BRANCH' -buildFor '$ZUUL_PROJECT' -zuulChange '$ZUUL_CHANGE' '$IS_DEBUG_JOB' >> '$LOG_DIR'\create-environment.log 2>&1"'
+    [ "$IS_DEBUG_JOB" == "yes" ] && run_wsmancmd_with_retry $1 $2 $3 '"powershell Write-Host Calling create-environment with devstackIP='$DEVSTACK_IP' branchName='$ZUUL_BRANCH' buildFor='$ZUUL_PROJECT' zuulChange='$ZUUL_CHANGE' '$IS_DEBUG_JOB' >> '$LOG_DIR'\create-environment.log 2>&1"'
+    run_wsmancmd_with_retry $1 $2 $3 '"powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\create-environment.ps1 -devstackIP '$DEVSTACK_IP' -branchName '$ZUUL_BRANCH' -buildFor '$ZUUL_PROJECT' -zuulChange '$ZUUL_CHANGE' '$IS_DEBUG_JOB' >> '$LOG_DIR'\create-environment.log 2>&1"'
 }
 
 function teardown_hyperv () {
@@ -143,3 +144,4 @@ function poll_shh () {
 
 	try_port $IP 22
 }
+

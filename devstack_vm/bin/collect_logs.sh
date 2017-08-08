@@ -1,8 +1,7 @@
 #!/bin/bash
 
 hyperv01=$1
-hyperv02=$2
-IS_DEBUG_JOB=$3
+IS_DEBUG_JOB=$2
 
 DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
 . $DIR/config.sh
@@ -136,20 +135,16 @@ done
 if [ "$IS_DEBUG_JOB" != "yes" ]; then 
     echo "Stop devstack services"
     cd /home/ubuntu/devstack
-    ./unstack.sh
+    ./unstack.sh > /dev/null 2>&1
 fi
 
 set +e
 
 echo "Getting Hyper-V logs for $hyperv01"
 get_win_files $hyperv01 "\OpenStack\logs" "$LOG_DST_HV/$hyperv01-compute01"
-echo "Getting Hyper-V logs for $hyperv02"
-get_win_files $hyperv02 "\OpenStack\logs" "$LOG_DST_HV/$hyperv02-compute02"
 
 echo "Getting Hyper-V configs for $hyperv01"
 get_win_files $hyperv01 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv01-compute01"
-echo "Getting Hyper-V configs for $hyperv02"
-get_win_files $hyperv02 "\OpenStack\etc" "$CONFIG_DST_HV/$hyperv02-compute02"
 
 archive_devstack_logs
 archive_devstack_configs

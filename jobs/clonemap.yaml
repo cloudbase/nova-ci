@@ -1,0 +1,4 @@
+clonemap:
+ - name: 'openstack/(.*)'
+   dest: '\1'
+

@@ -32,36 +32,42 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 
 $pip_conf_content = @"
 [global]
-index-url = http://10.20.1.8:8080/cloudbase/CI/+simple/
+index-url = http://144.76.59.195:8099/cloudbase/CI/+simple/
 [install]
-trusted-host = 10.20.1.8
+trusted-host = 144.76.59.195
 "@
 
 $ErrorActionPreference = "SilentlyContinue"
+#disable firewall
+Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled False
 
 # Do a selective teardown
-Write-Host "Ensuring nova and neutron services are stopped."
-Stop-Service -Name nova-compute -Force
-Stop-Service -Name neutron-hyperv-agent -Force
+#Write-Host "Ensuring nova and neutron services are stopped."
+#Stop-Service -Name nova-compute -Force
+#Stop-Service -Name neutron-hyperv-agent -Force
 
-Write-Host "Stopping any possible python processes left."
-Stop-Process -Name python -Force
+#Write-Host "Stopping any possible python processes left."
+#Stop-Process -Name python -Force
 
 # At the moment, nova may leak planned vms in case of failed live migrations.
 # We'll have to clean them up, otherwise spawning instances at the same
 # location will fail.
-destroy_planned_vms
+#destroy_planned_vms
 
-if (Get-Process -Name nova-compute){
-    Throw "Nova is still running on this host"
-}
+#if (Get-Process -Name nova-compute){
+#    Throw "Nova is still running on this host"
+#}
 
-if (Get-Process -Name neutron-hyperv-agent){
-    Throw "Neutron is still running on this host"
-}
+#if (Get-Process -Name neutron-hyperv-agent){
+#    Throw "Neutron is still running on this host"
+#}
 
-if (Get-Process -Name python){
-    Throw "Python processes still running on this host"
+#if (Get-Process -Name python){
+#    Throw "Python processes still running on this host"
+#}
+
+if (-Not (Test-Path c:\openstack\Instances)){
+    mkdir c:\openstack\Instances
 }
 
 $ErrorActionPreference = "Stop"
@@ -76,13 +82,13 @@ if (-not (get-service nova-compute -ErrorAction SilentlyContinue))
     Throw "Nova Compute Service not registered"
 }
 
-if ($(Get-Service nova-compute).Status -ne "Stopped"){
-    Throw "Nova service is still running"
-}
+#if ($(Get-Service nova-compute).Status -ne "Stopped"){
+#    Throw "Nova service is still running"
+#}
 
-if ($(Get-Service neutron-hyperv-agent).Status -ne "Stopped"){
-    Throw "Neutron service is still running"
-}
+#if ($(Get-Service neutron-hyperv-agent).Status -ne "Stopped"){
+#    Throw "Neutron service is still running"
+#}
 
 Write-Host "Cleaning up the config folder."
 if ($hasConfigDir -eq $false) {
@@ -111,7 +117,7 @@ if ($hasBinDir -eq $false){
 }
 
 if (($hasMkisoFs -eq $false) -or ($hasQemuImg -eq $false)){
-    Invoke-WebRequest -Uri "http://10.20.1.14:8080/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
+    Invoke-WebRequest -Uri "http://144.76.59.195:8088/openstack_bin.zip" -OutFile "$bindir\openstack_bin.zip"
     [System.IO.Compression.ZipFile]::ExtractToDirectory("$bindir\openstack_bin.zip", "$bindir")
     Remove-Item -Force "$bindir\openstack_bin.zip"
 }
@@ -129,8 +135,10 @@ if ($isDebug -eq  'yes') {
     Get-ChildItem $buildDir
 }
 
-git config --global user.email "hyper-v_ci@microsoft.com"
-git config --global user.name "Hyper-V CI"
+#git config --global user.email "hyper-v_ci@microsoft.com"
+git config --global user.email "m.capsali@gmail.com"
+#git config --global user.name "Hyper-V CI"
+git config --global user.name "capsali"
 
 
 if ($buildFor -eq "openstack/nova"){
@@ -164,7 +172,7 @@ if (Test-Path $pythonArchive)
 {
     Remove-Item -Force $pythonArchive
 }
-Invoke-WebRequest -Uri http://10.20.1.14:8080/python.zip -OutFile $pythonArchive
+Invoke-WebRequest -Uri http://144.76.59.195:8088/python.zip -OutFile $pythonArchive
 if (Test-Path $pythonDir)
 {
     Cmd /C "rmdir /S /Q $pythonDir"
@@ -194,16 +202,6 @@ $ErrorActionPreference = "Continue"
 $ErrorActionPreference = "Stop"
 
 popd
-
-$hasPipConf = Test-Path "$env:APPDATA\pip"
-if ($hasPipConf -eq $false){
-    mkdir "$env:APPDATA\pip"
-}
-else 
-{
-    Remove-Item -Force "$env:APPDATA\pip\*"
-}
-Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
 cp $templateDir\distutils.cfg "$pythonDir\Lib\distutils\distutils.cfg"
 
@@ -344,3 +342,4 @@ if ($hasNeutronExec -eq $false){
 }
 
 Write-Host 'Done building env'
+
