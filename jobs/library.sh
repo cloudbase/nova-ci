@@ -95,7 +95,7 @@ function run_ssh_cmd_with_retry () {
 
 function join_hyperv (){
     run_wsmancmd_with_retry $1 $2 $3 'powershell if (-Not (test-path '$LOG_DIR')){mkdir '$LOG_DIR'} ; if (-Not (test-path '$BUILD_DIR')){mkdir '$BUILD_DIR'}'
-    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\nova-ci ; git clone https://github.com/andreibacos/hetzner-nova-ci C:\OpenStack\nova-ci ; cd C:\OpenStack\nova-ci >> '$LOG_DIR'\create-environment.log 2>&1'
+    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned Remove-Item -Recurse -Force C:\OpenStack\nova-ci ; git clone https://github.com/cloudbase/nova-ci C:\OpenStack\nova-ci ; cd C:\OpenStack\nova-ci; git checkout hetzner >> '$LOG_DIR'\create-environment.log 2>&1'
 #    run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned C:\OpenStack\nova-ci\HyperV\scripts\teardown.ps1'
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned pip install zuul==2.5.2'
     run_wsmancmd_with_retry $1 $2 $3 'powershell -ExecutionPolicy RemoteSigned zuul-cloner -m C:\OpenStack\nova-ci\jobs\clonemap.yaml -v git://git.openstack.org '$ZUUL_PROJECT' --zuul-branch '$ZUUL_BRANCH' --zuul-ref '$ZUUL_REF' --zuul-url '$ZUUL_SITE'/p --workspace c:\openstack\build'
