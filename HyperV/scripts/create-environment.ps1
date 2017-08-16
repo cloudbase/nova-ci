@@ -258,11 +258,7 @@ ExecRetry {
     pushd $buildDir\networking-hyperv
     Write-Host "Installing openstack/networking-hyperv..."
     & update-requirements.exe --source $buildDir\requirements .
-    if (($branchName -eq 'stable/liberty') -or ($branchName -eq 'stable/mitaka')) {
-        & pip install -c $buildDir\requirements\upper-constraints.txt -U .
-    } else {
-        & pip install -e $buildDir\networking-hyperv
-    }
+    & pip install -e $buildDir\networking-hyperv
     if ($LastExitCode) { Throw "Failed to install networking-hyperv from repo" }
     popd
 }
@@ -313,10 +309,6 @@ $cpu_array = ([array](gwmi -class Win32_Processor))
 $cores_count = $cpu_array.count * $cpu_array[0].NumberOfCores
 $novaConfig = (gc "$templateDir\nova.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser)
 $neutronConfig = (gc "$templateDir\neutron_hyperv_agent.conf").replace('[DEVSTACK_IP]', "$devstackIP").Replace('[LOGDIR]', "$openstackLogs").Replace('[RABBITUSER]', $rabbitUser).replace('[CORES_COUNT]', "$cores_count")
-
-if (($branchName -ne 'stable/liberty') -and ($branchName -ne 'stable/mitaka')) {
-    $novaConfig = $novaConfig.replace('network_api_class', '#network_api_class')
-}
 
 Set-Content $configDir\nova.conf $novaConfig
 if ($? -eq $false){

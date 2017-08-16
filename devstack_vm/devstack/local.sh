@@ -4,7 +4,7 @@ set -e
 echo "Before updating nova flavors:"
 nova flavor-list
 
-if [ "$branch" == "stable/newton" ] || [ "$branch" == "stable/liberty" ] || [ "$branch" == "stable/mitaka" ]; then
+if [ "$branch" == "stable/newton" ] ; then
     nova flavor-delete 42
     nova flavor-delete 84
     nova flavor-delete 451
