@@ -294,10 +294,9 @@ ExecRetry {
     popd
 }
 
-# Temporary fix for os-win 
-pip install setuptools==33.1.1 oslo.log==3.23.0
-
 if ($branchName -eq 'master') {
+    # Temporary fix for os-win 
+    pip install setuptools==33.1.1 oslo.log==3.23.0
     pip install kombu==4.0.1
     pip install amqp==2.1.3
 }
