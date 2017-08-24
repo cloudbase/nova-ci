@@ -294,13 +294,6 @@ ExecRetry {
     popd
 }
 
-if ($branchName -eq 'master') {
-    # Temporary fix for os-win 
-    pip install setuptools==33.1.1 oslo.log==3.23.0
-    pip install kombu==4.0.1
-    pip install amqp==2.1.3
-}
-
 # Note: be careful as WMI queries may return only one element, in which case we
 # won't get an array. To make it easier, we can just make sure we always have an
 # array.
