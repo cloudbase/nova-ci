@@ -165,8 +165,6 @@ fi
 
 set -e
 
-run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY "sed -i 's/export OS_AUTH_URL.*/export OS_AUTH_URL=http:\/\/127.0.0.1\/identity/g' /home/ubuntu/keystonerc" 3
-
 # update repos
 run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY "/home/ubuntu/bin/update_devstack_repos.sh --branch $ZUUL_BRANCH --build-for $ZUUL_PROJECT" 1
 
@@ -260,12 +258,12 @@ fi
 post_build_restart_hyperv_services $HV1_IP $WIN_USER $WIN_PASS
 
 # Check for nova join (must equal 2)
-run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NOVA_COUNT=$(nova service-list | grep nova-compute | grep -c -w up); if [ "$NOVA_COUNT" != 1 ];then nova service-list; exit 1;fi' 12
-run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; nova service-list' 1
+run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/devstack/openrc admin admin; NOVA_COUNT=$(nova service-list | grep nova-compute | grep -c -w up); if [ "$NOVA_COUNT" != 1 ];then nova service-list; exit 1;fi' 12
+run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/devstack/openrc admin admin; nova service-list' 1
 
 # Check for neutron join (must equal 2)
-run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; NEUTRON_COUNT=$(neutron agent-list | grep -c "HyperV agent.*:-)"); if [ "$NEUTRON_COUNT" != 1 ];then neutron agent-list; exit 1;fi' 12
-run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/keystonerc; neutron agent-list' 1
+run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/devstack/openrc admin admin; NEUTRON_COUNT=$(neutron agent-list | grep -c "HyperV agent.*:-)"); if [ "$NEUTRON_COUNT" != 1 ];then neutron agent-list; exit 1;fi' 12
+run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'source /home/ubuntu/devstack/openrc admin admin; neutron agent-list' 1
 
 run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY 'mkdir /opt/stack/logs/screen || echo /opt/stack/logs/screen already present' 1
 

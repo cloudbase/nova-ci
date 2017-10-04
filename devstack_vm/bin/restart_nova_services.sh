@@ -1,5 +1,5 @@
 #!/bin/bash
-source /home/ubuntu/keystonerc
+source /home/ubuntu/devstack/openrc admin admin
 TOP_DIR=/home/ubuntu/devstack
 source $TOP_DIR/functions
 source $TOP_DIR/inc/meta-config
