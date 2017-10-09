@@ -26,3 +26,4 @@ tempest.api.compute.admin.test_services.ServicesAdminTestJSON.test_get_service_b
 tempest.api.compute.admin.test_server_diagnostics.ServerDiagnosticsTest
 tempest.api.compute.admin.test_server_diagnostics.ServerDiagnosticsV248Test
 tempest.scenario.test_object_storage_basic_ops.TestObjectStorageBasicOps.test_swift_acl_anonymous_download
+tempest.api.volume.test_volumes_extend.VolumesExtendAttachedTest
