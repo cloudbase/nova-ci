@@ -192,6 +192,9 @@ run_ssh_cmd_with_retry ubuntu@$DEVSTACK_IP $DEVSTACK_SSH_KEY "chmod a+x /home/ub
 # Wait for hyperv to restart and check connectivity
 #run_wsman_cmd_with_retry $HV1_IP $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned ipconfig'
 
+# make sure timezone is set to utc
+run_wsman_cmd $HV1_IP $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned set-timezone -id UTC'
+
 # Create vswitch br100 and add data IP
 echo "Creating vswitch br100 on $HV1_NAME"
 run_wsman_cmd $HV1_IP $WIN_USER $WIN_PASS 'powershell -ExecutionPolicy RemoteSigned New-VMSwitch -Name br100 -AllowManagementOS $true -NetAdapterName \"Ethernet1\"'
