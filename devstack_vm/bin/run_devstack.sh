@@ -30,6 +30,8 @@ sudo mkdir -p /root/.pip
 sudo cp $HOME/.pip/pip.conf /root/.pip/
 sudo chown -R root:root /root/.pip
 
+sudo apt install libpcre3-dev
+
 # Update packages to latest version
 sudo pip install -U six
 sudo pip install -U kombu
