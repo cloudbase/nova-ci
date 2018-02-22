@@ -38,11 +38,6 @@ source $tests_dir/.tox/tempest/bin/activate
 pip install -c /opt/stack/requirements/upper-constraints.txt babel
 set -u
 
-tests_file=$(tempfile)
-$basedir/get-tests.sh $tests_dir > $tests_file
-
-echo "Started running tests."
-
 if [ ! -d "$tests_dir/.stestr" ]; then
     push_dir
     cd $tests_dir
@@ -50,6 +45,11 @@ if [ ! -d "$tests_dir/.stestr" ]; then
     stestr init
     pop_dir
 fi
+
+echo "Running tests"
+
+tests_file=$(tempfile)
+$basedir/get-tests.sh $tests_dir > $tests_file
 
 $basedir/parallel-test-runner.sh $tests_file $tests_dir $log_file \
     $parallel_tests $max_attempts || true
