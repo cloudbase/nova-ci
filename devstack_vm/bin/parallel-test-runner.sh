@@ -17,7 +17,7 @@ function run_test_retry(){
 
     while : ; do
         > $tmp_log_file
-        testr run --subunit --load-list=$tests_file > $tmp_log_file 2>&1
+        stestr run --subunit --load-list=$tests_file > $tmp_log_file 2>&1
         subunit-stats $tmp_log_file > /dev/null
         exit_code=$?
         ((i++))

@@ -44,4 +44,4 @@ if [ ! "$exclude_regex" ]; then
 fi
 
 cd $tests_dir
-testr list-tests | grep $include_regex | grep -v $exclude_regex
+stestr list | grep $include_regex | grep -v $exclude_regex
