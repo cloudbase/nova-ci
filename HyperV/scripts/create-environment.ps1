@@ -244,6 +244,7 @@ ExecRetry {
     Write-Host "Installing openstack/neutron..."
     git fetch git://git.openstack.org/openstack/neutron refs/changes/33/468833/1
     cherry_pick FETCH_HEAD
+    & update-requirements.exe --source $buildDir\requirements .
     & edit-constraints.exe $buildDir\requirements\upper-constraints.txt -- neutron ""
     & pip install -c $buildDir\requirements\upper-constraints.txt -U .
     if ($LastExitCode) { Throw "Failed to install neutron from repo" }
