@@ -228,9 +228,9 @@ if ($isDebug -eq  'yes') {
 
 ExecRetry {
     pushd "$buildDir\requirements"
+    (gc upper-constraints.txt) -replace "^pbr.*", "pbr===3.1.1" | Set-Content upper-constraints.txt
     Write-Host "Installing OpenStack/Requirements..."
     & pip install -c upper-constraints.txt -U .
-    & edit-constraints.exe $buildDir\requirements\upper-constraints.txt -- pbr "pbr===3.1.1"
     & pip install -c upper-constraints.txt -U pbr virtualenv httplib2 prettytable>=0.7 setuptools
     
     if ($LastExitCode) { Throw "Failed to install openstack/requirements from repo" }
