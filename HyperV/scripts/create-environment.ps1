@@ -194,6 +194,7 @@ Add-Content "$env:APPDATA\pip\pip.ini" $pip_conf_content
 
 $ErrorActionPreference = "Continue"
 & easy_install -U pip==9.0.1
+& pip install setuptools==26.0.0
 & pip install pymi
 & pip install cffi
 & pip install numpy
