@@ -29,3 +29,5 @@ tempest.scenario.test_object_storage_basic_ops.TestObjectStorageBasicOps.test_sw
 tempest.api.volume.test_volumes_extend.VolumesExtendAttachedTest
 tempest.api.compute.volumes.test_attach_volume.AttachVolumeTestJSON.test_list_get_volume_attachments
 tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_rebuild_server
+# Feature not available
+tempest.api.compute.servers.test_device_tagging.TaggedAttachmentsTest.test_tagged_attachment
