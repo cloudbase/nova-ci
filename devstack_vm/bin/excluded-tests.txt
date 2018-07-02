@@ -31,3 +31,4 @@ tempest.api.compute.volumes.test_attach_volume.AttachVolumeTestJSON.test_list_ge
 tempest.api.compute.servers.test_server_actions.ServerActionsTestJSON.test_rebuild_server
 # Feature not available
 tempest.api.compute.servers.test_device_tagging.TaggedAttachmentsTest.test_tagged_attachment
+tempest.api.compute.servers.test_servers.ServerShowV263Test.test_show_update_rebuild_list_server
